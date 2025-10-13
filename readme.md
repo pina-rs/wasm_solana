@@ -22,13 +22,13 @@ This repository contains several crates that make it easier to interact with Sol
 
 | Crate                                                 | Version | Description                                                               |
 | ----------------------------------------------------- | ------- | ------------------------------------------------------------------------- |
-| [`memory_wallet`](./crates/memory_wallet)             | 0.1.16  | A memory based wallet standard implementation primarily used for testing. |
+| [`memory_wallet`](./crates/memory_wallet)             | 0.1     | A memory based wallet standard implementation primarily used for testing. |
 | [`test_utils_insta`](./crates/test_utils_insta)       | 0.1     | Test utilities for working with `insta` redactions                        |
-| [`test_utils_keypairs`](./crates/test_utils_keypairs) | 0.1     | Test utilities for working with pre defined keypairs                      |
+| [`test_utils_keypairs`](./crates/test_utils_keypairs) | 0.1     | Test utilities for working with pre-defined keypairs                      |
 | [`test_utils_solana`](./crates/test_utils_solana)     | 0.5     | Testing utilities for Solana programs                                     |
-| [`test_utils_anchor`](./crates/test_utils_anchor)     | 0.5     | Testing utilities specific to Anchor programs                             |
-| [`wasm_client_anchor`](./crates/wasm_client_anchor)   | 0.7.0   | WebAssembly client for interacting with Anchor programs                   |
-| [`wasm_client_solana`](./crates/wasm_client_solana)   | 0.7.0   | WebAssembly client for interacting with Solana programs                   |
+| [`test_utils_anchor`](./crates/test_utils_anchor)     | 0.2     | Testing utilities specific to Anchor programs                             |
+| [`wasm_client_anchor`](./crates/wasm_client_anchor)   | 0.9     | WebAssembly client for interacting with Anchor programs                   |
+| [`wasm_client_solana`](./crates/wasm_client_solana)   | 0.9     | WebAssembly client for interacting with Solana programs                   |
 
 ## Why?
 

@@ -2,80 +2,121 @@
 
 <br />
 
-> A wasm compatible anchor client.
+> A Wasm-compatible, type-safe client for interacting with Anchor programs.
 
 <br />
 
 [![Crate][crate-image]][crate-link] [![Docs][docs-image]][docs-link] [![Status][ci-status-image]][ci-status-link] [![Unlicense][unlicense-image]][unlicense-link] [![codecov][codecov-image]][codecov-link]
 
+This crate provides a client for Anchor programs that can be compiled to WebAssembly. It uses a macro-based system to generate type-safe client structs with a builder pattern for each instruction, making it easy and safe to interact with your on-chain programs from any Rust environment, including browsers.
+
 ## Installation
 
-To install you can used the following command:
-
-```bash
-cargo add wasm_client_anchor
-```
-
-Or directly add the following to your `Cargo.toml`:
+Add the following to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-wasm_client_anchor = "0.8" # replace with the latest version
+wasm_client_anchor = "0.9"
 ```
 
 ### Features
 
-This crate provides the following features:
+- `js`: Enables `wasm-bindgen` support for use in browser environments.
+- `ssr`: Enables `reqwest` and `tokio` support for use in server-side or native environments.
 
-- `js`: Enables the use of the `wasm-bindgen` crate for the `js` target. This is useful for using the crate in a browser environment.
-- `ssr`: Enables the use of the `reqwest` and `tokio` crates for using in a server or non-browser environment.
+## Compatibility
 
-## Usage
+This crate is compatible with **Anchor v0.32.1**.
 
-Use `AnchorProgram` to interact directly with anchor programs.
+## How It Works
+
+The core of this library is a set of macros that you use to generate a client for your specific Anchor program. This process involves two main steps:
+
+1. **Code Generation**: You create a small client crate (or module) where you use the provided macros to generate the program client struct and request builders for each instruction.
+2. **Usage**: In your application (e.g., a Yew/Leptos component or a server-side process), you use the generated client to build and send transactions.
+
+### 1. Code Generation
+
+First, define a client for your Anchor program. Let's assume your Anchor program is in a crate named `my_anchor_program`. You would create a new `lib.rs` file for your client like this:
 
 ```rust
-use memory_wallet::AnchorProgram;
-use memory_wallet::AnchorRequestMethods;
-use memory_wallet::WalletAnchor;
-use solana_sdk::instruction::AccountMeta;
-use solana_sdk::instruction::Instruction;
-use solana_sdk::pubkey;
-use solana_sdk::signature::Signature;
-use solana_sdk::transaction::VersionedTransaction;
-use wasm_client_anchor::AnchorClientResult;
+// In your client crate (e.g., `my_anchor_program_client/src/lib.rs`)
 
-async fn run() -> AnchorClientResult<()> {
-	let program_id = pubkey!("9xQeWvG816bUx9EPjHmaT23yvVM2ZWbrrpZb9PusVFin");
-	let anchor_program = AnchorProgram::builder()
-		.rpc(rpc)
-		.wallet(wallet)
-		.program_id(program_id)
+use wasm_client_anchor::create_program_client;
+use wasm_client_anchor::create_program_client_macro;
+
+// 1. Generate the main client struct, pointing to your program's ID
+create_program_client!(my_anchor_program::ID, MyProgramClient);
+
+// 2. Create a macro that will generate request builders
+create_program_client_macro!(my_anchor_program, MyProgramClient);
+
+// 3. For each instruction in your program, generate a request builder.
+//    - Use "optional:args" if the instruction struct has no fields.
+//    - Omit it if the instruction struct has fields.
+my_program_client_request_builder!(Initialize, "optional:args");
+my_program_client_request_builder!(DoSomething);
+```
+
+### 2. Usage
+
+Once the client is generated, you can use it in your application to interact with the program.
+
+```rust
+use memory_wallet::MemoryWallet;
+use my_anchor_program_client::IntoMyProgramClient;
+use my_anchor_program_client::MyProgramClient;
+use solana_sdk::signature::Keypair;
+use wasm_client_solana::DEVNET;
+use wasm_client_solana::SolanaRpcClient;
+
+async fn run() -> anyhow::Result<()> {
+	// Setup your RPC client and a wallet
+	let rpc = SolanaRpcClient::new(DEVNET);
+	let keypair = Keypair::new();
+	let mut wallet = MemoryWallet::new(rpc.clone(), &[keypair]);
+	wallet.connect().await?;
+
+	// Instantiate your generated program client
+	let program_client: MyProgramClient<_> = MyProgramClient::builder()
+		.wallet(wallet.clone())
+		.rpc(rpc.clone())
+		.build()
+		.into(); // Convert from the base AnchorProgram
+
+	// --- Example 1: Call a single instruction ---
+	let initialize_request = program_client
+		.initialize() // The generated method for the `Initialize` instruction
+		.accounts(my_anchor_program::accounts::Initialize {
+			user: wallet.pubkey(),
+			// ... other accounts
+		})
 		.build();
 
-	// sample instruction data
-	let data = vec![0u8; 10];
-	// sample accounts needed for the anchor program instruction
-	let accounts = vec![AccountMeta::new(
-		pubkey!("SysvarC1ock11111111111111111111111111111111"),
-		false,
-		true,
-	)];
+	let signature = initialize_request.sign_and_send_transaction().await?;
+	println!("Initialize Signature: {}", signature);
 
-	// create an anchor request using the builder pattern
-	let anchor_request = client.request().data(data).accounts(accounts).build();
+	// --- Example 2: Compose multiple instructions ---
+	let signer_keypair = Keypair::new();
+	let composition_request = program_client
+		.do_something() // First instruction
+		.args(42) // Set instruction arguments
+		.accounts(my_anchor_program::accounts::DoSomething {
+			signer: signer_keypair.pubkey(),
+			// ...
+		})
+		.signer(&signer_keypair) // Add extra signers
+		.build()
+		.compose() // Chain to the next instruction
+		.initialize()
+		.accounts(my_anchor_program::accounts::Initialize {
+			user: wallet.pubkey(),
+			// ...
+		})
+		.build();
 
-	// get the instructions to be sent
-	let instructions: Vec<Instruction> = anchor_request.instructions();
-
-	// sign the transaction with the wallet as payer
-	let versioned_transaction: VersionedTransaction =
-		anchor_program.sign_transaction(anchor_request).await?;
-
-	// send and send the transaction at the same time
-	let signature: Signature = anchor_program
-		.sign_and_send_transaction(anchor_request)
-		.await?;
+	let composed_signature = composition_request.sign_and_send_transaction().await?;
+	println!("Composed Signature: {}", composed_signature);
 
 	Ok(())
 }

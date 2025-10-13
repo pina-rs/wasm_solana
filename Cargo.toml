@@ -13,7 +13,7 @@ rust-version = "1.85.0"
 [workspace.dependencies]
 Inflector = { default-features = false, version = "^0.11" }
 agave-reserved-account-keys = { default-features = false, version = "^2" }
-anchor-lang = { default-features = false, version = "^0.31" }
+anchor-lang = { default-features = false, version = "0.32.1" }
 anyhow = { default-features = false, version = "^1" }
 assert2 = { default-features = false, version = "^0.3" }
 assert_matches = { default-features = false, version = "^1" }
