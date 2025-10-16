@@ -6,6 +6,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 
+## [0.2.0](https://github.com/pina-rs/wasm_solana/compare/test_utils_anchor@v0.1.2...test_utils_anchor@v0.2.0) - 2025-10-16
+
+### <!-- 0 -->🎉 Added
+
+- upgrade to `anchor@0.32.1`
+
 ## [0.1.2](https://github.com/solapino/wasm_solana/compare/test_utils_anchor@v0.1.1...test_utils_anchor@v0.1.2) - 2025-10-03
 
 ### <!-- 7 -->⚙️ Miscellaneous Tasks
