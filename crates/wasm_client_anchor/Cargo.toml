@@ -1,15 +1,15 @@
 [package]
 name = "wasm_client_anchor"
-version = "0.8.2"
+version = "0.9.0"
 authors = { workspace = true }
 categories = ["wasm", "web-programming"]
 edition = { workspace = true }
 homepage = { workspace = true }
+keywords = ["solana", "wallet", "web3", "blockchain", "anchor"]
 license = { workspace = true }
 readme = "readme.md"
 repository = { workspace = true }
 rust-version = { workspace = true }
-# tags = ["solana", "wallet", "web3", "blockchain", "anchor"]
 description = "A wasm compatible anchor client"
 
 [lints]

@@ -127,7 +127,7 @@ test_utils_anchor = { path = "crates/test_utils_anchor" }
 test_utils_insta = { path = "crates/test_utils_insta" }
 test_utils_keypairs = { path = "crates/test_utils_keypairs" }
 test_utils_solana = { path = "crates/test_utils_solana", version = "0.7.4" }
-wasm_client_anchor = { path = "crates/wasm_client_anchor", version = "0.8.2" }
+wasm_client_anchor = { path = "crates/wasm_client_anchor", version = "0.9.0" }
 wasm_client_solana = { path = "crates/wasm_client_solana", version = "0.9.0" }
 
 # forks

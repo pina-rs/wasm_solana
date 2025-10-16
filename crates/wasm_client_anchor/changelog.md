@@ -6,6 +6,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 
+## [0.9.0](https://github.com/pina-rs/wasm_solana/compare/wasm_client_anchor@v0.8.2...wasm_client_anchor@v0.9.0) - 2025-10-16
+
+### <!-- 0 -->🎉 Added
+
+- upgrade to `anchor@0.32.1`
+
 ## [0.8.2](https://github.com/solapino/wasm_solana/compare/wasm_client_anchor@v0.8.1...wasm_client_anchor@v0.8.2) - 2025-10-03
 
 ### <!-- 0 -->🎉 Added
