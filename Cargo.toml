@@ -96,7 +96,7 @@ solana-version = { default-features = false, version = "^2" }
 solana-vote-interface = { default-features = false, version = "^2" }
 solana-zk-token-sdk = { default-features = false, version = "^2" }
 spl-associated-token-account = { default-features = false, version = "^7" }
-spl-generic-token = { default-features = false, version = "^1" }
+spl-generic-token = { default-features = false, version = "^2" }
 spl-memo = { default-features = false, version = "^6" }
 spl-pod = { default-features = false, version = "^0.5" }
 spl-token = { default-features = false, version = "^8" }
