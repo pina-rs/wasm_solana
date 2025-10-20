@@ -90,7 +90,7 @@ solana-system-interface = { default-features = false, version = "^1" }
 solana-sysvar = { default-features = false, version = "^2" }
 solana-test-validator = { default-features = false, version = "^2" }
 solana-transaction = { default-features = false, version = "^2" }
-solana-transaction-context = { default-features = false, version = "^2" }
+solana-transaction-context = { default-features = false, version = "^3" }
 solana-transaction-error = { default-features = false, version = "^2" }
 solana-version = { default-features = false, version = "^2" }
 solana-vote-interface = { default-features = false, version = "^2" }
