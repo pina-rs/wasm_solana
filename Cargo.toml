@@ -65,7 +65,7 @@ solana-config-program-client = { default-features = false, version = "^1" }
 solana-epoch-schedule = { default-features = false, version = "^2" }
 solana-faucet = { default-features = false, version = "^2" }
 solana-fee-calculator = { default-features = false, version = "^2" }
-solana-hash = { default-features = false, version = "^2" }
+solana-hash = { default-features = false, version = "^3" }
 solana-instruction = { default-features = false, version = "^2" }
 solana-loader-v2-interface = { default-features = false, version = "^2" }
 solana-loader-v3-interface = { default-features = false, version = "^5" }
