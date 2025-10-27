@@ -79,7 +79,7 @@ solana-program-test = { default-features = false, version = "^2" }
 solana-pubkey = { version = "2", default-features = false }
 solana-rent = { default-features = false, version = "^2" }
 solana-reward-info = { default-features = false, version = "^2" }
-solana-rpc = { default-features = false, version = "^2" }
+solana-rpc = { default-features = false, version = "^3" }
 solana-sdk = { default-features = false, version = "^2" }
 solana-sdk-ids = { default-features = false, version = "^2" }
 solana-signature = { version = "2", default-features = false }
