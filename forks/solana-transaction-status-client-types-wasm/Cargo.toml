@@ -1,6 +1,6 @@
 [package]
 name = "solana-transaction-status-client-types-wasm"
-version = "2.3.12"
+version = "3.0.10"
 authors = { workspace = true }
 documentation = "https://docs.rs/solana-transaction-status-client-types"
 edition = { workspace = true }
@@ -24,6 +24,7 @@ solana-account-decoder-client-types-wasm = { workspace = true }
 solana-clock = { workspace = true, features = ["serde"], default-features = true }
 solana-commitment-config = { workspace = true, default-features = true }
 solana-hash = { workspace = true, features = ["serde", "bytemuck", "borsh"], default-features = true }
+solana-instruction = { workspace = true }
 solana-message = { workspace = true, default-features = true }
 solana-pubkey = { workspace = true, features = ["serde", "bytemuck", "borsh"], default-features = true }
 solana-reward-info = { workspace = true, features = ["serde"], default-features = true }
@@ -32,3 +33,6 @@ solana-transaction = { workspace = true, features = ["serde"], default-features 
 solana-transaction-context = { workspace = true, default-features = true }
 solana-transaction-error = { workspace = true, features = ["serde"], default-features = true }
 thiserror = { workspace = true, default-features = true }
+
+[dev-dependencies]
+test-case = { workspace = true, default-features = true }

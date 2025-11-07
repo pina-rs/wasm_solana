@@ -1,7 +1,7 @@
-use spl_token_2022::extension::confidential_transfer_fee::instruction::*;
-use spl_token_2022::instruction::decode_instruction_data;
-use spl_token_2022::instruction::decode_instruction_type;
-use spl_token_2022::solana_zk_sdk::encryption::pod::elgamal::PodElGamalPubkey;
+use spl_token_2022_interface::extension::confidential_transfer_fee::instruction::*;
+use spl_token_2022_interface::instruction::decode_instruction_data;
+use spl_token_2022_interface::instruction::decode_instruction_type;
+use spl_token_2022_interface::solana_zk_sdk::encryption::pod::elgamal::PodElGamalPubkey;
 
 use super::*;
 
@@ -211,10 +211,10 @@ pub(in crate::parse_token) fn parse_confidential_transfer_fee_instruction(
 // 	use solana_instruction::Instruction;
 // 	use solana_message::Message;
 // 	use solana_pubkey::Pubkey;
-// 	use spl_token_2022::extension::confidential_transfer_fee::instruction::inner_withdraw_withheld_tokens_from_accounts;
-// 	use spl_token_2022::extension::confidential_transfer_fee::instruction::inner_withdraw_withheld_tokens_from_mint;
-// 	use spl_token_2022::solana_zk_sdk::encryption::pod::auth_encryption::PodAeCiphertext;
-// 	use spl_token_2022::solana_zk_sdk::zk_elgamal_proof_program::proof_data::CiphertextCiphertextEqualityProofData;
+// 	use spl_token_2022_interface::extension::confidential_transfer_fee::instruction::inner_withdraw_withheld_tokens_from_accounts;
+// 	use spl_token_2022_interface::extension::confidential_transfer_fee::instruction::inner_withdraw_withheld_tokens_from_mint;
+// 	use spl_token_2022_interface::solana_zk_sdk::encryption::pod::auth_encryption::PodAeCiphertext;
+// 	use spl_token_2022_interface::solana_zk_sdk::zk_elgamal_proof_program::proof_data::CiphertextCiphertextEqualityProofData;
 // 	use spl_token_confidential_transfer_proof_extraction::instruction::ProofData;
 // 	use spl_token_confidential_transfer_proof_extraction::instruction::ProofLocation;
 
@@ -247,7 +247,7 @@ pub(in crate::parse_token) fn parse_confidential_transfer_fee_instruction(
 // 			ProofLocation::ContextStateAccount(&Pubkey::new_unique()),
 // 		] {
 // 			let instruction = inner_withdraw_withheld_tokens_from_accounts(
-// 				&spl_token_2022::id(),
+// 				&spl_token_2022_interface::id(),
 // 				&Pubkey::new_unique(),
 // 				&Pubkey::new_unique(),
 // 				&PodAeCiphertext::default(),
@@ -275,7 +275,7 @@ pub(in crate::parse_token) fn parse_confidential_transfer_fee_instruction(
 // 			ProofLocation::ContextStateAccount(&Pubkey::new_unique()),
 // 		] {
 // 			let instruction = inner_withdraw_withheld_tokens_from_mint(
-// 				&spl_token_2022::id(),
+// 				&spl_token_2022_interface::id(),
 // 				&Pubkey::new_unique(),
 // 				&Pubkey::new_unique(),
 // 				&PodAeCiphertext::default(),

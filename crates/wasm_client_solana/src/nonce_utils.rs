@@ -2,16 +2,16 @@
 
 use serde::Deserialize;
 use serde::Serialize;
+use solana_commitment_config::CommitmentConfig;
+use solana_nonce::state::Data;
+use solana_nonce::state::State;
+use solana_nonce::versions::Versions;
 use solana_sdk::account::Account;
 use solana_sdk::account::ReadableAccount;
 use solana_sdk::account_utils::StateMut;
-use solana_sdk::commitment_config::CommitmentConfig;
 use solana_sdk::hash::Hash;
-use solana_sdk::nonce::State;
-use solana_sdk::nonce::state::Data;
-use solana_sdk::nonce::state::Versions;
 use solana_sdk::pubkey::Pubkey;
-use solana_sdk::system_program;
+use solana_sdk_ids::system_program;
 
 use crate::ClientResult;
 use crate::SolanaRpcClient;
@@ -86,7 +86,7 @@ pub async fn get_account_with_commitment(
 /// the system program. Returns [`NonceError::UnexpectedDataSize`] if the
 /// account contains no data.
 pub fn account_identity_ok<T: ReadableAccount>(account: &T) -> Result<(), NonceError> {
-	if account.owner() != &system_program::id() {
+	if account.owner() != &system_program::ID {
 		Err(NonceError::InvalidAccountOwner)
 	} else if account.data().is_empty() {
 		Err(NonceError::UnexpectedDataSize)

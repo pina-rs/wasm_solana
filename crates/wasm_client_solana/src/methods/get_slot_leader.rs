@@ -2,7 +2,7 @@ use serde::Deserialize;
 use serde_tuple::Serialize_tuple;
 use serde_with::DisplayFromStr;
 use serde_with::serde_as;
-use solana_sdk::commitment_config::CommitmentConfig;
+use solana_commitment_config::CommitmentConfig;
 use solana_sdk::pubkey::Pubkey;
 
 use crate::impl_http_method;

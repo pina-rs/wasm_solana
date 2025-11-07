@@ -13,6 +13,8 @@ use solana_sdk_ids::sysvar;
 use solana_slot_hashes::SlotHashes;
 use solana_slot_history::SlotHistory;
 use solana_slot_history::{self as slot_history};
+use solana_stake_interface::stake_history::StakeHistory;
+use solana_stake_interface::stake_history::StakeHistoryEntry;
 use solana_sysvar::epoch_rewards::EpochRewards;
 #[allow(deprecated)]
 use solana_sysvar::fees::Fees;
@@ -20,8 +22,6 @@ use solana_sysvar::last_restart_slot::LastRestartSlot;
 #[allow(deprecated)]
 use solana_sysvar::recent_blockhashes::RecentBlockhashes;
 use solana_sysvar::rewards::Rewards;
-use solana_sysvar::stake_history::StakeHistory;
-use solana_sysvar::stake_history::StakeHistoryEntry;
 
 use crate::StringAmount;
 use crate::UiFeeCalculator;

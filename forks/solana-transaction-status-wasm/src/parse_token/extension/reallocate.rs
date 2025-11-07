@@ -1,4 +1,4 @@
-use spl_token_2022::extension::ExtensionType;
+use spl_token_2022_interface::extension::ExtensionType;
 
 use super::*;
 
@@ -33,7 +33,7 @@ pub(in crate::parse_token) fn parse_reallocate_instruction(
 mod test {
 	use solana_message::Message;
 	use solana_pubkey::Pubkey;
-	use spl_token_2022::instruction::reallocate;
+	use spl_token_2022_interface::instruction::reallocate;
 
 	use super::*;
 
@@ -50,7 +50,7 @@ mod test {
 		// Single owner
 		let owner_pubkey = Pubkey::new_unique();
 		let reallocate_ix = reallocate(
-			&spl_token_2022::id(),
+			&spl_token_2022_interface::id(),
 			&account_pubkey,
 			&payer_pubkey,
 			&owner_pubkey,
@@ -83,7 +83,7 @@ mod test {
 		let multisig_signer0 = Pubkey::new_unique();
 		let multisig_signer1 = Pubkey::new_unique();
 		let reallocate_ix = reallocate(
-			&spl_token_2022::id(),
+			&spl_token_2022_interface::id(),
 			&account_pubkey,
 			&payer_pubkey,
 			&multisig_pubkey,

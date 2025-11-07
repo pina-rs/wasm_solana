@@ -7,7 +7,7 @@ use serde_tuple::Serialize_tuple;
 use serde_with::DisplayFromStr;
 use serde_with::serde_as;
 use serde_with::skip_serializing_none;
-use solana_sdk::commitment_config::CommitmentConfig;
+use solana_commitment_config::CommitmentConfig;
 use solana_sdk::pubkey::Pubkey;
 use solana_sdk::signature::Signature;
 

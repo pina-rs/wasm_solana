@@ -122,7 +122,7 @@ mod test {
 
 		// Initialize
 		let ix = spl_token_metadata_interface::instruction::initialize(
-			&spl_token_2022::id(),
+			&spl_token_2022_interface::id(),
 			&metadata,
 			&update_authority,
 			&mint,
@@ -156,7 +156,7 @@ mod test {
 		// UpdateField
 		// Update one of the fixed fields.
 		let ix = spl_token_metadata_interface::instruction::update_field(
-			&spl_token_2022::id(),
+			&spl_token_2022_interface::id(),
 			&metadata,
 			&update_authority,
 			spl_token_metadata_interface::state::Field::Uri,
@@ -182,7 +182,7 @@ mod test {
 		);
 		// Add a new field
 		let ix = spl_token_metadata_interface::instruction::update_field(
-			&spl_token_2022::id(),
+			&spl_token_2022_interface::id(),
 			&metadata,
 			&update_authority,
 			spl_token_metadata_interface::state::Field::Key("new_field".to_string()),
@@ -209,7 +209,7 @@ mod test {
 
 		// RemoveKey
 		let ix = spl_token_metadata_interface::instruction::remove_key(
-			&spl_token_2022::id(),
+			&spl_token_2022_interface::id(),
 			&metadata,
 			&update_authority,
 			"new_field".to_string(),
@@ -238,7 +238,7 @@ mod test {
 		// Update authority to a new authority.
 		let new_authority = Pubkey::new_unique();
 		let ix = spl_token_metadata_interface::instruction::update_authority(
-			&spl_token_2022::id(),
+			&spl_token_2022_interface::id(),
 			&metadata,
 			&update_authority,
 			Some(new_authority).try_into().unwrap(),
@@ -262,7 +262,7 @@ mod test {
 		);
 		// Update authority to None.
 		let ix = spl_token_metadata_interface::instruction::update_authority(
-			&spl_token_2022::id(),
+			&spl_token_2022_interface::id(),
 			&metadata,
 			&update_authority,
 			Option::<Pubkey>::None.try_into().unwrap(),
@@ -288,7 +288,7 @@ mod test {
 		// Emit
 		// Emit with start and end.
 		let ix = spl_token_metadata_interface::instruction::emit(
-			&spl_token_2022::id(),
+			&spl_token_2022_interface::id(),
 			&metadata,
 			Some(1),
 			Some(2),
@@ -312,7 +312,7 @@ mod test {
 		);
 		// Emit with only start.
 		let ix = spl_token_metadata_interface::instruction::emit(
-			&spl_token_2022::id(),
+			&spl_token_2022_interface::id(),
 			&metadata,
 			Some(1),
 			None,
@@ -335,7 +335,7 @@ mod test {
 		);
 		// Emit with only end.
 		let ix = spl_token_metadata_interface::instruction::emit(
-			&spl_token_2022::id(),
+			&spl_token_2022_interface::id(),
 			&metadata,
 			None,
 			Some(2),
@@ -358,7 +358,7 @@ mod test {
 		);
 		// Emit with neither start nor end.
 		let ix = spl_token_metadata_interface::instruction::emit(
-			&spl_token_2022::id(),
+			&spl_token_2022_interface::id(),
 			&metadata,
 			None,
 			None,

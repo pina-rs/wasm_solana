@@ -55,12 +55,12 @@ async fn account_stream_subscription() -> anyhow::Result<()> {
 	let space = 100; // Size of the account data
 	let lamports = rpc.get_minimum_balance_for_rent_exemption(space).await?;
 
-	let instruction = solana_sdk::system_instruction::create_account(
+	let instruction = solana_system_interface::instruction::create_account(
 		&payer.pubkey(),
 		&pubkey,
 		lamports,
 		space as u64,
-		&solana_sdk::system_program::id(),
+		&solana_sdk_ids::system_program::id(),
 	);
 	let recent_blockhash = rpc.get_latest_blockhash().await.unwrap();
 	let transaction = solana_sdk::transaction::Transaction::new_signed_with_payer(

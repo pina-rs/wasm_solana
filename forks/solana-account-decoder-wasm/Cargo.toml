@@ -1,6 +1,6 @@
 [package]
 name = "solana-account-decoder-wasm"
-version = "2.3.12"
+version = "3.0.10"
 authors = { workspace = true }
 documentation = "https://docs.rs/solana-account-decoder"
 edition = { workspace = true }
@@ -28,7 +28,7 @@ solana-account = { workspace = true, default-features = true }
 solana-account-decoder-client-types-wasm = { workspace = true }
 solana-address-lookup-table-interface = { workspace = true, features = ["bincode", "bytemuck"], default-features = true }
 solana-clock = { workspace = true, default-features = true }
-solana-config-program-client = { workspace = true, features = ["serde"], default-features = true }
+solana-config-interface = { workspace = true, features = ["bincode"], default-features = true }
 solana-epoch-schedule = { workspace = true, default-features = true }
 solana-fee-calculator = { workspace = true, default-features = true }
 solana-instruction = { workspace = true, default-features = true }
@@ -41,13 +41,13 @@ solana-rent = { workspace = true, default-features = true }
 solana-sdk-ids = { workspace = true, default-features = true }
 solana-slot-hashes = { workspace = true, default-features = true }
 solana-slot-history = { workspace = true, default-features = true }
-solana-stake-interface = { workspace = true, default-features = true }
+solana-stake-interface = { workspace = true, features = ["bincode", "sysvar"], default-features = true }
 solana-sysvar = { workspace = true, default-features = true }
 solana-vote-interface = { workspace = true, features = ["bincode"], default-features = true }
 spl-generic-token = { workspace = true, default-features = true }
-spl-token = { workspace = true, features = ["no-entrypoint"], default-features = true }
-spl-token-2022 = { workspace = true, features = ["no-entrypoint"], default-features = true }
+spl-token-2022-interface = { workspace = true, default-features = true }
 spl-token-group-interface = { workspace = true, default-features = true }
+spl-token-interface = { workspace = true, default-features = true }
 spl-token-metadata-interface = { workspace = true, default-features = true }
 thiserror = { workspace = true, default-features = true }
 zstd = { workspace = true, optional = true, default-features = true }

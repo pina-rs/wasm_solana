@@ -3,12 +3,12 @@ use std::time::Duration;
 
 use futures_timer::Delay;
 use serde::de::DeserializeOwned;
+use solana_commitment_config::CommitmentConfig;
+use solana_commitment_config::CommitmentLevel;
 use solana_sdk::account::Account;
 use solana_sdk::clock::Epoch;
 use solana_sdk::clock::Slot;
 use solana_sdk::clock::UnixTimestamp;
-use solana_sdk::commitment_config::CommitmentConfig;
-use solana_sdk::commitment_config::CommitmentLevel;
 use solana_sdk::epoch_info::EpochInfo;
 use solana_sdk::epoch_schedule::EpochSchedule;
 use solana_sdk::hash::Hash;

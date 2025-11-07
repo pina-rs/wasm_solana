@@ -26,9 +26,9 @@ use solana_message::AccountKeys;
 use solana_message::compiled_instruction::CompiledInstruction;
 use solana_program_option::COption;
 use solana_pubkey::Pubkey;
-use spl_token_2022::extension::ExtensionType;
-use spl_token_2022::instruction::AuthorityType;
-use spl_token_2022::instruction::TokenInstruction;
+use spl_token_2022_interface::extension::ExtensionType;
+use spl_token_2022_interface::instruction::AuthorityType;
+use spl_token_2022_interface::instruction::TokenInstruction;
 use spl_token_group_interface::instruction::TokenGroupInstruction;
 use spl_token_metadata_interface::instruction::TokenMetadataInstruction;
 
@@ -910,7 +910,7 @@ mod test {
 
 	use solana_message::Message;
 	use solana_pubkey::Pubkey;
-	use spl_token_2022::instruction::*;
+	use spl_token_2022_interface::instruction::*;
 
 	use super::*;
 
@@ -1707,7 +1707,7 @@ mod test {
 		let get_account_data_size_ix = get_account_data_size(
 			program_id,
 			&mint_pubkey,
-			&[], // This emulates the packed data of spl_token::instruction::get_account_data_size
+			&[], // This emulates the packed data of spl_token_interface::instruction::get_account_data_size
 		)
 		.unwrap();
 		let message = Message::new(&[get_account_data_size_ix], None);
@@ -1794,18 +1794,18 @@ mod test {
 
 	#[test]
 	fn test_parse_token_v3() {
-		test_parse_token(&spl_token::id());
+		test_parse_token(&spl_token_interface::id());
 	}
 
 	#[test]
 	fn test_parse_token_2022() {
-		test_parse_token(&spl_token_2022::id());
+		test_parse_token(&spl_token_2022_interface::id());
 	}
 
 	#[test]
 	fn test_create_native_mint() {
 		let payer = Pubkey::new_unique();
-		let create_native_mint_ix = create_native_mint(&spl_token_2022::id(), &payer).unwrap();
+		let create_native_mint_ix = create_native_mint(&spl_token_2022_interface::id(), &payer).unwrap();
 		let message = Message::new(&[create_native_mint_ix], None);
 		let compiled_instruction = &message.instructions[0];
 		assert_eq!(
@@ -1818,7 +1818,7 @@ mod test {
 				instruction_type: "createNativeMint".to_string(),
 				info: json!({
 				   "payer": payer.to_string(),
-				   "nativeMint": spl_token_2022::native_mint::id().to_string(),
+				   "nativeMint": spl_token_2022_interface::native_mint::id().to_string(),
 				   "systemProgram": solana_sdk_ids::system_program::id().to_string(),
 				})
 			}
@@ -2172,11 +2172,11 @@ mod test {
 
 	#[test]
 	fn test_not_enough_keys_token_v3() {
-		test_token_ix_not_enough_keys(&spl_token::id());
+		test_token_ix_not_enough_keys(&spl_token_interface::id());
 	}
 
 	#[test]
 	fn test_not_enough_keys_token_2022() {
-		test_token_ix_not_enough_keys(&spl_token_2022::id());
+		test_token_ix_not_enough_keys(&spl_token_2022_interface::id());
 	}
 }

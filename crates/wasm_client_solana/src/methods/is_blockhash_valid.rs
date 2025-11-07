@@ -47,7 +47,7 @@ mod tests {
 	use std::str::FromStr;
 
 	use assert2::check;
-	use solana_sdk::commitment_config::CommitmentConfig;
+	use solana_commitment_config::CommitmentConfig;
 
 	use super::*;
 	use crate::ClientRequest;

@@ -2,7 +2,7 @@ use serde::Deserialize;
 use serde::Serialize;
 use serde_tuple::Deserialize_tuple;
 use serde_tuple::Serialize_tuple;
-use solana_sdk::vote::state::MAX_LOCKOUT_HISTORY;
+use solana_vote_interface::state::MAX_LOCKOUT_HISTORY;
 
 use crate::impl_http_method;
 

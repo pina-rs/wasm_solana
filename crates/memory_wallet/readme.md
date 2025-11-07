@@ -20,7 +20,7 @@ Or directly add the following to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-memory_wallet = "0.1" # replace with the latest version
+memory_wallet = "0.1.24"
 ```
 
 ### Features
@@ -36,7 +36,7 @@ The memory wallet is a simple wallet that stores all accounts in memory and conf
 use anyhow::Result;
 use memory_wallet::MemoryWallet;
 use memory_wallet::prelude::*;
-use solana_sdk::native_token::sol_to_lamports;
+use solana_native_token::sol_str_to_lamports;
 use solana_sdk::pubkey::Pubkey;
 use solana_sdk::signature::Keypair;
 use solana_sdk::signature::Signature;
@@ -50,7 +50,8 @@ async fn run() -> Result<()> {
 	let keypair = Keypair::new();
 	let pubkey = keypair.pubkey();
 	let target_pubkey = Pubkey::new_unique();
-	let instruction = system_instruction::transfer(&pubkey, &target_pubkey, sol_to_lamports(0.5));
+	let instruction =
+		system_instruction::transfer(&pubkey, &target_pubkey, sol_str_to_lamports("0.5").unwrap());
 	let rpc = SolanaRpcClient::new(DEVNET);
 	let blockhash = rpc.get_latest_blockhash().await?;
 	let transaction =

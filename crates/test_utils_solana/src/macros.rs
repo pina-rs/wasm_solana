@@ -22,7 +22,7 @@ macro_rules! assert_banks_client_simulated_error {
 	}};
 }
 
-/// Assert that the banks client errors with the expected anchor error code.
+/// Assert that the banks client errors with the expected error code.
 #[macro_export]
 macro_rules! assert_banks_client_metadata_error {
 	($result:ident, $expected_error:path) => {{

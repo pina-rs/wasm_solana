@@ -12,14 +12,14 @@ use anyhow::Result;
 use crossbeam_channel::unbounded;
 use port_check::is_local_ipv4_port_free;
 use rand::Rng;
+use solana_commitment_config::CommitmentConfig;
+use solana_commitment_config::CommitmentLevel;
 use solana_faucet::faucet::run_local_faucet_with_port;
+use solana_native_token::sol_str_to_lamports;
 use solana_program::epoch_schedule::EpochSchedule;
 use solana_rpc::rpc::JsonRpcConfig;
 use solana_sdk::account::AccountSharedData;
 use solana_sdk::clock::Slot;
-use solana_sdk::commitment_config::CommitmentConfig;
-use solana_sdk::commitment_config::CommitmentLevel;
-use solana_sdk::native_token::sol_to_lamports;
 use solana_sdk::pubkey::Pubkey;
 use solana_sdk::signature::Keypair;
 use solana_sdk::signer::Signer;
@@ -50,7 +50,7 @@ pub struct TestValidatorRunnerProps {
 	/// [`TestValidatorRunnerProps::pubkeys`].
 	///
 	/// The default amount is `5.0 SOL`.
-	#[builder(default = sol_to_lamports(5.0))]
+	#[builder(default = sol_str_to_lamports("5.0").unwrap())]
 	pub initial_lamports: u64,
 	/// The default commitment level to use for the validator client rpc.
 	#[builder(default, setter(into))]
@@ -78,7 +78,7 @@ impl TestValidatorRunnerProps {
 	/// defined in this struct.
 	///
 	/// ```rust
-	/// use solana_sdk::native_token::sol_to_lamports;
+	/// use solana_native_token::sol_str_to_lamports;
 	/// use solana_sdk::pubkey;
 	/// use test_utils_solana::TestValidatorRunnerProps;
 	///
@@ -86,7 +86,7 @@ impl TestValidatorRunnerProps {
 	/// 	let user = pubkey!("9xQeWvG816bUx9EPjHmaT23yvVM2ZWbrrpZb9PusVFin");
 	/// 	let runner = TestValidatorRunnerProps::builder()
 	/// 		.pubkeys(vec![user])
-	/// 		.initial_lamports(sol_to_lamports(2.0))
+	/// 		.initial_lamports(sol_str_to_lamports("2.0").unwrap())
 	/// 		.build()
 	/// 		.run()
 	/// 		.await;
@@ -104,7 +104,7 @@ pub struct TestProgramInfo {
 	pub program_path: PathBuf,
 	#[builder(default = Pubkey::default())]
 	pub upgrade_authority: Pubkey,
-	#[builder(default = solana_sdk::bpf_loader_upgradeable::ID)]
+	#[builder(default = solana_sdk_ids::bpf_loader_upgradeable::ID)]
 	pub loader: Pubkey,
 }
 
@@ -240,7 +240,11 @@ impl TestValidatorRunner {
 			.add_upgradeable_programs_with_path(&programs)
 			.add_account(
 				faucet_pubkey,
-				AccountSharedData::new(sol_to_lamports(1_000_000.0), 0, &system_program::ID),
+				AccountSharedData::new(
+					sol_str_to_lamports("1000000.0").unwrap(),
+					0,
+					&system_program::ID,
+				),
 			)
 			.add_accounts(funded_accounts)
 			.add_accounts(accounts);
@@ -256,8 +260,11 @@ impl TestValidatorRunner {
 		// waiting for fees to stablize doesn't seem to work, so here waiting for this
 		// random airdrop to succeed seems to work. An alternative is a 15 second daily.
 		// The validator to be warmed up.
-		rpc.request_airdrop(&mint_keypair.pubkey(), sol_to_lamports(500.0))
-			.await?;
+		rpc.request_airdrop(
+			&mint_keypair.pubkey(),
+			sol_str_to_lamports("500.0").unwrap(),
+		)
+		.await?;
 
 		let runner = Self {
 			genesis: Arc::new(genesis),

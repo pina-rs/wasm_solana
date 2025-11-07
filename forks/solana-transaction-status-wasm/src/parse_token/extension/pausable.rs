@@ -1,7 +1,7 @@
-use spl_token_2022::extension::pausable::instruction::InitializeInstructionData;
-use spl_token_2022::extension::pausable::instruction::PausableInstruction;
-use spl_token_2022::instruction::decode_instruction_data;
-use spl_token_2022::instruction::decode_instruction_type;
+use spl_token_2022_interface::extension::pausable::instruction::InitializeInstructionData;
+use spl_token_2022_interface::extension::pausable::instruction::PausableInstruction;
+use spl_token_2022_interface::instruction::decode_instruction_data;
+use spl_token_2022_interface::instruction::decode_instruction_type;
 
 use super::*;
 

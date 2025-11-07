@@ -1,8 +1,8 @@
-use spl_token_2022::extension::interest_bearing_mint::BasisPoints;
-use spl_token_2022::extension::interest_bearing_mint::instruction::InitializeInstructionData;
-use spl_token_2022::extension::interest_bearing_mint::instruction::InterestBearingMintInstruction;
-use spl_token_2022::instruction::decode_instruction_data;
-use spl_token_2022::instruction::decode_instruction_type;
+use spl_token_2022_interface::extension::interest_bearing_mint::BasisPoints;
+use spl_token_2022_interface::extension::interest_bearing_mint::instruction::InitializeInstructionData;
+use spl_token_2022_interface::extension::interest_bearing_mint::instruction::InterestBearingMintInstruction;
+use spl_token_2022_interface::instruction::decode_instruction_data;
+use spl_token_2022_interface::instruction::decode_instruction_type;
 
 use super::*;
 

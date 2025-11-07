@@ -1,6 +1,6 @@
-use spl_token_2022::extension::confidential_mint_burn::instruction::*;
-use spl_token_2022::instruction::decode_instruction_data;
-use spl_token_2022::instruction::decode_instruction_type;
+use spl_token_2022_interface::extension::confidential_mint_burn::instruction::*;
+use spl_token_2022_interface::instruction::decode_instruction_data;
+use spl_token_2022_interface::instruction::decode_instruction_type;
 
 use super::*;
 
@@ -283,16 +283,16 @@ pub(in crate::parse_token) fn parse_confidential_mint_burn_instruction(
 // 	use solana_instruction::Instruction;
 // 	use solana_message::Message;
 // 	use solana_pubkey::Pubkey;
-// 	use spl_token_2022::extension::confidential_mint_burn::instruction::confidential_burn_with_split_proofs;
-// 	use spl_token_2022::extension::confidential_mint_burn::instruction::confidential_mint_with_split_proofs;
-// 	use spl_token_2022::extension::confidential_mint_burn::instruction::initialize_mint;
-// 	use spl_token_2022::solana_zk_sdk::encryption::pod::auth_encryption::PodAeCiphertext;
-// 	use spl_token_2022::solana_zk_sdk::encryption::pod::elgamal::PodElGamalCiphertext;
-// 	use spl_token_2022::solana_zk_sdk::encryption::pod::elgamal::PodElGamalPubkey;
-// 	use spl_token_2022::solana_zk_sdk::zk_elgamal_proof_program::proof_data::BatchedGroupedCiphertext3HandlesValidityProofData;
-// 	use spl_token_2022::solana_zk_sdk::zk_elgamal_proof_program::proof_data::BatchedRangeProofU128Data;
-// 	use spl_token_2022::solana_zk_sdk::zk_elgamal_proof_program::proof_data::CiphertextCiphertextEqualityProofData;
-// 	use spl_token_2022::solana_zk_sdk::zk_elgamal_proof_program::proof_data::CiphertextCommitmentEqualityProofData;
+// 	use spl_token_2022_interface::extension::confidential_mint_burn::instruction::confidential_burn_with_split_proofs;
+// 	use spl_token_2022_interface::extension::confidential_mint_burn::instruction::confidential_mint_with_split_proofs;
+// 	use spl_token_2022_interface::extension::confidential_mint_burn::instruction::initialize_mint;
+// 	use spl_token_2022_interface::solana_zk_sdk::encryption::pod::auth_encryption::PodAeCiphertext;
+// 	use spl_token_2022_interface::solana_zk_sdk::encryption::pod::elgamal::PodElGamalCiphertext;
+// 	use spl_token_2022_interface::solana_zk_sdk::encryption::pod::elgamal::PodElGamalPubkey;
+// 	use spl_token_2022_interface::solana_zk_sdk::zk_elgamal_proof_program::proof_data::BatchedGroupedCiphertext3HandlesValidityProofData;
+// 	use spl_token_2022_interface::solana_zk_sdk::zk_elgamal_proof_program::proof_data::BatchedRangeProofU128Data;
+// 	use spl_token_2022_interface::solana_zk_sdk::zk_elgamal_proof_program::proof_data::CiphertextCiphertextEqualityProofData;
+// 	use spl_token_2022_interface::solana_zk_sdk::zk_elgamal_proof_program::proof_data::CiphertextCommitmentEqualityProofData;
 // 	use spl_token_confidential_transfer_proof_extraction::instruction::ProofData;
 // 	use spl_token_confidential_transfer_proof_extraction::instruction::ProofLocation;
 
@@ -314,7 +314,7 @@ pub(in crate::parse_token) fn parse_confidential_mint_burn_instruction(
 // 	#[test]
 // 	fn test_initialize() {
 // 		let instruction = initialize_mint(
-// 			&spl_token_2022::id(),
+// 			&spl_token_2022_interface::id(),
 // 			&Pubkey::new_unique(),
 // 			&PodElGamalPubkey::default(),
 // 			&PodAeCiphertext::default(),
@@ -326,7 +326,7 @@ pub(in crate::parse_token) fn parse_confidential_mint_burn_instruction(
 // 	#[test]
 // 	fn test_update() {
 // 		let instruction = update_decryptable_supply(
-// 			&spl_token_2022::id(),
+// 			&spl_token_2022_interface::id(),
 // 			&Pubkey::new_unique(),
 // 			&Pubkey::new_unique(),
 // 			&[],
@@ -350,7 +350,7 @@ pub(in crate::parse_token) fn parse_confidential_mint_burn_instruction(
 // 			ProofLocation::ContextStateAccount(&Pubkey::new_unique()),
 // 		] {
 // 			let instructions = rotate_supply_elgamal_pubkey(
-// 				&spl_token_2022::id(),
+// 				&spl_token_2022_interface::id(),
 // 				&Pubkey::new_unique(),
 // 				&Pubkey::new_unique(),
 // 				&[],
@@ -402,7 +402,7 @@ pub(in crate::parse_token) fn parse_confidential_mint_burn_instruction(
 // 			),
 // 		] {
 // 			let instructions = confidential_mint_with_split_proofs(
-// 				&spl_token_2022::id(),
+// 				&spl_token_2022_interface::id(),
 // 				&Pubkey::new_unique(),
 // 				&Pubkey::new_unique(),
 // 				&PodElGamalCiphertext::default(),
@@ -459,7 +459,7 @@ pub(in crate::parse_token) fn parse_confidential_mint_burn_instruction(
 // 			),
 // 		] {
 // 			let instructions = confidential_burn_with_split_proofs(
-// 				&spl_token_2022::id(),
+// 				&spl_token_2022_interface::id(),
 // 				&Pubkey::new_unique(),
 // 				&Pubkey::new_unique(),
 // 				&PodAeCiphertext::default(),

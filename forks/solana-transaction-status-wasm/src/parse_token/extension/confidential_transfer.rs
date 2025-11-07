@@ -1,7 +1,7 @@
-use spl_token_2022::extension::confidential_transfer::instruction::*;
-use spl_token_2022::instruction::decode_instruction_data;
-use spl_token_2022::instruction::decode_instruction_type;
-use spl_token_2022::solana_zk_sdk::encryption::pod::elgamal::PodElGamalPubkey;
+use spl_token_2022_interface::extension::confidential_transfer::instruction::*;
+use spl_token_2022_interface::instruction::decode_instruction_data;
+use spl_token_2022_interface::instruction::decode_instruction_type;
+use spl_token_2022_interface::solana_zk_sdk::encryption::pod::elgamal::PodElGamalPubkey;
 
 use super::*;
 
@@ -599,16 +599,16 @@ pub(in crate::parse_token) fn parse_confidential_transfer_instruction(
 // 	use solana_instruction::Instruction;
 // 	use solana_message::Message;
 // 	use solana_pubkey::Pubkey;
-// 	use spl_token_2022::extension::confidential_transfer::instruction::initialize_mint;
-// 	use spl_token_2022::extension::confidential_transfer::instruction::inner_configure_account;
-// 	use spl_token_2022::extension::confidential_transfer::instruction::inner_empty_account;
-// 	use spl_token_2022::extension::confidential_transfer::instruction::update_mint;
-// 	use spl_token_2022::solana_zk_sdk::encryption::pod::auth_encryption::PodAeCiphertext;
-// 	use spl_token_2022::solana_zk_sdk::encryption::pod::elgamal::PodElGamalCiphertext;
-// 	use spl_token_2022::solana_zk_sdk::zk_elgamal_proof_program::proof_data::BatchedGroupedCiphertext3HandlesValidityProofData;
-// 	use spl_token_2022::solana_zk_sdk::zk_elgamal_proof_program::proof_data::BatchedRangeProofU128Data;
-// 	use spl_token_2022::solana_zk_sdk::zk_elgamal_proof_program::proof_data::CiphertextCommitmentEqualityProofData;
-// 	use spl_token_2022::solana_zk_sdk::zk_elgamal_proof_program::proof_data::ZeroCiphertextProofData;
+// 	use spl_token_2022_interface::extension::confidential_transfer::instruction::initialize_mint;
+// 	use spl_token_2022_interface::extension::confidential_transfer::instruction::inner_configure_account;
+// 	use spl_token_2022_interface::extension::confidential_transfer::instruction::inner_empty_account;
+// 	use spl_token_2022_interface::extension::confidential_transfer::instruction::update_mint;
+// 	use spl_token_2022_interface::solana_zk_sdk::encryption::pod::auth_encryption::PodAeCiphertext;
+// 	use spl_token_2022_interface::solana_zk_sdk::encryption::pod::elgamal::PodElGamalCiphertext;
+// 	use spl_token_2022_interface::solana_zk_sdk::zk_elgamal_proof_program::proof_data::BatchedGroupedCiphertext3HandlesValidityProofData;
+// 	use spl_token_2022_interface::solana_zk_sdk::zk_elgamal_proof_program::proof_data::BatchedRangeProofU128Data;
+// 	use spl_token_2022_interface::solana_zk_sdk::zk_elgamal_proof_program::proof_data::CiphertextCommitmentEqualityProofData;
+// 	use spl_token_2022_interface::solana_zk_sdk::zk_elgamal_proof_program::proof_data::ZeroCiphertextProofData;
 // 	use spl_token_confidential_transfer_proof_extraction::instruction::ProofData;
 // 	use spl_token_confidential_transfer_proof_extraction::instruction::ProofLocation;
 
@@ -630,7 +630,7 @@ pub(in crate::parse_token) fn parse_confidential_transfer_instruction(
 // 	#[test]
 // 	fn test_initialize() {
 // 		let instruction = initialize_mint(
-// 			&spl_token_2022::id(),
+// 			&spl_token_2022_interface::id(),
 // 			&Pubkey::new_unique(),
 // 			Some(Pubkey::new_unique()),
 // 			true,
@@ -643,7 +643,7 @@ pub(in crate::parse_token) fn parse_confidential_transfer_instruction(
 // 	#[test]
 // 	fn test_approve() {
 // 		let instruction = approve_account(
-// 			&spl_token_2022::id(),
+// 			&spl_token_2022_interface::id(),
 // 			&Pubkey::new_unique(),
 // 			&Pubkey::new_unique(),
 // 			&Pubkey::new_unique(),
@@ -656,7 +656,7 @@ pub(in crate::parse_token) fn parse_confidential_transfer_instruction(
 // 	#[test]
 // 	fn test_update() {
 // 		let instruction = update_mint(
-// 			&spl_token_2022::id(),
+// 			&spl_token_2022_interface::id(),
 // 			&Pubkey::new_unique(),
 // 			&Pubkey::new_unique(),
 // 			&[],
@@ -681,7 +681,7 @@ pub(in crate::parse_token) fn parse_confidential_transfer_instruction(
 // 			ProofLocation::ContextStateAccount(&Pubkey::new_unique()),
 // 		] {
 // 			let instruction = inner_configure_account(
-// 				&spl_token_2022::id(),
+// 				&spl_token_2022_interface::id(),
 // 				&Pubkey::new_unique(),
 // 				&Pubkey::new_unique(),
 // 				&PodAeCiphertext::default(),
@@ -709,7 +709,7 @@ pub(in crate::parse_token) fn parse_confidential_transfer_instruction(
 // 			ProofLocation::ContextStateAccount(&Pubkey::new_unique()),
 // 		] {
 // 			let instruction = inner_empty_account(
-// 				&spl_token_2022::id(),
+// 				&spl_token_2022_interface::id(),
 // 				&Pubkey::new_unique(),
 // 				&Pubkey::new_unique(),
 // 				&[],
@@ -749,7 +749,7 @@ pub(in crate::parse_token) fn parse_confidential_transfer_instruction(
 // 			),
 // 		] {
 // 			let instruction = inner_withdraw(
-// 				&spl_token_2022::id(),
+// 				&spl_token_2022_interface::id(),
 // 				&Pubkey::new_unique(),
 // 				&Pubkey::new_unique(),
 // 				1,
@@ -805,7 +805,7 @@ pub(in crate::parse_token) fn parse_confidential_transfer_instruction(
 // 			),
 // 		] {
 // 			let instruction = inner_transfer(
-// 				&spl_token_2022::id(),
+// 				&spl_token_2022_interface::id(),
 // 				&Pubkey::new_unique(),
 // 				&Pubkey::new_unique(),
 // 				&Pubkey::new_unique(),
@@ -889,7 +889,7 @@ pub(in crate::parse_token) fn parse_confidential_transfer_instruction(
 // 			),
 // 		] {
 // 			let instruction = inner_transfer_with_fee(
-// 				&spl_token_2022::id(),
+// 				&spl_token_2022_interface::id(),
 // 				&Pubkey::new_unique(),
 // 				&Pubkey::new_unique(),
 // 				&Pubkey::new_unique(),

@@ -26,12 +26,12 @@ pub use solana_account_decoder_client_types_wasm::token::UiTransferHookAccount;
 use solana_clock::UnixTimestamp;
 use solana_program_pack::Pack;
 use solana_pubkey::Pubkey;
-use spl_token_2022::extension::BaseState;
-use spl_token_2022::extension::BaseStateWithExtensions;
-use spl_token_2022::extension::ExtensionType;
-use spl_token_2022::extension::StateWithExtensions;
-use spl_token_2022::extension::{self};
-use spl_token_2022::solana_zk_sdk::encryption::pod::elgamal::PodElGamalPubkey;
+use spl_token_2022_interface::extension::BaseState;
+use spl_token_2022_interface::extension::BaseStateWithExtensions;
+use spl_token_2022_interface::extension::ExtensionType;
+use spl_token_2022_interface::extension::StateWithExtensions;
+use spl_token_2022_interface::extension::{self};
+use spl_token_2022_interface::solana_zk_sdk::encryption::pod::elgamal::PodElGamalPubkey;
 use spl_token_group_interface::state::TokenGroup;
 use spl_token_group_interface::state::TokenGroupMember;
 use spl_token_metadata_interface::state::TokenMetadata;
@@ -94,7 +94,7 @@ pub fn parse_extension<S: BaseState + Pack>(
 				.get_extension::<extension::confidential_transfer::ConfidentialTransferAccount>()
 				.map(|&extension| {
 					UiExtension::ConfidentialTransferAccount(convert_confidential_transfer_account(
-						extension,
+						&extension,
 					))
 				})
 				.unwrap_or(UiExtension::UnparseableExtension)
@@ -275,8 +275,9 @@ fn convert_mint_close_authority(
 fn convert_default_account_state(
 	default_account_state: extension::default_account_state::DefaultAccountState,
 ) -> UiDefaultAccountState {
-	let account_state = spl_token_2022::state::AccountState::try_from(default_account_state.state)
-		.unwrap_or_default();
+	let account_state =
+		spl_token_2022_interface::state::AccountState::try_from(default_account_state.state)
+			.unwrap_or_default();
 	UiDefaultAccountState {
 		account_state: convert_account_state(account_state),
 	}
@@ -352,7 +353,7 @@ pub fn convert_confidential_transfer_fee_config(
 }
 
 fn convert_confidential_transfer_account(
-	confidential_transfer_account: extension::confidential_transfer::ConfidentialTransferAccount,
+	confidential_transfer_account: &extension::confidential_transfer::ConfidentialTransferAccount,
 ) -> UiConfidentialTransferAccount {
 	UiConfidentialTransferAccount {
 		approved: confidential_transfer_account.approved.into(),

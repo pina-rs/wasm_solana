@@ -9,7 +9,7 @@ use futures::lock::Mutex;
 use send_wrapper::SendWrapper;
 use serde_json::Value;
 use solana_program_test::ProgramTestContext;
-use solana_sdk::commitment_config::CommitmentConfig;
+use solana_commitment_config::CommitmentConfig;
 use solana_sdk::signature::Signature;
 use wasm_client_solana::ClientError;
 use wasm_client_solana::ClientResponse;

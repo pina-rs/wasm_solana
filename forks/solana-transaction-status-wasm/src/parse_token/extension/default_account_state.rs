@@ -1,6 +1,6 @@
 use solana_account_decoder_wasm::parse_token::convert_account_state;
-use spl_token_2022::extension::default_account_state::instruction::DefaultAccountStateInstruction;
-use spl_token_2022::extension::default_account_state::instruction::decode_instruction;
+use spl_token_2022_interface::extension::default_account_state::instruction::DefaultAccountStateInstruction;
+use spl_token_2022_interface::extension::default_account_state::instruction::decode_instruction;
 
 use super::*;
 
@@ -52,9 +52,9 @@ pub(in crate::parse_token) fn parse_default_account_state_instruction(
 mod test {
 	use solana_message::Message;
 	use solana_pubkey::Pubkey;
-	use spl_token_2022::extension::default_account_state::instruction::initialize_default_account_state;
-	use spl_token_2022::extension::default_account_state::instruction::update_default_account_state;
-	use spl_token_2022::state::AccountState;
+	use spl_token_2022_interface::extension::default_account_state::instruction::initialize_default_account_state;
+	use spl_token_2022_interface::extension::default_account_state::instruction::update_default_account_state;
+	use spl_token_2022_interface::state::AccountState;
 
 	use super::*;
 
@@ -62,7 +62,7 @@ mod test {
 	fn test_parse_default_account_state_instruction() {
 		let mint_pubkey = Pubkey::new_unique();
 		let init_default_account_state_ix = initialize_default_account_state(
-			&spl_token_2022::id(),
+			&spl_token_2022_interface::id(),
 			&mint_pubkey,
 			&AccountState::Frozen,
 		)
@@ -87,7 +87,7 @@ mod test {
 		// Single mint freeze_authority
 		let mint_freeze_authority = Pubkey::new_unique();
 		let update_default_account_state_ix = update_default_account_state(
-			&spl_token_2022::id(),
+			&spl_token_2022_interface::id(),
 			&mint_pubkey,
 			&mint_freeze_authority,
 			&[],
@@ -117,7 +117,7 @@ mod test {
 		let multisig_signer0 = Pubkey::new_unique();
 		let multisig_signer1 = Pubkey::new_unique();
 		let update_default_account_state_ix = update_default_account_state(
-			&spl_token_2022::id(),
+			&spl_token_2022_interface::id(),
 			&mint_pubkey,
 			&multisig_pubkey,
 			&[&multisig_signer0, &multisig_signer1],

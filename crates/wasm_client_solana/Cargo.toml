@@ -46,18 +46,31 @@ serde_json = { workspace = true, default-features = true }
 serde_tuple = { workspace = true, default-features = true }
 serde_with = { workspace = true, default-features = true }
 solana-account-decoder-client-types-wasm = { workspace = true }
-solana-account-decoder-wasm = { workspace = true }
+solana-account-decoder-wasm = { workspace = true, default-features = true }
+solana-address-lookup-table-interface = { workspace = true, default-features = true, features = ["serde"] }
+solana-commitment-config = { workspace = true, default-features = true, features = ["serde"] }
+solana-compute-budget = { workspace = true, default-features = true }
+solana-compute-budget-interface = { workspace = true, default-features = true, features = ["serde"] }
+solana-hash = { workspace = true, default-features = true, features = ["serde"] }
+solana-message = { workspace = true, default-features = true, features = ["serde"] }
+solana-native-token = { workspace = true, default-features = true }
+solana-nonce = { workspace = true, default-features = true, features = ["serde"] }
 solana-program = { workspace = true, default-features = true }
+solana-pubkey = { workspace = true, default-features = true }
 solana-sdk = { workspace = true, default-features = true }
+solana-sdk-ids = { workspace = true, default-features = true }
+solana-system-interface = { workspace = true, default-features = true }
+solana-system-program = { workspace = true, default-features = true }
 solana-transaction-status-client-types-wasm = { workspace = true }
 solana-transaction-status-wasm = { workspace = true }
 solana-version = { workspace = true, default-features = true }
+solana-vote-interface = { workspace = true, default-features = true, features = ["bincode", "serde"] }
 solana-zk-token-sdk = { workspace = true, default-features = true }
-spl-associated-token-account = { workspace = true, features = ["no-entrypoint"], default-features = true }
-spl-memo = { workspace = true, features = ["no-entrypoint"], default-features = true }
-spl-token = { workspace = true, features = ["no-entrypoint"], default-features = true }
-spl-token-2022 = { workspace = true, features = ["no-entrypoint", "serde-traits"], default-features = true }
+spl-associated-token-account-interface = { workspace = true, default-features = true }
+spl-memo-interface = { workspace = true, default-features = true }
+spl-token-2022-interface = { workspace = true, features = ["serde"], default-features = true }
 spl-token-group-interface = { workspace = true, default-features = true }
+spl-token-interface = { workspace = true, default-features = true }
 spl-token-metadata-interface = { workspace = true, default-features = true }
 thiserror = { workspace = true, default-features = true }
 tokio = { workspace = true, features = ["rt"], optional = true, default-features = true }

@@ -11,7 +11,7 @@ rust-version = { workspace = true }
 description = "Test utils to make working with pre defined keypairs easier."
 
 [dependencies]
-solana-sdk = { workspace = true, default-features = true }
+solana-keypair = { workspace = true, default-features = true }
 
 [lints]
 workspace = true

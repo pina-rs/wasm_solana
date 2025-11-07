@@ -1,6 +1,6 @@
 [package]
 name = "solana-account-decoder-client-types-wasm"
-version = "2.3.12"
+version = "3.0.10"
 authors = { workspace = true }
 documentation = "https://docs.rs/solana-account-decoder-client-types"
 edition = { workspace = true }

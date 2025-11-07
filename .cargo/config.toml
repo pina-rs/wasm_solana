@@ -2,9 +2,6 @@
 runner = 'wasm-bindgen-test-runner'
 
 [alias]
-llvm-cov = ["bin", "cargo-llvm-cov"]
-semver-checks = ["bin", "cargo-semver-checks"]
-
 test_wasm = [
 	"test",
 	"--target",
@@ -117,3 +114,9 @@ coverage_codecov_report = [
 	"--output-path",
 	"codecov.json",
 ]
+
+binstall = ["bin", "cargo-binstall"]
+dylint = ["bin", "cargo-dylint"]
+llvm-cov = ["bin", "cargo-llvm-cov"]
+nextest = ["bin", "cargo-nextest"]
+semver-checks = ["bin", "cargo-semver-checks"]

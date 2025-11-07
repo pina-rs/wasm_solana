@@ -1,5 +1,5 @@
-use spl_token_2022::extension::cpi_guard::instruction::CpiGuardInstruction;
-use spl_token_2022::instruction::decode_instruction_type;
+use spl_token_2022_interface::extension::cpi_guard::instruction::CpiGuardInstruction;
+use spl_token_2022_interface::instruction::decode_instruction_type;
 
 use super::*;
 
@@ -37,8 +37,8 @@ pub(in crate::parse_token) fn parse_cpi_guard_instruction(
 mod test {
 	use solana_message::Message;
 	use solana_pubkey::Pubkey;
-	use spl_token_2022::extension::cpi_guard::instruction::disable_cpi_guard;
-	use spl_token_2022::extension::cpi_guard::instruction::enable_cpi_guard;
+	use spl_token_2022_interface::extension::cpi_guard::instruction::disable_cpi_guard;
+	use spl_token_2022_interface::extension::cpi_guard::instruction::enable_cpi_guard;
 
 	use super::*;
 
@@ -49,7 +49,7 @@ mod test {
 		// Enable, single owner
 		let owner_pubkey = Pubkey::new_unique();
 		let enable_cpi_guard_ix =
-			enable_cpi_guard(&spl_token_2022::id(), &account_pubkey, &owner_pubkey, &[]).unwrap();
+			enable_cpi_guard(&spl_token_2022_interface::id(), &account_pubkey, &owner_pubkey, &[]).unwrap();
 		let message = Message::new(&[enable_cpi_guard_ix], None);
 		let compiled_instruction = &message.instructions[0];
 		assert_eq!(
@@ -72,7 +72,7 @@ mod test {
 		let multisig_signer0 = Pubkey::new_unique();
 		let multisig_signer1 = Pubkey::new_unique();
 		let enable_cpi_guard_ix = enable_cpi_guard(
-			&spl_token_2022::id(),
+			&spl_token_2022_interface::id(),
 			&account_pubkey,
 			&multisig_pubkey,
 			&[&multisig_signer0, &multisig_signer1],
@@ -101,7 +101,7 @@ mod test {
 
 		// Disable, single owner
 		let enable_cpi_guard_ix =
-			disable_cpi_guard(&spl_token_2022::id(), &account_pubkey, &owner_pubkey, &[]).unwrap();
+			disable_cpi_guard(&spl_token_2022_interface::id(), &account_pubkey, &owner_pubkey, &[]).unwrap();
 		let message = Message::new(&[enable_cpi_guard_ix], None);
 		let compiled_instruction = &message.instructions[0];
 		assert_eq!(
@@ -124,7 +124,7 @@ mod test {
 		let multisig_signer0 = Pubkey::new_unique();
 		let multisig_signer1 = Pubkey::new_unique();
 		let enable_cpi_guard_ix = disable_cpi_guard(
-			&spl_token_2022::id(),
+			&spl_token_2022_interface::id(),
 			&account_pubkey,
 			&multisig_pubkey,
 			&[&multisig_signer0, &multisig_signer1],

@@ -7,8 +7,8 @@ use serde::Serialize;
 use solana_sdk::account::AccountSharedData;
 use solana_sdk::account::ReadableAccount;
 use solana_sdk::pubkey::Pubkey;
-use spl_token_2022::generic_token_account::GenericTokenAccount;
-use spl_token_2022::state::Account;
+use spl_token_2022_interface::generic_token_account::GenericTokenAccount;
+use spl_token_2022_interface::state::Account;
 use thiserror::Error;
 
 const MAX_DATA_SIZE: usize = 128;
@@ -185,7 +185,7 @@ impl Memcmp {
 		}
 	}
 
-	pub fn bytes(&self) -> Option<Cow<Vec<u8>>> {
+	pub fn bytes(&'_ self) -> Option<Cow<'_, Vec<u8>>> {
 		use MemcmpEncodedBytes::Base58;
 		use MemcmpEncodedBytes::Base64;
 		use MemcmpEncodedBytes::Binary;

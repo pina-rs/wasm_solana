@@ -20,7 +20,7 @@ Or directly add the following to your `Cargo.toml`:
 
 ```toml
 [dev-dependencies]
-test_utils_solana = "0.7" # replace with the latest version
+test_utils_solana = "0.7.4"
 ```
 
 ### Features
@@ -85,9 +85,9 @@ async fn my_integration_test() {
 For more lightweight unit tests, you can use `ProgramTest` from `solana-program-test`. This library provides helpers to make it easier to work with.
 
 ```rust
+use solana_native_token::sol_str_to_lamports;
 use solana_program_test::ProgramTest;
 use solana_sdk::account::Account;
-use solana_sdk::native_token::sol_to_lamports;
 use solana_sdk::pubkey::Pubkey;
 use test_utils_solana::TestRpcProvider;
 
@@ -103,7 +103,7 @@ async fn my_unit_test() {
 	program_test.add_account(
 		user_pubkey,
 		Account {
-			lamports: sol_to_lamports(1.0),
+			lamports: sol_str_to_lamports("1.0").unwrap(),
 			..Account::default()
 		},
 	);

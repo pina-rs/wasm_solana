@@ -217,9 +217,9 @@ pub struct Subscription<T: DeserializeOwned + WebSocketNotification> {
 	#[builder(default)]
 	pub(crate) latest: PhantomData<T>,
 	/// The `id` that was originally used to create the parent subscription.
-	pub(crate) id: u32,
+	pub(crate) creator_id: u32,
 	/// The `subscription_id` used to unsubscribe.
-	pub(crate) subscription_id: SubscriptionId,
+	pub(crate) id: SubscriptionId,
 	// pub(crate) unsubscription: Unsubscription,
 }
 
@@ -228,8 +228,8 @@ impl<T: DeserializeOwned + WebSocketNotification> Subscription<T> {
 		Self::builder()
 			.receiver(ws.receiver.clone())
 			.sender(ws.sender.clone())
-			.id(id)
-			.subscription_id(subscription_id)
+			.creator_id(id)
+			.id(subscription_id)
 			.build()
 	}
 
@@ -274,8 +274,8 @@ impl<T: DeserializeOwned + WebSocketNotification> Subscription<T> {
 			.method(T::UNSUBSCRIBE)
 			.sender(self.sender.clone())
 			.receiver(self.receiver.clone())
-			.id(self.id)
-			.subscription_id(self.subscription_id)
+			.id(self.creator_id)
+			.subscription_id(self.id)
 			.build()
 	}
 
@@ -292,12 +292,12 @@ impl<T: DeserializeOwned + WebSocketNotification> Subscription<T> {
 	/// The `id` originally used to create this subscription. It is also used to
 	/// uniquely identify the unsubscription call.
 	pub fn id(&self) -> u32 {
-		self.id
+		self.creator_id
 	}
 
 	/// Get the `subscription_id` for this [`Subscription`].
 	pub fn subscription_id(&self) -> SubscriptionId {
-		self.subscription_id
+		self.id
 	}
 }
 

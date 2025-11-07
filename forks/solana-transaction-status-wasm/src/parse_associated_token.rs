@@ -2,23 +2,12 @@ use borsh::BorshDeserialize;
 use serde_json::json;
 use solana_message::AccountKeys;
 use solana_message::compiled_instruction::CompiledInstruction;
-use solana_pubkey::Pubkey;
-use spl_associated_token_account::instruction::AssociatedTokenAccountInstruction;
+use spl_associated_token_account_interface::instruction::AssociatedTokenAccountInstruction;
 
 use crate::parse_instruction::ParsableProgram;
 use crate::parse_instruction::ParseInstructionError;
 use crate::parse_instruction::ParsedInstructionEnum;
 use crate::parse_instruction::check_num_accounts;
-
-// A helper function to convert spl_associated_token_account::id() as
-// spl_sdk::pubkey::Pubkey to solana_pubkey::Pubkey
-#[deprecated(
-	since = "2.3.0",
-	note = "Use `spl_associated_token_account_client::program::id()` instead"
-)]
-pub fn spl_associated_token_id() -> Pubkey {
-	spl_associated_token_account::id()
-}
 
 pub fn parse_associated_token(
 	instruction: &CompiledInstruction,
@@ -96,15 +85,15 @@ fn check_num_associated_token_accounts(
 
 #[cfg(test)]
 mod test {
+	use solana_instruction::AccountMeta;
 	use solana_message::Message;
+	use solana_pubkey::Pubkey;
 	use solana_sdk_ids::sysvar;
-	#[allow(deprecated)]
-	use spl_associated_token_account::create_associated_token_account as create_associated_token_account_deprecated;
-	use spl_associated_token_account::get_associated_token_address;
-	use spl_associated_token_account::get_associated_token_address_with_program_id;
-	use spl_associated_token_account::instruction::create_associated_token_account;
-	use spl_associated_token_account::instruction::create_associated_token_account_idempotent;
-	use spl_associated_token_account::instruction::recover_nested;
+	use spl_associated_token_account_interface::address::get_associated_token_address;
+	use spl_associated_token_account_interface::address::get_associated_token_address_with_program_id;
+	use spl_associated_token_account_interface::instruction::create_associated_token_account;
+	use spl_associated_token_account_interface::instruction::create_associated_token_account_idempotent;
+	use spl_associated_token_account_interface::instruction::recover_nested;
 
 	use super::*;
 
@@ -114,8 +103,14 @@ mod test {
 		let wallet_address = Pubkey::new_unique();
 		let mint = Pubkey::new_unique();
 		let associated_account_address = get_associated_token_address(&wallet_address, &mint);
-		#[allow(deprecated)]
-		let create_ix = create_associated_token_account_deprecated(&funder, &wallet_address, &mint);
+		let token_program_id = spl_token_interface::id();
+		// mimic the deprecated instruction
+		let mut create_ix =
+			create_associated_token_account(&funder, &wallet_address, &mint, &token_program_id);
+		create_ix.data = vec![];
+		create_ix
+			.accounts
+			.push(AccountMeta::new_readonly(sysvar::rent::id(), false));
 		let mut message = Message::new(&[create_ix], None);
 		let compiled_instruction = &mut message.instructions[0];
 		let expected_parsed_ix = ParsedInstructionEnum {
@@ -126,7 +121,7 @@ mod test {
 				"wallet": wallet_address.to_string(),
 				"mint": mint.to_string(),
 				"systemProgram": solana_sdk_ids::system_program::id().to_string(),
-				"tokenProgram": spl_token::id().to_string(),
+				"tokenProgram": token_program_id.to_string(),
 			}),
 		};
 		assert_eq!(

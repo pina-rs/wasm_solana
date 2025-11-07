@@ -13,9 +13,7 @@ in
     with pkgs;
     [
       binaryen
-      cargo-binstall # speed up cargo-rust-bin installs
-      cargo-insta
-      cargo-nextest
+      cargo-release
       cargo-run-bin
       chromedriver
       curl # needed for `release-plz`
@@ -87,12 +85,12 @@ in
   };
 
   scripts = {
-    "release-plz" = {
+    "knope" = {
       exec = ''
         set -e
-        cargo bin release-plz $@
+        cargo bin knope $@
       '';
-      description = "The `release-plz` executable";
+      description = "The `knope` executable";
       binary = "bash";
     };
     "wasm-bindgen-test-runner" = {
@@ -167,7 +165,7 @@ in
     };
     "build:docs" = {
       exec = ''
-        RUSTUP_TOOLCHAIN="nightly" RUSTDOCFLAGS="--cfg docsrs" cargo doc --workspace --exclude example_program --exclude example_client --exclude test_utils_solana --exclude test_utils_anchor
+        RUSTUP_TOOLCHAIN="nightly" RUSTDOCFLAGS="--cfg docsrs" cargo doc --workspace --exclude example_program --exclude example_client --exclude test_utils_solana
       '';
       description = "Build documentation site.";
       binary = "bash";

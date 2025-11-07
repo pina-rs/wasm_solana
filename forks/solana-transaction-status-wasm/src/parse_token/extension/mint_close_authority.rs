@@ -23,7 +23,7 @@ mod test {
 	use serde_json::Value;
 	use solana_message::Message;
 	use solana_pubkey::Pubkey;
-	use spl_token_2022::instruction::*;
+	use spl_token_2022_interface::instruction::*;
 
 	use super::*;
 
@@ -32,7 +32,7 @@ mod test {
 		let mint_pubkey = Pubkey::new_unique();
 		let close_authority = Pubkey::new_unique();
 		let mint_close_authority_ix = initialize_mint_close_authority(
-			&spl_token_2022::id(),
+			&spl_token_2022_interface::id(),
 			&mint_pubkey,
 			Some(&close_authority),
 		)
@@ -55,7 +55,7 @@ mod test {
 		);
 
 		let mint_close_authority_ix =
-			initialize_mint_close_authority(&spl_token_2022::id(), &mint_pubkey, None).unwrap();
+			initialize_mint_close_authority(&spl_token_2022_interface::id(), &mint_pubkey, None).unwrap();
 		let message = Message::new(&[mint_close_authority_ix], None);
 		let compiled_instruction = &message.instructions[0];
 		assert_eq!(

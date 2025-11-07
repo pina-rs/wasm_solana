@@ -4,10 +4,10 @@ use std::future::Future;
 use std::ops::Div;
 use std::ops::Mul;
 
-use solana_sdk::address_lookup_table::AddressLookupTableAccount;
-use solana_sdk::address_lookup_table::instruction::create_lookup_table;
-use solana_sdk::address_lookup_table::instruction::extend_lookup_table;
-use solana_sdk::compute_budget::ComputeBudgetInstruction;
+use solana_address_lookup_table_interface::instruction::create_lookup_table;
+use solana_address_lookup_table_interface::instruction::extend_lookup_table;
+use solana_compute_budget_interface::ComputeBudgetInstruction;
+use solana_message::AddressLookupTableAccount;
 use solana_sdk::hash::Hash;
 use solana_sdk::instruction::Instruction;
 use solana_sdk::message::CompileError;

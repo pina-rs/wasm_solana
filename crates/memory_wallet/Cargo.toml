@@ -20,8 +20,11 @@ indexmap = { workspace = true, default-features = true }
 log = { workspace = true, default-features = true }
 nacl = { workspace = true, default-features = true }
 serde = { workspace = true, features = ["derive"], default-features = true }
+solana-commitment-config = { workspace = true, default-features = true }
+solana-native-token = { workspace = true, default-features = true }
 solana-program = { workspace = true, default-features = true }
 solana-sdk = { workspace = true, default-features = true }
+solana-system-interface = { workspace = true, default-features = true }
 typed-builder = { workspace = true, default-features = true }
 wallet_standard = { workspace = true, features = ["solana"], default-features = true }
 wasm_client_solana = { workspace = true }

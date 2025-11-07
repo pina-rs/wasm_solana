@@ -33,15 +33,18 @@ solana-banks-client = { workspace = true, default-features = true }
 solana-banks-interface = { workspace = true, default-features = true }
 solana-commitment-config = { workspace = true, default-features = true }
 solana-faucet = { workspace = true, optional = true, default-features = true }
+solana-loader-v3-interface = { workspace = true, default-features = true }
+solana-native-token = { workspace = true, default-features = true }
 solana-program = { workspace = true, default-features = true }
 solana-program-runtime = { workspace = true, default-features = true }
 solana-program-test = { workspace = true, default-features = true }
 solana-rpc = { workspace = true, default-features = true }
 solana-sdk = { workspace = true, default-features = true }
+solana-sdk-ids = { workspace = true, default-features = true }
 solana-system-interface = { workspace = true, default-features = true }
 solana-test-validator = { workspace = true, optional = true, default-features = true }
-spl-associated-token-account = { workspace = true, default-features = true }
-spl-token-2022 = { workspace = true, default-features = true }
+spl-associated-token-account-interface = { workspace = true, default-features = true }
+spl-token-2022-interface = { workspace = true, default-features = true }
 tarpc = { workspace = true, default-features = true }
 tempfile = { workspace = true, default-features = true, optional = true }
 typed-builder = { workspace = true, default-features = true }

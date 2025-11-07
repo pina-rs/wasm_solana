@@ -14,7 +14,7 @@ Add the following to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-wasm_client_solana = "0.9"
+wasm_client_solana = "0.9.0"
 ```
 
 Or use `cargo add`:
@@ -46,7 +46,7 @@ This crate provides the following features:
 The `SolanaRpcClient` provides a wasm compatible client for the [solana rpc](https://solana.com/docs/rpc) and [pubsub](https://solana.com/docs/rpc/websocket) methods.
 
 ```rust
-use solana_sdk::native_token::sol_to_lamports;
+use solana_native_token::sol_str_to_lamports;
 use solana_sdk::pubkey;
 use wasm_client_solana::ClientResult;
 use wasm_client_solana::DEVNET;
@@ -57,7 +57,7 @@ async fn run() -> ClientResult<()> {
 	let address = pubkey!("99P8ZgtJYe1buSK8JXkvpLh8xPsCFuLYhz9hQFNw93WJ");
 
 	client
-		.request_airdrop(&address, sol_to_lamports(1.0))
+		.request_airdrop(&address, sol_str_to_lamports("1.0").unwrap())
 		.await?;
 	let account = client.get_account(&address).await?;
 

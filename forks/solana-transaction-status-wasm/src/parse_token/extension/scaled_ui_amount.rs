@@ -1,8 +1,8 @@
-use spl_token_2022::extension::scaled_ui_amount::instruction::InitializeInstructionData;
-use spl_token_2022::extension::scaled_ui_amount::instruction::ScaledUiAmountMintInstruction;
-use spl_token_2022::extension::scaled_ui_amount::instruction::UpdateMultiplierInstructionData;
-use spl_token_2022::instruction::decode_instruction_data;
-use spl_token_2022::instruction::decode_instruction_type;
+use spl_token_2022_interface::extension::scaled_ui_amount::instruction::InitializeInstructionData;
+use spl_token_2022_interface::extension::scaled_ui_amount::instruction::ScaledUiAmountMintInstruction;
+use spl_token_2022_interface::extension::scaled_ui_amount::instruction::UpdateMultiplierInstructionData;
+use spl_token_2022_interface::instruction::decode_instruction_data;
+use spl_token_2022_interface::instruction::decode_instruction_type;
 
 use super::*;
 

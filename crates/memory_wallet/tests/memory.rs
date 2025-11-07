@@ -3,14 +3,14 @@
 use anyhow::Result;
 use assert2::check;
 use memory_wallet::MemoryWallet;
+use solana_commitment_config::CommitmentConfig;
+use solana_native_token::sol_str_to_lamports;
 use solana_sdk::account::Account;
-use solana_sdk::commitment_config::CommitmentConfig;
 use solana_sdk::hash::Hash;
-use solana_sdk::native_token::sol_to_lamports;
 use solana_sdk::pubkey::Pubkey;
 use solana_sdk::signature::Signature;
-use solana_sdk::system_instruction::transfer;
 use solana_sdk::transaction::VersionedTransaction;
+use solana_system_interface::instruction::transfer;
 use test_log::test;
 use test_utils_keypairs::get_wallet_keypair;
 use test_utils_solana::ProgramTest;
@@ -29,7 +29,7 @@ async fn sign_transaction() -> Result<()> {
 	let keypair = get_wallet_keypair();
 	let pubkey = keypair.pubkey();
 	let target_pubkey = Pubkey::new_unique();
-	let instruction = transfer(&pubkey, &target_pubkey, sol_to_lamports(0.5));
+	let instruction = transfer(&pubkey, &target_pubkey, sol_str_to_lamports("0.5").unwrap());
 	let blockhash = runner.rpc().get_latest_blockhash().await?;
 	let rpc = runner.rpc().clone();
 	let transaction =
@@ -54,7 +54,7 @@ async fn sign_and_send_transaction() -> Result<()> {
 	let keypair = get_wallet_keypair();
 	let pubkey = keypair.pubkey();
 	let target_pubkey = Pubkey::new_unique();
-	let instruction = transfer(&pubkey, &target_pubkey, sol_to_lamports(0.5));
+	let instruction = transfer(&pubkey, &target_pubkey, sol_str_to_lamports("0.5").unwrap());
 	let rpc = runner.rpc().clone();
 	let blockhash = rpc.get_latest_blockhash().await?;
 	let transaction =
@@ -82,7 +82,7 @@ async fn banks_client_process_transaction() -> Result<()> {
 	let target_pubkey = Pubkey::new_unique();
 	let (mut ctx, rpc) = create_program_test().await;
 	let mut wallet = MemoryWallet::new(rpc, &[keypair]);
-	let instruction = transfer(&pubkey, &target_pubkey, sol_to_lamports(0.5));
+	let instruction = transfer(&pubkey, &target_pubkey, sol_str_to_lamports("0.5").unwrap());
 
 	wallet.connect().await?;
 
@@ -108,7 +108,7 @@ async fn banks_client_simulate_transaction() -> Result<()> {
 	let target_pubkey = Pubkey::new_unique();
 	let (mut ctx, rpc) = create_program_test().await;
 	let mut wallet = MemoryWallet::new(rpc, &[keypair]);
-	let instruction = transfer(&pubkey, &target_pubkey, sol_to_lamports(0.5));
+	let instruction = transfer(&pubkey, &target_pubkey, sol_str_to_lamports("0.5").unwrap());
 
 	wallet.connect().await?;
 
@@ -145,7 +145,7 @@ async fn create_program_test() -> (ProgramTestContext, SolanaRpcClient) {
 	program_test.add_account(
 		pubkey,
 		Account {
-			lamports: sol_to_lamports(1.0),
+			lamports: sol_str_to_lamports("1.0").unwrap(),
 			..Account::default()
 		},
 	);

@@ -21,8 +21,8 @@ use solana_sdk_ids::stake;
 use solana_sdk_ids::system_program;
 use solana_sdk_ids::sysvar;
 use solana_sdk_ids::vote;
-use spl_token_2022::extension::interest_bearing_mint::InterestBearingConfig;
-use spl_token_2022::extension::scaled_ui_amount::ScaledUiAmountConfig;
+use spl_token_2022_interface::extension::interest_bearing_mint::InterestBearingConfig;
+use spl_token_2022_interface::extension::scaled_ui_amount::ScaledUiAmountConfig;
 use thiserror::Error;
 
 use crate::MAX_BASE58_BYTES;
@@ -49,8 +49,8 @@ pub static PARSABLE_PROGRAM_IDS: std::sync::LazyLock<HashMap<Pubkey, ParsableAcc
 		);
 		m.insert(config::id(), ParsableAccount::Config);
 		m.insert(system_program::id(), ParsableAccount::Nonce);
-		m.insert(spl_token::id(), ParsableAccount::SplToken);
-		m.insert(spl_token_2022::id(), ParsableAccount::SplToken2022);
+		m.insert(spl_token_interface::id(), ParsableAccount::SplToken);
+		m.insert(spl_token_2022_interface::id(), ParsableAccount::SplToken2022);
 		m.insert(stake::id(), ParsableAccount::Stake);
 		m.insert(sysvar::id(), ParsableAccount::Sysvar);
 		m.insert(vote::id(), ParsableAccount::Vote);
@@ -89,18 +89,6 @@ pub enum ParsableAccount {
 	Vote,
 }
 
-#[deprecated(since = "2.0.0", note = "Use `AccountAdditionalDataV3` instead")]
-#[derive(Clone, Copy, Default)]
-pub struct AccountAdditionalData {
-	pub spl_token_decimals: Option<u8>,
-}
-
-#[deprecated(since = "2.2.0", note = "Use `AccountAdditionalDataV3` instead")]
-#[derive(Clone, Copy, Default)]
-pub struct AccountAdditionalDataV2 {
-	pub spl_token_additional_data: Option<SplTokenAdditionalData>,
-}
-
 pub trait EncodeUiAccount {}
 
 fn encode_ui_accout_bs58<T: ReadableAccount>(
@@ -119,7 +107,7 @@ pub fn encode_ui_account<T: ReadableAccount>(
 	pubkey: &Pubkey,
 	account: &T,
 	encoding: UiAccountEncoding,
-	additional_data: Option<AccountAdditionalDataV2>,
+	additional_data: Option<AccountAdditionalDataV3>,
 	data_slice_config: Option<UiDataSliceConfig>,
 ) -> UiAccount {
 	let space = account.data().len();
@@ -160,7 +148,7 @@ pub fn encode_ui_account<T: ReadableAccount>(
 		}
 		UiAccountEncoding::JsonParsed => {
 			if let Ok(parsed_data) =
-				parse_account_data_v2(pubkey, account.owner(), account.data(), additional_data)
+				parse_account_data_v3(pubkey, account.owner(), account.data(), additional_data)
 			{
 				UiAccountData::Json(parsed_data)
 			} else {
@@ -184,15 +172,6 @@ pub fn encode_ui_account<T: ReadableAccount>(
 #[derive(Clone, Copy, Default)]
 pub struct AccountAdditionalDataV3 {
 	pub spl_token_additional_data: Option<SplTokenAdditionalDataV2>,
-}
-
-#[allow(deprecated)]
-impl From<AccountAdditionalDataV2> for AccountAdditionalDataV3 {
-	fn from(v: AccountAdditionalDataV2) -> Self {
-		Self {
-			spl_token_additional_data: v.spl_token_additional_data.map(Into::into),
-		}
-	}
 }
 
 #[derive(Clone, Copy, Default)]
@@ -236,39 +215,6 @@ impl SplTokenAdditionalDataV2 {
 	}
 }
 
-#[deprecated(since = "2.0.0", note = "Use `parse_account_data_v3` instead")]
-#[allow(deprecated)]
-pub fn parse_account_data(
-	pubkey: &Pubkey,
-	program_id: &Pubkey,
-	data: &[u8],
-	additional_data: Option<AccountAdditionalData>,
-) -> Result<ParsedAccount, ParseAccountError> {
-	parse_account_data_v3(
-		pubkey,
-		program_id,
-		data,
-		additional_data.map(|d| {
-			AccountAdditionalDataV3 {
-				spl_token_additional_data: d
-					.spl_token_decimals
-					.map(SplTokenAdditionalDataV2::with_decimals),
-			}
-		}),
-	)
-}
-
-#[deprecated(since = "2.2.0", note = "Use `parse_account_data_v3` instead")]
-#[allow(deprecated)]
-pub fn parse_account_data_v2(
-	pubkey: &Pubkey,
-	program_id: &Pubkey,
-	data: &[u8],
-	additional_data: Option<AccountAdditionalDataV2>,
-) -> Result<ParsedAccount, ParseAccountError> {
-	parse_account_data_v3(pubkey, program_id, data, additional_data.map(Into::into))
-}
-
 pub fn parse_account_data_v3(
 	pubkey: &Pubkey,
 	program_id: &Pubkey,
@@ -310,9 +256,10 @@ mod test {
 	use solana_nonce::state::Data;
 	use solana_nonce::state::State;
 	use solana_nonce::versions::Versions;
-	use solana_vote_interface::program::id as vote_program_id;
-	use solana_vote_interface::state::VoteState;
-	use solana_vote_interface::state::VoteStateVersions;
+	use solana_vote_interface::{
+		program::id as vote_program_id,
+		state::{VoteStateV3, VoteStateVersions},
+	};
 
 	use super::*;
 
@@ -323,10 +270,10 @@ mod test {
 		let data = vec![0; 4];
 		assert!(parse_account_data_v3(&account_pubkey, &other_program, &data, None).is_err());
 
-		let vote_state = VoteState::default();
-		let mut vote_account_data: Vec<u8> = vec![0; VoteState::size_of()];
-		let versioned = VoteStateVersions::new_current(vote_state);
-		VoteState::serialize(&versioned, &mut vote_account_data).unwrap();
+		let vote_state = VoteStateV3::default();
+		let mut vote_account_data: Vec<u8> = vec![0; VoteStateV3::size_of()];
+		let versioned = VoteStateVersions::new_v3(vote_state);
+		VoteStateV3::serialize(&versioned, &mut vote_account_data).unwrap();
 		let parsed = parse_account_data_v3(
 			&account_pubkey,
 			&vote_program_id(),
@@ -335,7 +282,7 @@ mod test {
 		)
 		.unwrap();
 		assert_eq!(parsed.program, "vote".to_string());
-		assert_eq!(parsed.space, VoteState::size_of() as u64);
+		assert_eq!(parsed.space, VoteStateV3::size_of() as u64);
 
 		let nonce_data = Versions::new(State::Initialized(Data::default()));
 		let nonce_account_data = bincode::serialize(&nonce_data).unwrap();

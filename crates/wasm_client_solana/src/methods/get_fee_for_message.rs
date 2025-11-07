@@ -2,7 +2,7 @@ use serde::Deserialize;
 use serde::Serializer;
 use serde_tuple::Serialize_tuple;
 use serde_with::skip_serializing_none;
-use solana_sdk::commitment_config::CommitmentConfig;
+use solana_commitment_config::CommitmentConfig;
 use solana_sdk::message::Message;
 
 use super::Context;

@@ -5,7 +5,7 @@ use std::time::Duration;
 use anyhow::Result;
 use assert2::check;
 use futures_timer::Delay;
-use solana_sdk::native_token::sol_to_lamports;
+use solana_native_token::sol_str_to_lamports;
 use solana_sdk::signature::Keypair;
 use test_utils_keypairs::get_wallet_keypair;
 use wasm_bindgen_test::*;
@@ -21,7 +21,7 @@ wasm_bindgen_test_configure!(run_in_browser);
 pub async fn request_airdrop() -> Result<()> {
 	let rpc = SolanaRpcClient::new(LOCALNET);
 	let pubkey = Keypair::new().pubkey();
-	let lamports = sol_to_lamports(1.0);
+	let lamports = sol_str_to_lamports("1.0").unwrap();
 	let signature = rpc.request_airdrop(&pubkey, lamports).await?;
 	rpc.confirm_transaction(&signature).await?;
 
@@ -86,15 +86,15 @@ pub async fn account_subscription() -> Result<()> {
 	});
 
 	let payer = get_wallet_keypair();
-	let instruction = solana_sdk::system_instruction::create_account(
+	let instruction = solana_system_interface::instruction::create_account(
 		&payer.pubkey(),
 		&new_account.pubkey(),
 		lamports,
 		space,
-		&solana_sdk::system_program::id(),
+		&solana_sdk_ids::system_program::id(),
 	);
 	let signature = rpc
-		.request_airdrop(&payer.pubkey(), sol_to_lamports(1.0))
+		.request_airdrop(&payer.pubkey(), sol_str_to_lamports("1.0").unwrap())
 		.await?;
 	rpc.confirm_transaction(&signature).await?;
 
@@ -117,7 +117,7 @@ pub async fn account_subscription() -> Result<()> {
 	console_log!("elapsed: {elapsed}");
 
 	let signature = rpc
-		.request_airdrop(&new_account.pubkey(), sol_to_lamports(1.0))
+		.request_airdrop(&new_account.pubkey(), sol_str_to_lamports("1.0").unwrap())
 		.await?;
 	rpc.confirm_transaction(&signature).await?;
 
@@ -125,7 +125,7 @@ pub async fn account_subscription() -> Result<()> {
 	console_log!("elapsed: {elapsed}");
 
 	let signature = rpc
-		.request_airdrop(&new_account.pubkey(), sol_to_lamports(1.0))
+		.request_airdrop(&new_account.pubkey(), sol_str_to_lamports("1.0").unwrap())
 		.await?;
 	rpc.confirm_transaction(&signature).await?;
 	let elapsed = js_sys::Date::now() - date.get_time();

@@ -35,24 +35,6 @@ jobs:
         run: lint:format
         shell: devenv shell -c -- bash -e {0}
 
-  # docs:
-  #   timeout-minutes: 60
-  #   runs-on: ubuntu-latest
-  # #   runs-on: blacksmith-2vcpu-ubuntu-2404
-  #   env:
-  #     RUSTUP_TOOLCHAIN: "nightly"
-  #   steps:
-  #     - name: checkout repository
-  #       uses: actions/checkout@v4
-
-  #     - name: setup
-  #       uses: ./.github/actions/devenv
-  #       with:
-  #         github-token: ${{ secrets.GITHUB_TOKEN }}
-
-  #     - name: build docs
-  #       run: build:docs
-
   test:
     timeout-minutes: 60
     runs-on: blacksmith-2vcpu-ubuntu-2404
@@ -202,60 +184,3 @@ jobs:
           export RUSTFLAGS='--cfg getrandom_backend="wasm_js"'
           cargo build -p wasm_client_solana --target wasm32-unknown-unknown
         shell: devenv shell -c -- bash -e {0}
-
-  release:
-    permissions:
-      pull-requests: write
-      contents: write
-      issues: write
-    timeout-minutes: 60
-    if: github.event_name == 'push'
-    runs-on: blacksmith-2vcpu-ubuntu-2404
-    needs: [test, lint, build]
-    steps:
-      - name: setup rust
-        uses: dtolnay/rust-toolchain@stable
-
-      - name: checkout
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-          token: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: release
-        uses: MarcoIeni/release-plz-action@v0.5
-        id: release-plz
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
-
-      - name: tag released prs
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          RELEASES: ${{ steps.release-plz.outputs.releases }}
-        run: |
-          set -e
-
-          # Iterate over released packages and add a label to the PRs
-          # shipped with the release.
-          for release in $(echo "$RELEASES" | jq -r -c '.[]'); do
-              package_name=$(echo "$release" | jq -r '.package_name')
-              version=$(echo "$release" | jq -r '.version')
-              prs_length=$(echo "$release" | jq '.prs | length')
-              if [ "$prs_length" -gt 0 ]; then
-                  # Create label.
-                  # Use `--force` to overwrite the label,
-                  # so that the command does not fail if the label already exists.
-                  label="released:$package_name-$version"
-                  echo "Creating label $label"
-                  gh label create $label --color BFD4F2 --force
-                  for pr in $(echo "$release" | jq -r -c '.prs[]'); do
-                      pr_number=$(echo "$pr" | jq -r '.number')
-                      echo "Adding label $label to PR #$pr_number"
-                      gh pr edit $pr_number --add-label $label
-                  done
-              else
-                  echo "No PRs found for package $package_name"
-              fi
-          done
-        shell: bash

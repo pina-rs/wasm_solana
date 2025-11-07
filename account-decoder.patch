@@ -1,0 +1,358 @@
+diff --git a/account-decoder/Cargo.toml b/account-decoder/Cargo.toml
+index eb8f97da89..d94c96a195 100644
+--- a/account-decoder/Cargo.toml
++++ b/account-decoder/Cargo.toml
+@@ -28,7 +28,7 @@ solana-address-lookup-table-interface = { workspace = true, features = [
+     "bytemuck",
+ ] }
+ solana-clock = { workspace = true }
+-solana-config-program-client = { workspace = true, features = ["serde"] }
++solana-config-interface = { workspace = true, features = ["bincode"] }
+ solana-epoch-schedule = { workspace = true }
+ solana-fee-calculator = { workspace = true }
+ solana-instruction = { workspace = true }
+@@ -41,13 +41,13 @@ solana-rent = { workspace = true }
+ solana-sdk-ids = { workspace = true }
+ solana-slot-hashes = { workspace = true }
+ solana-slot-history = { workspace = true }
+-solana-stake-interface = { workspace = true }
++solana-stake-interface = { workspace = true, features = ["bincode", "sysvar"] }
+ solana-sysvar = { workspace = true }
+ solana-vote-interface = { workspace = true, features = ["bincode"] }
+ spl-generic-token = { workspace = true }
+-spl-token = { workspace = true, features = ["no-entrypoint"] }
+-spl-token-2022 = { workspace = true, features = ["no-entrypoint"] }
++spl-token-2022-interface = { workspace = true }
+ spl-token-group-interface = { workspace = true }
++spl-token-interface = { workspace = true }
+ spl-token-metadata-interface = { workspace = true }
+ thiserror = { workspace = true }
+ zstd = { workspace = true }
+diff --git a/account-decoder/src/parse_account_data.rs b/account-decoder/src/parse_account_data.rs
+index 9f58a0c4fb..5b1d0bf527 100644
+--- a/account-decoder/src/parse_account_data.rs
++++ b/account-decoder/src/parse_account_data.rs
+@@ -13,7 +13,7 @@ use {
+     solana_sdk_ids::{
+         address_lookup_table, bpf_loader_upgradeable, config, stake, system_program, sysvar, vote,
+     },
+-    spl_token_2022::extension::{
++    spl_token_2022_interface::extension::{
+         interest_bearing_mint::InterestBearingConfig, scaled_ui_amount::ScaledUiAmountConfig,
+     },
+     std::collections::HashMap,
+@@ -33,8 +33,11 @@ pub static PARSABLE_PROGRAM_IDS: std::sync::LazyLock<HashMap<Pubkey, ParsableAcc
+         );
+         m.insert(config::id(), ParsableAccount::Config);
+         m.insert(system_program::id(), ParsableAccount::Nonce);
+-        m.insert(spl_token::id(), ParsableAccount::SplToken);
+-        m.insert(spl_token_2022::id(), ParsableAccount::SplToken2022);
++        m.insert(
++            spl_token_2022_interface::id(),
++            ParsableAccount::SplToken2022,
++        );
++        m.insert(spl_token_interface::id(), ParsableAccount::SplToken);
+         m.insert(stake::id(), ParsableAccount::Stake);
+         m.insert(sysvar::id(), ParsableAccount::Sysvar);
+         m.insert(vote::id(), ParsableAccount::Vote);
+@@ -73,32 +76,11 @@ pub enum ParsableAccount {
+     Vote,
+ }
+ 
+-#[deprecated(since = "2.0.0", note = "Use `AccountAdditionalDataV3` instead")]
+-#[derive(Clone, Copy, Default)]
+-pub struct AccountAdditionalData {
+-    pub spl_token_decimals: Option<u8>,
+-}
+-
+-#[deprecated(since = "2.2.0", note = "Use `AccountAdditionalDataV3` instead")]
+-#[derive(Clone, Copy, Default)]
+-pub struct AccountAdditionalDataV2 {
+-    pub spl_token_additional_data: Option<SplTokenAdditionalData>,
+-}
+-
+ #[derive(Clone, Copy, Default)]
+ pub struct AccountAdditionalDataV3 {
+     pub spl_token_additional_data: Option<SplTokenAdditionalDataV2>,
+ }
+ 
+-#[allow(deprecated)]
+-impl From<AccountAdditionalDataV2> for AccountAdditionalDataV3 {
+-    fn from(v: AccountAdditionalDataV2) -> Self {
+-        Self {
+-            spl_token_additional_data: v.spl_token_additional_data.map(Into::into),
+-        }
+-    }
+-}
+-
+ #[derive(Clone, Copy, Default)]
+ pub struct SplTokenAdditionalData {
+     pub decimals: u8,
+@@ -140,37 +122,6 @@ impl SplTokenAdditionalDataV2 {
+     }
+ }
+ 
+-#[deprecated(since = "2.0.0", note = "Use `parse_account_data_v3` instead")]
+-#[allow(deprecated)]
+-pub fn parse_account_data(
+-    pubkey: &Pubkey,
+-    program_id: &Pubkey,
+-    data: &[u8],
+-    additional_data: Option<AccountAdditionalData>,
+-) -> Result<ParsedAccount, ParseAccountError> {
+-    parse_account_data_v3(
+-        pubkey,
+-        program_id,
+-        data,
+-        additional_data.map(|d| AccountAdditionalDataV3 {
+-            spl_token_additional_data: d
+-                .spl_token_decimals
+-                .map(SplTokenAdditionalDataV2::with_decimals),
+-        }),
+-    )
+-}
+-
+-#[deprecated(since = "2.2.0", note = "Use `parse_account_data_v3` instead")]
+-#[allow(deprecated)]
+-pub fn parse_account_data_v2(
+-    pubkey: &Pubkey,
+-    program_id: &Pubkey,
+-    data: &[u8],
+-    additional_data: Option<AccountAdditionalDataV2>,
+-) -> Result<ParsedAccount, ParseAccountError> {
+-    parse_account_data_v3(pubkey, program_id, data, additional_data.map(Into::into))
+-}
+-
+ pub fn parse_account_data_v3(
+     pubkey: &Pubkey,
+     program_id: &Pubkey,
+@@ -214,7 +165,7 @@ mod test {
+         },
+         solana_vote_interface::{
+             program::id as vote_program_id,
+-            state::{VoteState, VoteStateVersions},
++            state::{VoteStateV3, VoteStateVersions},
+         },
+     };
+ 
+@@ -225,10 +176,10 @@ mod test {
+         let data = vec![0; 4];
+         assert!(parse_account_data_v3(&account_pubkey, &other_program, &data, None).is_err());
+ 
+-        let vote_state = VoteState::default();
+-        let mut vote_account_data: Vec<u8> = vec![0; VoteState::size_of()];
+-        let versioned = VoteStateVersions::new_current(vote_state);
+-        VoteState::serialize(&versioned, &mut vote_account_data).unwrap();
++        let vote_state = VoteStateV3::default();
++        let mut vote_account_data: Vec<u8> = vec![0; VoteStateV3::size_of()];
++        let versioned = VoteStateVersions::new_v3(vote_state);
++        VoteStateV3::serialize(&versioned, &mut vote_account_data).unwrap();
+         let parsed = parse_account_data_v3(
+             &account_pubkey,
+             &vote_program_id(),
+@@ -237,7 +188,7 @@ mod test {
+         )
+         .unwrap();
+         assert_eq!(parsed.program, "vote".to_string());
+-        assert_eq!(parsed.space, VoteState::size_of() as u64);
++        assert_eq!(parsed.space, VoteStateV3::size_of() as u64);
+ 
+         let nonce_data = Versions::new(State::Initialized(Data::default()));
+         let nonce_account_data = bincode::serialize(&nonce_data).unwrap();
+diff --git a/account-decoder/src/parse_config.rs b/account-decoder/src/parse_config.rs
+index 4f03503806..08be68fc42 100644
+--- a/account-decoder/src/parse_config.rs
++++ b/account-decoder/src/parse_config.rs
+@@ -5,7 +5,7 @@ use {
+     },
+     bincode::deserialize,
+     serde_json::Value,
+-    solana_config_program_client::{get_config_data, ConfigKeys},
++    solana_config_interface::state::{get_config_data, ConfigKeys},
+     solana_pubkey::Pubkey,
+     solana_stake_interface::config::{
+         Config as StakeConfig, {self as stake_config},
+@@ -101,7 +101,6 @@ mod test {
+         bincode::serialize,
+         serde_json::json,
+         solana_account::{Account, AccountSharedData, ReadableAccount},
+-        solana_config_program_client::ConfigKeys,
+     };
+ 
+     fn create_config_account<T: serde::Serialize>(
+diff --git a/account-decoder/src/parse_sysvar.rs b/account-decoder/src/parse_sysvar.rs
+index c0b260f154..9a5c70c89d 100644
+--- a/account-decoder/src/parse_sysvar.rs
++++ b/account-decoder/src/parse_sysvar.rs
+@@ -14,11 +14,9 @@ use {
+     solana_sdk_ids::sysvar,
+     solana_slot_hashes::SlotHashes,
+     solana_slot_history::{self as slot_history, SlotHistory},
++    solana_stake_interface::stake_history::{StakeHistory, StakeHistoryEntry},
+     solana_sysvar::{
+-        epoch_rewards::EpochRewards,
+-        last_restart_slot::LastRestartSlot,
+-        rewards::Rewards,
+-        stake_history::{StakeHistory, StakeHistoryEntry},
++        epoch_rewards::EpochRewards, last_restart_slot::LastRestartSlot, rewards::Rewards,
+     },
+ };
+ 
+diff --git a/account-decoder/src/parse_token.rs b/account-decoder/src/parse_token.rs
+index 88354eec97..2d281aecf9 100644
+--- a/account-decoder/src/parse_token.rs
++++ b/account-decoder/src/parse_token.rs
+@@ -1,14 +1,12 @@
+ use {
+     crate::{
+-        parse_account_data::{
+-            ParsableAccount, ParseAccountError, SplTokenAdditionalData, SplTokenAdditionalDataV2,
+-        },
++        parse_account_data::{ParsableAccount, ParseAccountError, SplTokenAdditionalDataV2},
+         parse_token_extension::parse_extension,
+     },
+     solana_program_option::COption,
+     solana_program_pack::Pack,
+     solana_pubkey::Pubkey,
+-    spl_token_2022::{
++    spl_token_2022_interface::{
+         extension::{BaseStateWithExtensions, StateWithExtensions},
+         generic_token_account::GenericTokenAccount,
+         state::{Account, AccountState, Mint, Multisig},
+@@ -23,25 +21,6 @@ pub use {
+     spl_generic_token::{is_known_spl_token_id, spl_token_ids},
+ };
+ 
+-#[deprecated(since = "2.0.0", note = "Use `parse_token_v3` instead")]
+-#[allow(deprecated)]
+-pub fn parse_token(
+-    data: &[u8],
+-    decimals: Option<u8>,
+-) -> Result<TokenAccountType, ParseAccountError> {
+-    let additional_data = decimals.map(SplTokenAdditionalData::with_decimals);
+-    parse_token_v2(data, additional_data.as_ref())
+-}
+-
+-#[deprecated(since = "2.2.0", note = "Use `parse_token_v3` instead")]
+-pub fn parse_token_v2(
+-    data: &[u8],
+-    additional_data: Option<&SplTokenAdditionalData>,
+-) -> Result<TokenAccountType, ParseAccountError> {
+-    let additional_data = additional_data.map(|v| (*v).into());
+-    parse_token_v3(data, additional_data.as_ref())
+-}
+-
+ pub fn parse_token_v3(
+     data: &[u8],
+     additional_data: Option<&SplTokenAdditionalDataV2>,
+@@ -143,20 +122,6 @@ pub fn convert_account_state(state: AccountState) -> UiAccountState {
+     }
+ }
+ 
+-#[deprecated(since = "2.0.0", note = "Use `token_amount_to_ui_amount_v3` instead")]
+-#[allow(deprecated)]
+-pub fn token_amount_to_ui_amount(amount: u64, decimals: u8) -> UiTokenAmount {
+-    token_amount_to_ui_amount_v2(amount, &SplTokenAdditionalData::with_decimals(decimals))
+-}
+-
+-#[deprecated(since = "2.2.0", note = "Use `token_amount_to_ui_amount_v3` instead")]
+-pub fn token_amount_to_ui_amount_v2(
+-    amount: u64,
+-    additional_data: &SplTokenAdditionalData,
+-) -> UiTokenAmount {
+-    token_amount_to_ui_amount_v3(amount, &(*additional_data).into())
+-}
+-
+ pub fn token_amount_to_ui_amount_v3(
+     amount: u64,
+     additional_data: &SplTokenAdditionalDataV2,
+@@ -211,7 +176,7 @@ mod test {
+         crate::parse_token_extension::{UiMemoTransfer, UiMintCloseAuthority},
+         solana_account_decoder_client_types::token::UiExtension,
+         spl_pod::optional_keys::OptionalNonZeroPubkey,
+-        spl_token_2022::extension::{
++        spl_token_2022_interface::extension::{
+             immutable_owner::ImmutableOwner, interest_bearing_mint::InterestBearingConfig,
+             memo_transfer::MemoTransfer, mint_close_authority::MintCloseAuthority,
+             scaled_ui_amount::ScaledUiAmountConfig, BaseStateWithExtensionsMut, ExtensionType,
+diff --git a/account-decoder/src/parse_token_extension.rs b/account-decoder/src/parse_token_extension.rs
+index ef23c5a353..958ff2afa6 100644
+--- a/account-decoder/src/parse_token_extension.rs
++++ b/account-decoder/src/parse_token_extension.rs
+@@ -11,7 +11,7 @@ use {
+     solana_clock::UnixTimestamp,
+     solana_program_pack::Pack,
+     solana_pubkey::Pubkey,
+-    spl_token_2022::{
++    spl_token_2022_interface::{
+         extension::{self, BaseState, BaseStateWithExtensions, ExtensionType, StateWithExtensions},
+         solana_zk_sdk::encryption::pod::elgamal::PodElGamalPubkey,
+     },
+@@ -202,8 +202,9 @@ fn convert_mint_close_authority(
+ fn convert_default_account_state(
+     default_account_state: extension::default_account_state::DefaultAccountState,
+ ) -> UiDefaultAccountState {
+-    let account_state = spl_token_2022::state::AccountState::try_from(default_account_state.state)
+-        .unwrap_or_default();
++    let account_state =
++        spl_token_2022_interface::state::AccountState::try_from(default_account_state.state)
++            .unwrap_or_default();
+     UiDefaultAccountState {
+         account_state: convert_account_state(account_state),
+     }
+diff --git a/account-decoder/src/parse_vote.rs b/account-decoder/src/parse_vote.rs
+index aca75b74f8..3dfb5aa63b 100644
+--- a/account-decoder/src/parse_vote.rs
++++ b/account-decoder/src/parse_vote.rs
+@@ -2,11 +2,11 @@ use {
+     crate::{parse_account_data::ParseAccountError, StringAmount},
+     solana_clock::{Epoch, Slot},
+     solana_pubkey::Pubkey,
+-    solana_vote_interface::state::{BlockTimestamp, Lockout, VoteState},
++    solana_vote_interface::state::{BlockTimestamp, Lockout, VoteStateV3},
+ };
+ 
+ pub fn parse_vote(data: &[u8]) -> Result<VoteAccountType, ParseAccountError> {
+-    let mut vote_state = VoteState::deserialize(data).map_err(ParseAccountError::from)?;
++    let mut vote_state = VoteStateV3::deserialize(data).map_err(ParseAccountError::from)?;
+     let epoch_credits = vote_state
+         .epoch_credits()
+         .iter()
+@@ -125,10 +125,10 @@ mod test {
+ 
+     #[test]
+     fn test_parse_vote() {
+-        let vote_state = VoteState::default();
+-        let mut vote_account_data: Vec<u8> = vec![0; VoteState::size_of()];
+-        let versioned = VoteStateVersions::new_current(vote_state);
+-        VoteState::serialize(&versioned, &mut vote_account_data).unwrap();
++        let vote_state = VoteStateV3::default();
++        let mut vote_account_data: Vec<u8> = vec![0; VoteStateV3::size_of()];
++        let versioned = VoteStateVersions::new_v3(vote_state);
++        VoteStateV3::serialize(&versioned, &mut vote_account_data).unwrap();
+         let expected_vote_state = UiVoteState {
+             node_pubkey: Pubkey::default().to_string(),
+             authorized_withdrawer: Pubkey::default().to_string(),
+diff --git a/account-decoder/src/validator_info.rs b/account-decoder/src/validator_info.rs
+index 9d35b6d75c..e0552d0c76 100644
+--- a/account-decoder/src/validator_info.rs
++++ b/account-decoder/src/validator_info.rs
+@@ -1,7 +1,6 @@
+-use solana_config_program_client::instructions_bincode::ConfigState;
+-
+ pub const MAX_SHORT_FIELD_LENGTH: usize = 80;
+ pub const MAX_LONG_FIELD_LENGTH: usize = 300;
++/// Maximum size of validator configuration data (`ValidatorInfo`).
+ pub const MAX_VALIDATOR_INFO: u64 = 576;
+ 
+ solana_pubkey::declare_id!("Va1idator1nfo111111111111111111111111111111");
+@@ -10,9 +9,3 @@ solana_pubkey::declare_id!("Va1idator1nfo111111111111111111111111111111");
+ pub struct ValidatorInfo {
+     pub info: String,
+ }
+-
+-impl ConfigState for ValidatorInfo {
+-    fn max_space() -> u64 {
+-        MAX_VALIDATOR_INFO
+-    }
+-}

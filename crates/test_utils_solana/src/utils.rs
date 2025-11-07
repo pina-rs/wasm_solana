@@ -10,19 +10,18 @@ use chrono_humanize::Tense;
 use solana_banks_client::BanksClient;
 use solana_banks_client::BanksClientError;
 use solana_banks_interface::BanksTransactionResultWithSimulation;
+use solana_commitment_config::CommitmentLevel;
+use solana_loader_v3_interface::state::UpgradeableLoaderState;
+use solana_native_token::sol_str_to_lamports;
 use solana_program_runtime::invoke_context::BuiltinFunctionWithContext;
 use solana_program_test::BanksTransactionResultWithMetadata;
 use solana_program_test::ProgramTest;
 use solana_program_test::ProgramTestContext;
 use solana_sdk::account::Account;
-use solana_sdk::bpf_loader_upgradeable;
-use solana_sdk::bpf_loader_upgradeable::UpgradeableLoaderState;
 use solana_sdk::clock::Clock;
 use solana_sdk::clock::Slot;
-use solana_sdk::commitment_config::CommitmentLevel;
 use solana_sdk::message::VersionedMessage;
 use solana_sdk::message::v0;
-use solana_sdk::native_token::sol_to_lamports;
 use solana_sdk::program_option::COption;
 use solana_sdk::program_pack::Pack;
 use solana_sdk::pubkey::Pubkey;
@@ -30,7 +29,8 @@ use solana_sdk::signature::Keypair;
 use solana_sdk::signature::Signer;
 use solana_sdk::sysvar::rent::Rent;
 use solana_sdk::transaction::VersionedTransaction;
-use spl_associated_token_account::get_associated_token_address;
+use solana_sdk_ids::bpf_loader_upgradeable;
+use spl_associated_token_account_interface::address::get_associated_token_address;
 use wallet_standard::SolanaSignAndSendTransactionProps;
 use wallet_standard::SolanaSignTransactionProps;
 use wallet_standard::prelude::*;
@@ -222,7 +222,7 @@ impl ProgramTestExtension for ProgramTest {
 
 		for _ in 0..number_of_accounts {
 			let keypair = Keypair::new();
-			let initial_lamports = sol_to_lamports(1_000.0);
+			let initial_lamports = sol_str_to_lamports("1000.0").unwrap();
 			self.add_account_with_lamports(keypair.pubkey(), keypair.pubkey(), initial_lamports);
 			accounts.push(keypair);
 		}
@@ -292,8 +292,8 @@ impl ProgramTestExtension for ProgramTest {
 	) {
 		self.add_account_with_packable(
 			pubkey,
-			spl_token_2022::ID,
-			spl_token_2022::state::Mint {
+			spl_token_2022_interface::ID,
+			spl_token_2022_interface::state::Mint {
 				mint_authority: COption::from(mint_authority),
 				supply,
 				decimals,
@@ -316,13 +316,13 @@ impl ProgramTestExtension for ProgramTest {
 	) {
 		self.add_account_with_packable(
 			pubkey,
-			spl_token_2022::id(),
-			spl_token_2022::state::Account {
+			spl_token_2022_interface::id(),
+			spl_token_2022_interface::state::Account {
 				mint,
 				owner,
 				amount,
 				delegate: COption::from(delegate),
-				state: spl_token_2022::state::AccountState::Initialized,
+				state: spl_token_2022_interface::state::AccountState::Initialized,
 				is_native: COption::from(is_native),
 				delegated_amount,
 				close_authority: COption::from(close_authority),
@@ -523,10 +523,10 @@ pub trait ProgramTestContextExtension {
 impl ProgramTestContextExtension for ProgramTestContext {
 	async fn create_funded_keypair(&mut self) -> Result<Keypair, BanksClientError> {
 		let keypair = Keypair::new();
-		let instruction = solana_program::system_instruction::transfer(
+		let instruction = solana_system_interface::instruction::transfer(
 			&self.payer.pubkey(),
 			&keypair.pubkey(),
-			sol_to_lamports(10.0),
+			sol_str_to_lamports("10.0").unwrap(),
 		);
 		let hash = self.banks_client.get_latest_blockhash().await?;
 		let message = v0::Message::try_compile(&self.payer.pubkey(), &[instruction], &[], hash)
