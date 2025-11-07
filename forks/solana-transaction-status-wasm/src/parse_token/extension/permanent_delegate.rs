@@ -30,7 +30,8 @@ mod test {
 		let mint_pubkey = Pubkey::new_unique();
 		let delegate = Pubkey::new_unique();
 		let permanent_delegate_ix =
-			initialize_permanent_delegate(&spl_token_2022_interface::id(), &mint_pubkey, &delegate).unwrap();
+			initialize_permanent_delegate(&spl_token_2022_interface::id(), &mint_pubkey, &delegate)
+				.unwrap();
 		let message = Message::new(&[permanent_delegate_ix], None);
 		let compiled_instruction = &message.instructions[0];
 		assert_eq!(

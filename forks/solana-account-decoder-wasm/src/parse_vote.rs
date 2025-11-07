@@ -3,13 +3,15 @@ use serde::Serialize;
 use solana_clock::Epoch;
 use solana_clock::Slot;
 use solana_pubkey::Pubkey;
-use solana_vote_interface::state::{BlockTimestamp, Lockout, VoteStateV3};
+use solana_vote_interface::state::BlockTimestamp;
+use solana_vote_interface::state::Lockout;
+use solana_vote_interface::state::VoteStateV3;
 
 use crate::StringAmount;
 use crate::parse_account_data::ParseAccountError;
 
 pub fn parse_vote(data: &[u8]) -> Result<VoteAccountType, ParseAccountError> {
-    let mut vote_state = VoteStateV3::deserialize(data).map_err(ParseAccountError::from)?;
+	let mut vote_state = VoteStateV3::deserialize(data).map_err(ParseAccountError::from)?;
 	let epoch_credits = vote_state
 		.epoch_credits()
 		.iter()

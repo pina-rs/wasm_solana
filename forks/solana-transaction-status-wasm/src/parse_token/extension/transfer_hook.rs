@@ -103,7 +103,8 @@ mod test {
 			}
 		);
 
-		let init_ix = initialize(&spl_token_2022_interface::id(), &mint_pubkey, None, None).unwrap();
+		let init_ix =
+			initialize(&spl_token_2022_interface::id(), &mint_pubkey, None, None).unwrap();
 		let mut message = Message::new(&[init_ix], None);
 		let compiled_instruction = &mut message.instructions[0];
 		assert_eq!(

@@ -48,8 +48,13 @@ mod test {
 
 		// Enable, single owner
 		let owner_pubkey = Pubkey::new_unique();
-		let enable_cpi_guard_ix =
-			enable_cpi_guard(&spl_token_2022_interface::id(), &account_pubkey, &owner_pubkey, &[]).unwrap();
+		let enable_cpi_guard_ix = enable_cpi_guard(
+			&spl_token_2022_interface::id(),
+			&account_pubkey,
+			&owner_pubkey,
+			&[],
+		)
+		.unwrap();
 		let message = Message::new(&[enable_cpi_guard_ix], None);
 		let compiled_instruction = &message.instructions[0];
 		assert_eq!(
@@ -100,8 +105,13 @@ mod test {
 		);
 
 		// Disable, single owner
-		let enable_cpi_guard_ix =
-			disable_cpi_guard(&spl_token_2022_interface::id(), &account_pubkey, &owner_pubkey, &[]).unwrap();
+		let enable_cpi_guard_ix = disable_cpi_guard(
+			&spl_token_2022_interface::id(),
+			&account_pubkey,
+			&owner_pubkey,
+			&[],
+		)
+		.unwrap();
 		let message = Message::new(&[enable_cpi_guard_ix], None);
 		let compiled_instruction = &message.instructions[0];
 		assert_eq!(

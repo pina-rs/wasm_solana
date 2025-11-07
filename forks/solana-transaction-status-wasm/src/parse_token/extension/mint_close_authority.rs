@@ -55,7 +55,8 @@ mod test {
 		);
 
 		let mint_close_authority_ix =
-			initialize_mint_close_authority(&spl_token_2022_interface::id(), &mint_pubkey, None).unwrap();
+			initialize_mint_close_authority(&spl_token_2022_interface::id(), &mint_pubkey, None)
+				.unwrap();
 		let message = Message::new(&[mint_close_authority_ix], None);
 		let compiled_instruction = &message.instructions[0];
 		assert_eq!(

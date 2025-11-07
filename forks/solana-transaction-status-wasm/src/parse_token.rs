@@ -1707,7 +1707,8 @@ mod test {
 		let get_account_data_size_ix = get_account_data_size(
 			program_id,
 			&mint_pubkey,
-			&[], // This emulates the packed data of spl_token_interface::instruction::get_account_data_size
+			&[], /* This emulates the packed data of
+			      * spl_token_interface::instruction::get_account_data_size */
 		)
 		.unwrap();
 		let message = Message::new(&[get_account_data_size_ix], None);
@@ -1805,7 +1806,8 @@ mod test {
 	#[test]
 	fn test_create_native_mint() {
 		let payer = Pubkey::new_unique();
-		let create_native_mint_ix = create_native_mint(&spl_token_2022_interface::id(), &payer).unwrap();
+		let create_native_mint_ix =
+			create_native_mint(&spl_token_2022_interface::id(), &payer).unwrap();
 		let message = Message::new(&[create_native_mint_ix], None);
 		let compiled_instruction = &message.instructions[0];
 		assert_eq!(
