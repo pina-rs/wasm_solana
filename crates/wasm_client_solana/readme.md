@@ -31,7 +31,7 @@ When building your crate for the `wasm32-unknown-unknown` target, you need to se
 export RUSTFLAGS='--cfg getrandom_backend="wasm_js"'
 ```
 
-Alternatively you can add this to you `./.cargo/config.toml` file.
+Alternatively you can add this to your `./.cargo/config.toml` file.
 
 ```toml
 [target.wasm32-unknown-unknown]

@@ -16,7 +16,7 @@ in
       cargo-release
       cargo-run-bin
       chromedriver
-      curl # needed for `release-plz`
+      curl
       cmake
       dprint
       eget

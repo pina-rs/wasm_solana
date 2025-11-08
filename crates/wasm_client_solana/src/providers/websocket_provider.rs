@@ -216,9 +216,10 @@ pub struct Subscription<T: DeserializeOwned + WebSocketNotification> {
 	pub(crate) sender: Arc<Mutex<SplitSink<WebSocketStream, Value>>>,
 	#[builder(default)]
 	pub(crate) latest: PhantomData<T>,
-	/// The `id` that was originally used to create the parent subscription.
+	/// The `creator_id` that was originally used to create the parent
+	/// subscription.
 	pub(crate) creator_id: u32,
-	/// The `subscription_id` used to unsubscribe.
+	/// The subscription `id` used to unsubscribe.
 	pub(crate) id: SubscriptionId,
 	// pub(crate) unsubscription: Unsubscription,
 }
@@ -240,7 +241,6 @@ impl<T: DeserializeOwned + WebSocketNotification> Subscription<T> {
 	/// can also call [`Subscription::unsubscribe`].
 	///
 	/// ```
-	/// use solana_pubkey::Pubkey;
 	/// use wasm_client_solana::LOCALNET;
 	/// use wasm_client_solana::LogsSubscribeRequest;
 	/// use wasm_client_solana::RpcTransactionLogsFilter;
