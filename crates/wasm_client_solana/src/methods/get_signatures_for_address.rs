@@ -3,7 +3,7 @@ use serde_tuple::Serialize_tuple;
 use serde_with::DisplayFromStr;
 use serde_with::serde_as;
 use serde_with::skip_serializing_none;
-use solana_sdk::pubkey::Pubkey;
+use solana_pubkey::Pubkey;
 
 use crate::impl_http_method;
 use crate::rpc_config::RpcSignaturesForAddressConfig;
@@ -48,7 +48,7 @@ impl From<GetSignaturesForAddressResponse> for Vec<RpcConfirmedTransactionStatus
 #[cfg(test)]
 mod tests {
 	use assert2::check;
-	use solana_sdk::pubkey;
+	use solana_pubkey::pubkey;
 
 	use super::*;
 	use crate::ClientRequest;

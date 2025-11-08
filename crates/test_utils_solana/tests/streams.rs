@@ -6,7 +6,7 @@
 use std::time::Duration;
 
 use assert2::check;
-use solana_sdk::signature::Keypair;
+use solana_keypair::Keypair;
 use test_utils_keypairs::get_wallet_keypair;
 use test_utils_solana::TestValidatorRunner;
 use test_utils_solana::TestValidatorRunnerProps;
@@ -63,7 +63,7 @@ async fn account_stream_subscription() -> anyhow::Result<()> {
 		&solana_sdk_ids::system_program::id(),
 	);
 	let recent_blockhash = rpc.get_latest_blockhash().await.unwrap();
-	let transaction = solana_sdk::transaction::Transaction::new_signed_with_payer(
+	let transaction = solana_transaction::Transaction::new_signed_with_payer(
 		&[instruction],
 		Some(&payer.pubkey()),
 		&[&payer, &new_account],

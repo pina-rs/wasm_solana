@@ -12,17 +12,17 @@ use anyhow::Result;
 use crossbeam_channel::unbounded;
 use port_check::is_local_ipv4_port_free;
 use rand::Rng;
+use solana_account::AccountSharedData;
+use solana_clock::Slot;
 use solana_commitment_config::CommitmentConfig;
 use solana_commitment_config::CommitmentLevel;
+use solana_epoch_schedule::EpochSchedule;
 use solana_faucet::faucet::run_local_faucet_with_port;
+use solana_keypair::Keypair;
 use solana_native_token::sol_str_to_lamports;
-use solana_program::epoch_schedule::EpochSchedule;
+use solana_pubkey::Pubkey;
 use solana_rpc::rpc::JsonRpcConfig;
-use solana_sdk::account::AccountSharedData;
-use solana_sdk::clock::Slot;
-use solana_sdk::pubkey::Pubkey;
-use solana_sdk::signature::Keypair;
-use solana_sdk::signer::Signer;
+use solana_signer::Signer;
 use solana_system_interface::program as system_program;
 use solana_test_validator::TestValidator;
 pub use solana_test_validator::TestValidatorGenesis;
@@ -79,7 +79,7 @@ impl TestValidatorRunnerProps {
 	///
 	/// ```rust
 	/// use solana_native_token::sol_str_to_lamports;
-	/// use solana_sdk::pubkey;
+	/// use solana_pubkey::pubkey;
 	/// use test_utils_solana::TestValidatorRunnerProps;
 	///
 	/// async fn run() {
@@ -365,7 +365,7 @@ fn find_ports() -> Option<(u16, u16, u16, (u16, u16))> {
 		attempts -= 1;
 		let port: u16 = rng.random_range(1000..max);
 		let range_start = port + 3;
-		let range_end = range_start + 20;
+		let range_end = range_start + 100;
 		let ports = (port, port + 1, port + 2, (range_start, range_end));
 
 		if is_port_available(ports.0)

@@ -15,8 +15,6 @@ pub mod parse_token_extension;
 pub mod parse_vote;
 pub mod validator_info;
 
-use std::io::Write;
-
 use base64::Engine;
 use base64::prelude::BASE64_STANDARD;
 use solana_account::ReadableAccount;
@@ -73,6 +71,8 @@ pub fn encode_ui_account<T: ReadableAccount>(
 		UiAccountEncoding::Base64Zstd => todo!("Currently zstd is not supported unless specified"),
 		#[cfg(feature = "zstd")]
 		UiAccountEncoding::Base64Zstd => {
+			use std::io::Write;
+
 			let mut encoder = zstd::stream::write::Encoder::new(Vec::new(), 0).unwrap();
 			match encoder
 				.write_all(slice_data(account.data(), data_slice_config))

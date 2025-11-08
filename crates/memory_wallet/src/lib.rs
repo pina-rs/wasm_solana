@@ -8,10 +8,10 @@ use derive_more::derive::DerefMut;
 use futures::future::try_join_all;
 use indexmap::Equivalent;
 use indexmap::IndexSet;
-use solana_sdk::pubkey::Pubkey;
-use solana_sdk::signature::Keypair;
-use solana_sdk::signature::Signature;
-use solana_sdk::transaction::VersionedTransaction;
+use solana_keypair::Keypair;
+use solana_pubkey::Pubkey;
+use solana_signature::Signature;
+use solana_transaction::versioned::VersionedTransaction;
 use wallet_standard::SOLANA_SIGN_AND_SEND_TRANSACTION;
 use wallet_standard::SOLANA_SIGN_IN;
 use wallet_standard::SOLANA_SIGN_MESSAGE;
@@ -173,9 +173,9 @@ pub struct MemoryWallet {
 }
 
 impl Signer for MemoryWallet {
-	fn try_pubkey(&self) -> Result<Pubkey, solana_sdk::signer::SignerError> {
+	fn try_pubkey(&self) -> Result<Pubkey, solana_signer::SignerError> {
 		let Some(ref account) = self.account else {
-			return Err(solana_sdk::signer::SignerError::Connection(
+			return Err(solana_signer::SignerError::Connection(
 				"No connected account".into(),
 			));
 		};
@@ -183,12 +183,9 @@ impl Signer for MemoryWallet {
 		account.try_pubkey()
 	}
 
-	fn try_sign_message(
-		&self,
-		message: &[u8],
-	) -> Result<Signature, solana_sdk::signer::SignerError> {
+	fn try_sign_message(&self, message: &[u8]) -> Result<Signature, solana_signer::SignerError> {
 		let Some(ref account) = self.account else {
-			return Err(solana_sdk::signer::SignerError::Connection(
+			return Err(solana_signer::SignerError::Connection(
 				"No connected account".into(),
 			));
 		};
@@ -299,7 +296,7 @@ impl WalletSolanaSignAndSendTransaction for MemoryWallet {
 
 		transaction.try_sign(
 			&[&**account],
-			if message_blockhash == solana_sdk::hash::Hash::default() {
+			if message_blockhash == solana_hash::Hash::default() {
 				Some(self.rpc.get_latest_blockhash().await?)
 			} else {
 				None
@@ -340,7 +337,7 @@ impl WalletSolanaSignTransaction for MemoryWallet {
 
 		transaction.try_sign(
 			&[&**account],
-			if message_blockhash == solana_sdk::hash::Hash::default() {
+			if message_blockhash == solana_hash::Hash::default() {
 				Some(self.rpc.get_latest_blockhash().await?)
 			} else {
 				None

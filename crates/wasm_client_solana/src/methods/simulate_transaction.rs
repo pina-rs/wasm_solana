@@ -2,8 +2,8 @@ use serde::Deserialize;
 use serde::Deserializer;
 use serde::Serialize;
 use serde::ser::SerializeTuple;
-use solana_sdk::transaction::TransactionError;
-use solana_sdk::transaction::VersionedTransaction;
+use solana_transaction::versioned::VersionedTransaction;
+use solana_transaction_error::TransactionError;
 
 use super::Context;
 use crate::deserialize_and_decode;
@@ -119,7 +119,7 @@ mod tests {
 	use assert2::check;
 	use base64::Engine;
 	use base64::prelude::BASE64_STANDARD;
-	use solana_sdk::pubkey;
+	use solana_pubkey::pubkey;
 
 	use super::*;
 	use crate::ClientRequest;

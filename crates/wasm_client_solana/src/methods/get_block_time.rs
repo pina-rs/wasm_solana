@@ -2,7 +2,7 @@ use serde::Deserialize;
 use serde::Serialize;
 use serde_tuple::Deserialize_tuple;
 use serde_tuple::Serialize_tuple;
-use solana_sdk::clock::UnixTimestamp;
+use solana_clock::UnixTimestamp;
 
 use crate::impl_http_method;
 

@@ -47,7 +47,7 @@ The `SolanaRpcClient` provides a wasm compatible client for the [solana rpc](htt
 
 ```rust
 use solana_native_token::sol_str_to_lamports;
-use solana_sdk::pubkey;
+use solana_pubkey::pubkey;
 use wasm_client_solana::ClientResult;
 use wasm_client_solana::DEVNET;
 use wasm_client_solana::SolanaRpcClient;

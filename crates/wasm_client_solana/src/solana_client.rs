@@ -3,19 +3,19 @@ use std::time::Duration;
 
 use futures_timer::Delay;
 use serde::de::DeserializeOwned;
+use solana_account::Account;
+use solana_clock::Epoch;
+use solana_clock::Slot;
+use solana_clock::UnixTimestamp;
 use solana_commitment_config::CommitmentConfig;
 use solana_commitment_config::CommitmentLevel;
-use solana_sdk::account::Account;
-use solana_sdk::clock::Epoch;
-use solana_sdk::clock::Slot;
-use solana_sdk::clock::UnixTimestamp;
-use solana_sdk::epoch_info::EpochInfo;
-use solana_sdk::epoch_schedule::EpochSchedule;
-use solana_sdk::hash::Hash;
-use solana_sdk::message::Message;
-use solana_sdk::pubkey::Pubkey;
-use solana_sdk::signature::Signature;
-use solana_sdk::transaction::VersionedTransaction;
+use solana_epoch_info::EpochInfo;
+use solana_epoch_schedule::EpochSchedule;
+use solana_hash::Hash;
+use solana_message::Message;
+use solana_pubkey::Pubkey;
+use solana_signature::Signature;
+use solana_transaction::versioned::VersionedTransaction;
 
 use crate::ClientError;
 use crate::ClientResponse;
@@ -1405,7 +1405,7 @@ impl SolanaRpcClient {
 	/// ```rust
 	/// # use wasm_client_solana::DEVNET;
 	/// # use wasm_client_solana::SolanaRpcClient;
-	/// # use solana_sdk::pubkey;
+	/// # use solana_pubkey::pubkey;
 	/// # use futures::StreamExt;
 	///
 	/// # async fn run() -> anyhow::Result<()> {

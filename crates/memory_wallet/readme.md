@@ -36,12 +36,12 @@ The memory wallet is a simple wallet that stores all accounts in memory and conf
 use anyhow::Result;
 use memory_wallet::MemoryWallet;
 use memory_wallet::prelude::*;
+use solana_keypair::Keypair;
 use solana_native_token::sol_str_to_lamports;
-use solana_sdk::pubkey::Pubkey;
-use solana_sdk::signature::Keypair;
-use solana_sdk::signature::Signature;
-use solana_sdk::system_instruction;
-use solana_sdk::transaction::VersionedTransaction;
+use solana_pubkey::Pubkey;
+use solana_signature::Signature;
+use solana_system_interface::instruction::transfer;
+use solana_transaction::versioned::VersionedTransaction;
 use wallet_standard::SolanaSignTransactionProps;
 use wasm_client_solana::DEVNET;
 use wasm_client_solana::SolanaRpcClient;
@@ -50,8 +50,7 @@ async fn run() -> Result<()> {
 	let keypair = Keypair::new();
 	let pubkey = keypair.pubkey();
 	let target_pubkey = Pubkey::new_unique();
-	let instruction =
-		system_instruction::transfer(&pubkey, &target_pubkey, sol_str_to_lamports("0.5").unwrap());
+	let instruction = transfer(&pubkey, &target_pubkey, sol_str_to_lamports("0.5").unwrap());
 	let rpc = SolanaRpcClient::new(DEVNET);
 	let blockhash = rpc.get_latest_blockhash().await?;
 	let transaction =

@@ -3,7 +3,7 @@ use serde::Serialize;
 use serde_tuple::Deserialize_tuple;
 use serde_tuple::Serialize_tuple;
 use serde_with::skip_serializing_none;
-use solana_sdk::clock::Slot;
+use solana_clock::Slot;
 
 use crate::impl_http_method;
 use crate::rpc_config::RpcBlockConfig;
@@ -43,7 +43,7 @@ impl From<GetBlockResponse> for UiConfirmedBlock {
 #[cfg(test)]
 mod tests {
 	use assert2::check;
-	use solana_sdk::message::MessageHeader;
+	use solana_message::MessageHeader;
 
 	use super::*;
 	use crate::ClientRequest;

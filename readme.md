@@ -41,8 +41,8 @@ The path will not be easy. Hiring may be difficult, error messages may be crypti
 - **[`memory_wallet`](./crates/memory_wallet)**: A `wallet-standard` compliant in-memory wallet, ideal for testing and prototyping. It manages `Keypair`s directly in memory, allowing for seamless signing of transactions and messages without requiring user interaction.
 
   ```rust
-  use solana_sdk::transaction::Transaction;
-  use solana_sdk::signature::Keypair;
+  use solana_transaction::Transaction;
+  use solana_keypair::Keypair;
   use wasm_client_solana::{SolanaRpcClient, WasmRpcClient};
   use memory_wallet::MemoryWallet;
 
@@ -63,7 +63,7 @@ The path will not be easy. Hiring may be difficult, error messages may be crypti
 
   ```rust
   use insta::assert_debug_snapshot;
-  use solana_sdk::signature::Signature;
+  use solana_signature::Signature;
   use test_utils_insta::create_insta_redaction;
 
   let signature = Signature::new_unique();
@@ -108,7 +108,7 @@ The path will not be easy. Hiring may be difficult, error messages may be crypti
   ```rust
   use std::str::FromStr;
 
-  use solana_sdk::pubkey::Pubkey;
+  use solana_pubkey::Pubkey;
   use wasm_client_solana::SolanaRpcClient;
   use wasm_client_solana::WasmRpcClient;
 

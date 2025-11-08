@@ -2,15 +2,15 @@
 
 use serde::Deserialize;
 use serde::Serialize;
+use solana_account::Account;
+use solana_account::ReadableAccount;
+use solana_account::state_traits::StateMut;
 use solana_commitment_config::CommitmentConfig;
+use solana_hash::Hash;
 use solana_nonce::state::Data;
 use solana_nonce::state::State;
 use solana_nonce::versions::Versions;
-use solana_sdk::account::Account;
-use solana_sdk::account::ReadableAccount;
-use solana_sdk::account_utils::StateMut;
-use solana_sdk::hash::Hash;
-use solana_sdk::pubkey::Pubkey;
+use solana_pubkey::Pubkey;
 use solana_sdk_ids::system_program;
 
 use crate::ClientResult;

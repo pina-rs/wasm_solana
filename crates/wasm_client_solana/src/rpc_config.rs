@@ -9,13 +9,13 @@ use serde::de::DeserializeOwned;
 use serde_with::DisplayFromStr;
 use serde_with::serde_as;
 use serde_with::skip_serializing_none;
+use solana_clock::Epoch;
+use solana_clock::Slot;
 use solana_commitment_config::CommitmentConfig;
 use solana_commitment_config::CommitmentLevel;
-use solana_sdk::clock::Epoch;
-use solana_sdk::clock::Slot;
-use solana_sdk::hash::Hash;
-use solana_sdk::pubkey::Pubkey;
-use solana_sdk::signature::Signature;
+use solana_hash::Hash;
+use solana_pubkey::Pubkey;
+use solana_signature::Signature;
 use typed_builder::TypedBuilder;
 
 use super::rpc_filter::RpcFilterType;

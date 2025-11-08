@@ -5,8 +5,8 @@ use std::time::Duration;
 use anyhow::Result;
 use assert2::check;
 use futures_timer::Delay;
+use solana_keypair::Keypair;
 use solana_native_token::sol_str_to_lamports;
-use solana_sdk::signature::Keypair;
 use test_utils_keypairs::get_wallet_keypair;
 use wasm_bindgen_test::*;
 use wasm_client_solana::LOCALNET;
@@ -102,7 +102,7 @@ pub async fn account_subscription() -> Result<()> {
 	console_log!("elapsed: {elapsed}");
 
 	let recent_blockhash = rpc.get_latest_blockhash().await.unwrap();
-	let transaction = solana_sdk::transaction::Transaction::new_signed_with_payer(
+	let transaction = solana_transaction::Transaction::new_signed_with_payer(
 		&[instruction],
 		Some(&payer.pubkey()),
 		&[&payer, &new_account],

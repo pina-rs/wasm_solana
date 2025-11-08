@@ -34,7 +34,7 @@ test_utils_solana = "0.7.4"
 The following requires the `test_validator` feature to be enabled.
 
 ```rust
-use solana_sdk::pubkey;
+use solana_pubkey::pubkey;
 use test_utils_solana::TestValidatorRunner;
 use test_utils_solana::TestValidatorRunnerProps;
 
@@ -59,7 +59,7 @@ When writing tests that use this library, you'll need to use the `#[tokio::test(
 For integration tests that require a realistic Solana runtime, you can use `TestValidatorRunner`.
 
 ```rust
-use solana_sdk::pubkey;
+use solana_pubkey::pubkey;
 use test_utils_solana::TestValidatorRunner;
 use test_utils_solana::TestValidatorRunnerProps;
 
@@ -85,10 +85,10 @@ async fn my_integration_test() {
 For more lightweight unit tests, you can use `ProgramTest` from `solana-program-test`. This library provides helpers to make it easier to work with.
 
 ```rust
+use solana_account::Account;
 use solana_native_token::sol_str_to_lamports;
 use solana_program_test::ProgramTest;
-use solana_sdk::account::Account;
-use solana_sdk::pubkey::Pubkey;
+use solana_pubkey::Pubkey;
 use test_utils_solana::TestRpcProvider;
 
 #[tokio::test(flavor = "multi_thread")]

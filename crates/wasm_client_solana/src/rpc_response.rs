@@ -1,6 +1,7 @@
 use std::collections::HashMap;
 use std::fmt;
 use std::net::SocketAddr;
+use std::result::Result;
 use std::str::FromStr;
 
 use derive_more::derive::Deref;
@@ -12,17 +13,17 @@ use serde::Serializer;
 use serde_with::DisplayFromStr;
 use serde_with::serde_as;
 use serde_with::skip_serializing_none;
-use solana_sdk::clock::Epoch;
-use solana_sdk::clock::Slot;
-use solana_sdk::clock::UnixTimestamp;
-use solana_sdk::fee_calculator::FeeCalculator;
-use solana_sdk::fee_calculator::FeeRateGovernor;
-use solana_sdk::hash::Hash;
-use solana_sdk::inflation::Inflation;
-use solana_sdk::pubkey::Pubkey;
-use solana_sdk::signature::Signature;
-use solana_sdk::transaction::Result;
-use solana_sdk::transaction::TransactionError;
+use solana_clock::Epoch;
+use solana_clock::Slot;
+use solana_clock::UnixTimestamp;
+use solana_fee_calculator::FeeCalculator;
+use solana_fee_calculator::FeeRateGovernor;
+use solana_hash::Hash;
+use solana_inflation::Inflation;
+use solana_pubkey::Pubkey;
+use solana_signature::Signature;
+use solana_transaction_error::TransactionError;
+use solana_transaction_error::TransactionResult;
 use thiserror::Error;
 
 use crate::Context;
@@ -81,7 +82,7 @@ impl Default for RpcApiVersion {
 }
 
 impl Serialize for RpcApiVersion {
-	fn serialize<S>(&self, serializer: S) -> std::result::Result<S::Ok, S::Error>
+	fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
 	where
 		S: Serializer,
 	{
@@ -90,7 +91,7 @@ impl Serialize for RpcApiVersion {
 }
 
 impl<'de> Deserialize<'de> for RpcApiVersion {
-	fn deserialize<D>(deserializer: D) -> std::result::Result<Self, D::Error>
+	fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
 	where
 		D: Deserializer<'de>,
 	{
@@ -389,14 +390,13 @@ pub struct RpcContactInfo {
 pub struct RpcLeaderSchedule(#[serde(with = "pubkey_string_map")] pub HashMap<Pubkey, Vec<usize>>);
 
 mod pubkey_string_map {
+	use std::result::Result;
+
 	use serde::ser::SerializeMap;
 
 	use super::*;
 
-	pub fn serialize<S>(
-		map: &HashMap<Pubkey, Vec<usize>>,
-		serializer: S,
-	) -> std::result::Result<S::Ok, S::Error>
+	pub fn serialize<S>(map: &HashMap<Pubkey, Vec<usize>>, serializer: S) -> Result<S::Ok, S::Error>
 	where
 		S: Serializer,
 	{
@@ -407,9 +407,7 @@ mod pubkey_string_map {
 		ser_map.end()
 	}
 
-	pub fn deserialize<'de, D>(
-		deserializer: D,
-	) -> std::result::Result<HashMap<Pubkey, Vec<usize>>, D::Error>
+	pub fn deserialize<'de, D>(deserializer: D) -> Result<HashMap<Pubkey, Vec<usize>>, D::Error>
 	where
 		D: Deserializer<'de>,
 	{
@@ -531,7 +529,7 @@ pub struct RpcVoteAccountInfo {
 #[serde(rename_all = "camelCase")]
 pub struct RpcSignatureConfirmation {
 	pub confirmations: usize,
-	pub status: Result<()>,
+	pub status: TransactionResult<()>,
 }
 
 #[skip_serializing_none]

@@ -2,8 +2,8 @@ use std::fmt;
 
 use serde::Deserialize;
 use serde::Serialize;
-use solana_sdk::message::CompileError;
-use solana_sdk::signer::SignerError;
+use solana_message::CompileError;
+use solana_signer::SignerError;
 use wallet_standard::IntoWalletError;
 use wallet_standard::WalletError;
 

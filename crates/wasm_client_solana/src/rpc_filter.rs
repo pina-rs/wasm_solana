@@ -4,9 +4,9 @@ use std::borrow::Cow;
 
 use serde::Deserialize;
 use serde::Serialize;
-use solana_sdk::account::AccountSharedData;
-use solana_sdk::account::ReadableAccount;
-use solana_sdk::pubkey::Pubkey;
+use solana_account::AccountSharedData;
+use solana_account::ReadableAccount;
+use solana_pubkey::Pubkey;
 use spl_token_2022_interface::generic_token_account::GenericTokenAccount;
 use spl_token_2022_interface::state::Account;
 use thiserror::Error;

@@ -3,7 +3,7 @@ use serde::Deserializer;
 use serde::Serialize;
 use serde_with::DisplayFromStr;
 use serde_with::serde_as;
-use solana_sdk::pubkey::Pubkey;
+use solana_pubkey::Pubkey;
 use typed_builder::TypedBuilder;
 
 use super::Context;
@@ -16,7 +16,7 @@ use crate::solana_account_decoder::UiAccount;
 /// Use the builder pattern to create a request for account info.
 ///
 /// ```rust
-/// use solana_sdk::pubkey;
+/// use solana_pubkey::pubkey;
 /// use wasm_client_solana::GetAccountInfoRequest;
 ///
 /// let request = GetAccountInfoRequest::builder()
@@ -99,7 +99,7 @@ impl_websocket_notification!(GetAccountInfoResponse, "account");
 #[cfg(test)]
 mod tests {
 	use assert2::check;
-	use solana_sdk::pubkey;
+	use solana_pubkey::pubkey;
 
 	use super::*;
 	use crate::ClientRequest;

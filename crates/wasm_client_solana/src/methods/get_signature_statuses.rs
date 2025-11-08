@@ -5,7 +5,7 @@ use serde::Serializer;
 use serde_with::DisplayFromStr;
 use serde_with::serde_as;
 use serde_with::skip_serializing_none;
-use solana_sdk::signature::Signature;
+use solana_signature::Signature;
 
 use super::Context;
 use crate::impl_http_method;

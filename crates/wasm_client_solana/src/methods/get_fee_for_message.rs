@@ -3,7 +3,7 @@ use serde::Serializer;
 use serde_tuple::Serialize_tuple;
 use serde_with::skip_serializing_none;
 use solana_commitment_config::CommitmentConfig;
-use solana_sdk::message::Message;
+use solana_message::Message;
 
 use super::Context;
 use crate::impl_http_method;

@@ -4,7 +4,7 @@ use serde_tuple::Deserialize_tuple;
 use serde_tuple::Serialize_tuple;
 use serde_with::skip_serializing_none;
 use solana_commitment_config::CommitmentConfig;
-use solana_sdk::epoch_info::EpochInfo;
+use solana_epoch_info::EpochInfo;
 
 use crate::impl_http_method;
 

@@ -10,7 +10,7 @@ use send_wrapper::SendWrapper;
 use serde_json::Value;
 use solana_commitment_config::CommitmentConfig;
 use solana_program_test::ProgramTestContext;
-use solana_sdk::signature::Signature;
+use solana_signature::Signature;
 use wasm_client_solana::ClientError;
 use wasm_client_solana::ClientResponse;
 use wasm_client_solana::ClientResult;

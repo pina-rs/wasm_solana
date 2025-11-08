@@ -5,7 +5,7 @@ use serde_tuple::Serialize_tuple;
 use serde_with::DisplayFromStr;
 use serde_with::serde_as;
 use serde_with::skip_serializing_none;
-use solana_sdk::signature::Signature;
+use solana_signature::Signature;
 
 use crate::impl_http_method;
 use crate::rpc_config::RpcTransactionConfig;
@@ -52,7 +52,7 @@ mod tests {
 	use std::str::FromStr;
 
 	use assert2::check;
-	use solana_sdk::message::MessageHeader;
+	use solana_message::MessageHeader;
 
 	use super::*;
 	use crate::ClientRequest;

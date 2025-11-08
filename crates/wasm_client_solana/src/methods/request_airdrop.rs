@@ -8,8 +8,8 @@ use serde_with::DisplayFromStr;
 use serde_with::serde_as;
 use serde_with::skip_serializing_none;
 use solana_commitment_config::CommitmentConfig;
-use solana_sdk::pubkey::Pubkey;
-use solana_sdk::signature::Signature;
+use solana_pubkey::Pubkey;
+use solana_signature::Signature;
 
 use crate::impl_http_method;
 
@@ -52,7 +52,7 @@ mod tests {
 	use std::str::FromStr;
 
 	use assert2::check;
-	use solana_sdk::pubkey;
+	use solana_pubkey::pubkey;
 
 	use super::*;
 	use crate::ClientRequest;

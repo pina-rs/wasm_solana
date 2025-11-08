@@ -1,6 +1,6 @@
 use serde::Deserialize;
 use serde::Serialize;
-use solana_sdk::clock::Slot;
+use solana_clock::Slot;
 
 use crate::impl_http_method;
 

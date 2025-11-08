@@ -9,7 +9,6 @@ pub use solana_program_test::ProgramTestContext;
 pub use solana_program_test::ProgramTestError;
 pub use solana_program_test::processor;
 pub use solana_program_test::programs;
-pub use solana_sdk;
 pub use test_rpc_provider::*;
 #[cfg(feature = "test_validator")]
 pub use test_validator_runner::*;

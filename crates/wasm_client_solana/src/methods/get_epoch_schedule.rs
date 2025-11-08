@@ -1,6 +1,6 @@
 use serde::Deserialize;
 use serde::Serialize;
-use solana_sdk::epoch_schedule::EpochSchedule;
+use solana_epoch_schedule::EpochSchedule;
 
 use crate::impl_http_method;
 

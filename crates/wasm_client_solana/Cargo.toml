@@ -45,22 +45,31 @@ serde_bytes = { workspace = true, default-features = true }
 serde_json = { workspace = true, default-features = true }
 serde_tuple = { workspace = true, default-features = true }
 serde_with = { workspace = true, default-features = true }
+solana-account = { workspace = true, default-features = true }
 solana-account-decoder-client-types-wasm = { workspace = true }
 solana-account-decoder-wasm = { workspace = true, default-features = true }
 solana-address-lookup-table-interface = { workspace = true, default-features = true, features = ["serde"] }
+solana-clock = { workspace = true, default-features = true }
 solana-commitment-config = { workspace = true, default-features = true, features = ["serde"] }
 solana-compute-budget = { workspace = true, default-features = true }
 solana-compute-budget-interface = { workspace = true, default-features = true, features = ["serde"] }
-solana-hash = { workspace = true, default-features = true, features = ["serde"] }
+solana-epoch-info = { workspace = true, default-features = true }
+solana-epoch-schedule = { workspace = true, default-features = true }
+solana-fee-calculator = { workspace = true, default-features = true }
+solana-hash = { workspace = true, default-features = true }
+solana-inflation = { workspace = true, default-features = true }
+solana-instruction = { workspace = true, default-features = true }
 solana-message = { workspace = true, default-features = true, features = ["serde"] }
 solana-native-token = { workspace = true, default-features = true }
 solana-nonce = { workspace = true, default-features = true, features = ["serde"] }
-solana-program = { workspace = true, default-features = true }
 solana-pubkey = { workspace = true, default-features = true }
-solana-sdk = { workspace = true, default-features = true }
 solana-sdk-ids = { workspace = true, default-features = true }
+solana-signature = { workspace = true, default-features = true }
+solana-signer = { workspace = true, default-features = true }
 solana-system-interface = { workspace = true, default-features = true }
 solana-system-program = { workspace = true, default-features = true }
+solana-transaction = { workspace = true, default-features = true }
+solana-transaction-error = { workspace = true, default-features = true }
 solana-transaction-status-client-types-wasm = { workspace = true }
 solana-transaction-status-wasm = { workspace = true }
 solana-version = { workspace = true, default-features = true }
@@ -89,6 +98,7 @@ anyhow = { workspace = true, default-features = true }
 assert2 = { workspace = true, default-features = true }
 futures-timeout = { workspace = true, default-features = true }
 insta = { workspace = true, features = ["redactions", "json"], default-features = true }
+solana-keypair = { workspace = true, default-features = true }
 spl-pod = { workspace = true, default-features = true }
 test-log = { workspace = true, features = ["trace"], default-features = true }
 test_utils_insta = { workspace = true }

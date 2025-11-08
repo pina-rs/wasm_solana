@@ -36,7 +36,7 @@ pub struct GetLargestAccountsResponse {
 #[cfg(test)]
 mod tests {
 	use assert2::check;
-	use solana_sdk::pubkey;
+	use solana_pubkey::pubkey;
 
 	use super::*;
 	use crate::ClientRequest;

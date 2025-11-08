@@ -3,7 +3,6 @@ versioned_files = [
 	"crates/memory_wallet/Cargo.toml",
 	{ path = "Cargo.toml", dependency = "memory_wallet" },
 	{ path = "crates/memory_wallet/readme.md", regex = "memory_wallet = \"(?<version>\\d+\\.\\d+\\.\\d+)\"" },
-	# { path = "readme.md", regex = "\\[`memory_wallet`\\]\\(./crates/memory_wallet\\)\\s+\\|\\s+(?<version>\\d+\\.\\d+\\.\\d+)" },
 	"Cargo.lock",
 ]
 scopes = ["memory_wallet"]
@@ -15,7 +14,6 @@ versioned_files = [
 	"crates/test_utils_insta/Cargo.toml",
 	{ path = "Cargo.toml", dependency = "test_utils_insta" },
 	{ path = "crates/test_utils_insta/readme.md", regex = "test_utils_insta = \"(?<version>\\d+\\.\\d+\\.\\d+)\"" },
-	# { path = "readme.md", regex = "\\[`test_utils_insta`\\]\\(./crates/test_utils_insta\\)\\s+\\|\\s+(?<version>\\d+\\.\\d+\\.\\d+)" },
 	"Cargo.lock",
 ]
 scopes = ["test_utils_insta"]
@@ -27,7 +25,6 @@ versioned_files = [
 	"crates/test_utils_keypairs/Cargo.toml",
 	{ path = "Cargo.toml", dependency = "test_utils_keypairs" },
 	{ path = "crates/test_utils_keypairs/readme.md", regex = "test_utils_keypairs = \"(?<version>\\d+\\.\\d+\\.\\d+)\"" },
-	# { path = "readme.md", regex = "\\[`test_utils_keypairs`\\]\\(./crates/test_utils_keypairs\\)\\s+\\|\\s+(?<version>\\d+\\.\\d+\\.\\d+)" },
 	"Cargo.lock",
 ]
 scopes = ["test_utils_keypairs"]
@@ -39,7 +36,6 @@ versioned_files = [
 	"crates/test_utils_solana/Cargo.toml",
 	{ path = "Cargo.toml", dependency = "test_utils_solana" },
 	{ path = "crates/test_utils_solana/readme.md", regex = "test_utils_solana = \"(?<version>\\d+\\.\\d+\\.\\d+)\"" },
-	# { path = "readme.md", regex = "\\[`test_utils_solana`\\]\\(./crates/test_utils_solana\\)\\s+\\|\\s+(?<version>\\d+\\.\\d+\\.\\d+)" },
 	"Cargo.lock",
 ]
 scopes = ["test_utils_solana"]
@@ -51,44 +47,11 @@ versioned_files = [
 	"crates/wasm_client_solana/Cargo.toml",
 	{ path = "Cargo.toml", dependency = "wasm_client_solana" },
 	{ path = "crates/wasm_client_solana/readme.md", regex = "wasm_client_solana = \"(?<version>\\d+\\.\\d+\\.\\d+)\"" },
-	# { path = "readme.md", regex = "\\[`wasm_client_solana`\\]\\(./crates/wasm_client_solana\\)\\s+\\|\\s+(?<version>\\d+\\.\\d+\\.\\d+)" },
 	"Cargo.lock",
 ]
 scopes = ["wasm_client_solana"]
 changelog = "crates/wasm_client_solana/changelog.md"
 extra_changelog_sections = [{ name = "Notes", types = ["note"] }, { name = "Documentation", types = ["docs"] }]
-
-[packages.solana-account-decoder-client-types-wasm]
-versioned_files = [
-	"forks/solana-account-decoder-client-types-wasm/Cargo.toml",
-	{ path = "Cargo.toml", dependency = "solana-account-decoder-client-types-wasm" },
-	"Cargo.lock",
-]
-scopes = []
-
-[packages.solana-account-decoder-wasm]
-versioned_files = [
-	"forks/solana-account-decoder-wasm/Cargo.toml",
-	{ path = "Cargo.toml", dependency = "solana-account-decoder-wasm" },
-	"Cargo.lock",
-]
-scopes = []
-
-[packages.solana-transaction-status-client-types-wasm]
-versioned_files = [
-	"forks/solana-transaction-status-client-types-wasm/Cargo.toml",
-	{ path = "Cargo.toml", dependency = "solana-transaction-status-client-types-wasm" },
-	"Cargo.lock",
-]
-scopes = []
-
-[packages.solana-transaction-status-wasm]
-versioned_files = [
-	"forks/solana-transaction-status-wasm/Cargo.toml",
-	{ path = "Cargo.toml", dependency = "solana-transaction-status-wasm" },
-	"Cargo.lock",
-]
-scopes = []
 
 [[workflows]]
 name = "release"

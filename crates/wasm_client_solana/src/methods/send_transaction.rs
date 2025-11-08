@@ -4,8 +4,8 @@ use serde::Serialize;
 use serde::ser::SerializeTuple;
 use serde_with::DisplayFromStr;
 use serde_with::serde_as;
-use solana_sdk::signature::Signature;
-use solana_sdk::transaction::VersionedTransaction;
+use solana_signature::Signature;
+use solana_transaction::versioned::VersionedTransaction;
 
 use crate::deserialize_and_decode;
 use crate::impl_http_method;
@@ -105,7 +105,7 @@ impl From<SendTransactionResponse> for Signature {
 #[cfg(test)]
 mod tests {
 	use assert2::check;
-	use solana_sdk::transaction::Transaction;
+	use solana_transaction::Transaction;
 
 	use super::*;
 	use crate::ClientRequest;

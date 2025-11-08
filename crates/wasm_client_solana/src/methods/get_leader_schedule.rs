@@ -1,7 +1,7 @@
 use serde::Deserialize;
 use serde_tuple::Serialize_tuple;
 use serde_with::skip_serializing_none;
-use solana_sdk::clock::Slot;
+use solana_clock::Slot;
 
 use crate::impl_http_method;
 use crate::rpc_config::RpcLeaderScheduleConfig;
@@ -51,8 +51,8 @@ mod tests {
 	use std::collections::HashMap;
 
 	use assert2::check;
-	use solana_sdk::pubkey;
-	use solana_sdk::pubkey::Pubkey;
+	use solana_pubkey::Pubkey;
+	use solana_pubkey::pubkey;
 
 	use super::*;
 	use crate::ClientRequest;

@@ -240,7 +240,7 @@ impl<T: DeserializeOwned + WebSocketNotification> Subscription<T> {
 	/// can also call [`Subscription::unsubscribe`].
 	///
 	/// ```
-	/// use solana_sdk::pubkey::Pubkey;
+	/// use solana_pubkey::Pubkey;
 	/// use wasm_client_solana::LOCALNET;
 	/// use wasm_client_solana::LogsSubscribeRequest;
 	/// use wasm_client_solana::RpcTransactionLogsFilter;
