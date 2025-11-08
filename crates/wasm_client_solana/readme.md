@@ -31,6 +31,16 @@ When building your crate for the `wasm32-unknown-unknown` target, you need to se
 export RUSTFLAGS='--cfg getrandom_backend="wasm_js"'
 ```
 
+Alternatively you can add this to you `./.cargo/config.toml` file.
+
+```toml
+[target.wasm32-unknown-unknown]
+rustflags = [
+	"--cfg",
+	"get_random_backend=\"wasm_js\"",
+]
+```
+
 Without this flag, you may encounter compilation errors related to `getrandom`.
 
 ## Features

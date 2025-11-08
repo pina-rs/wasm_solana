@@ -137,10 +137,6 @@ wasm-bindgen-test = { default-features = false, version = "^0.3" }
 web-sys = { default-features = false, version = "^0.3" }
 zstd = { version = "0.13", default-features = false }
 
-# internal crates
-example_client = { path = "programs/example_client" }
-example_program = { path = "programs/example_program" }
-
 # publishable crates
 memory_wallet = { path = "crates/memory_wallet", version = "0.1.24" }
 test_utils_insta = { path = "crates/test_utils_insta" }
@@ -163,7 +159,7 @@ cargo-semver-checks = { version = "0.45.0" }
 dylint-link = { version = "5.0.0", bins = ["dylint-link"] }
 knope = { version = "0.21.5", bins = ["knope"] }
 wait-for-them = { version = "0.5.1", bins = ["wait-for-them"] }
-wasm-bindgen-cli = { version = "0.2.105", bins = ["wasm-bindgen", "wasm-bindgen-test-runner"] }
+wasm-bindgen-cli = { version = "0.2.104", bins = ["wasm-bindgen", "wasm-bindgen-test-runner"] }
 
 [profile.dev.package]
 insta.opt-level = 3

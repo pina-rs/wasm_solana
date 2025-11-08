@@ -1,5 +1,9 @@
 [target.wasm32-unknown-unknown]
 runner = 'wasm-bindgen-test-runner'
+rustflags = [
+	"--cfg",
+	"get_random_backend=\"wasm_js\"",
+]
 
 [alias]
 test_wasm = [
@@ -10,6 +14,8 @@ test_wasm = [
 	"wasm_client_solana",
 	"-F",
 	"js",
+	"--",
+	"--nocapture",
 ]
 test_streams = [
 	"nextest",
@@ -18,12 +24,6 @@ test_streams = [
 	"test_utils_solana",
 	"-F",
 	"test_validator",
-]
-test_example_client = [
-	"nextest",
-	"run",
-	"--package",
-	"example_client",
 ]
 test_memory_wallet_ssr = [
 	"nextest",
@@ -65,12 +65,6 @@ coverage_streams = [
 	"test_utils_solana",
 	"-F",
 	"test_validator",
-]
-coverage_example_client = [
-	"llvm-cov",
-	"--no-report",
-	"--package",
-	"example_client",
 ]
 coverage_memory_wallet_ssr = [
 	"llvm-cov",

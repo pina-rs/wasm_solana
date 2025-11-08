@@ -165,7 +165,7 @@ in
     };
     "build:docs" = {
       exec = ''
-        RUSTUP_TOOLCHAIN="nightly" RUSTDOCFLAGS="--cfg docsrs" cargo doc --workspace --exclude example_program --exclude example_client --exclude test_utils_solana
+        RUSTUP_TOOLCHAIN="nightly" RUSTDOCFLAGS="--cfg docsrs" cargo doc --workspace --exclude example_program --exclude test_utils_solana
       '';
       description = "Build documentation site.";
       binary = "bash";
@@ -177,9 +177,7 @@ in
         cargo test_memory_wallet_docs
         cargo test_wasm_client_solana_ssr
         cargo test_wasm_client_solana_docs
-        # echo -e "\033[0;31mWARNING: 'cargo test_streams' is currently disabled. Remember to re-enable it when the bug is resolved!\033[0m"
         cargo test_streams
-        cargo test_example_client
         WASM_BINDGEN_TEST_TIMEOUT=90 test:validator
       '';
       description = "Run all tests across the crates";
@@ -201,7 +199,6 @@ in
         sleep 5
 
         echo "running tests in chrome..."
-        export RUSTFLAGS='--cfg getrandom_backend="wasm_js"' 
         CHROMEDRIVER=$DEVENV_PROFILE/bin/chromedriver cargo test_wasm
 
         # echo "running tests in firefox..."
@@ -218,7 +215,6 @@ in
         cargo coverage_wasm_client_solana_ssr
         cargo coverage_wasm_client_solana_docs
         cargo coverage_streams
-        cargo coverage_example_client
         cargo coverage_codecov_report
       '';
       description = "Run coverage across the crates";

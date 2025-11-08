@@ -85,12 +85,6 @@ jobs:
           cargo test_streams
         shell: devenv shell -- bash -e {0}
 
-      - name: test `example_client`
-        run: |
-          sudo prlimit --pid $$ --nofile=1000000:1000000
-          cargo test_example_client
-        shell: devenv shell -- bash -e {0}
-
       - name: test `wasm` with background validator
         continue-on-error: true
         env:
@@ -139,12 +133,6 @@ jobs:
           cargo coverage_streams
         shell: devenv shell -- bash -e {0}
 
-      - name: coverage `example_client`
-        run: |
-          sudo prlimit --pid $$ --nofile=1000000:1000000
-          cargo coverage_example_client
-        shell: devenv shell -- bash -e {0}
-
       - name: coverage `codecov_report`
         run: |
           sudo prlimit --pid $$ --nofile=1000000:1000000
@@ -181,6 +169,5 @@ jobs:
 
       - name: build wasm
         run: |
-          export RUSTFLAGS='--cfg getrandom_backend="wasm_js"'
-          cargo build -p wasm_client_solana --target wasm32-unknown-unknown
+          cargo build -p wasm_client_solana --target wasm32-unknown-unknown -F js
         shell: devenv shell -c -- bash -e {0}

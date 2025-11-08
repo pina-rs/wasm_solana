@@ -30,6 +30,7 @@ derive_more = { workspace = true, features = ["debug", "deref", "deref_mut", "in
 fork_stream = { workspace = true, default-features = true }
 futures = { workspace = true, default-features = true }
 futures-timer = { workspace = true, default-features = true }
+getrandom = { workspace = true, default-features = true }
 gloo-net = { workspace = true, features = ["websocket"], default-features = true }
 heck = { workspace = true, default-features = true }
 js-sys = { workspace = true, default-features = true }
@@ -90,9 +91,6 @@ wasm-bindgen-futures = { workspace = true, default-features = true }
 web-sys = { workspace = true, features = ["console", "HtmlDocument", "Window", "AbortController", "Request", "RequestInit", "AbortSignal", "Response", "Headers"], default-features = true }
 zstd = { workspace = true, optional = true, default-features = true }
 
-[target.'cfg(all(target_arch = "wasm32", target_os = "unknown"))'.dependencies]
-getrandom = { version = "0.3", features = ["wasm_js"] }
-
 [dev-dependencies]
 anyhow = { workspace = true, default-features = true }
 assert2 = { workspace = true, default-features = true }
@@ -107,6 +105,6 @@ tokio = { workspace = true, features = ["test-util"], default-features = true }
 wasm-bindgen-test = { workspace = true, default-features = true }
 
 [features]
-js = ["futures-timer/wasm-bindgen"]
+js = ["futures-timer/wasm-bindgen", "getrandom/wasm_js"]
 ssr = ["dep:reqwest", "dep:reqwest-websocket", "dep:tokio"]
 zstd = ["ssr", "dep:zstd"]

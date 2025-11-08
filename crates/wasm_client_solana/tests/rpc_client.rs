@@ -1,10 +1,7 @@
 #![cfg(feature = "js")]
 
-use std::time::Duration;
-
 use anyhow::Result;
 use assert2::check;
-use futures_timer::Delay;
 use solana_keypair::Keypair;
 use solana_native_token::sol_str_to_lamports;
 use test_utils_keypairs::get_wallet_keypair;
@@ -73,7 +70,7 @@ pub async fn account_subscription() -> Result<()> {
 		.get_minimum_balance_for_rent_exemption(space as usize)
 		.await?;
 	let elapsed = js_sys::Date::now() - date.get_time();
-	console_log!("elapsed: {elapsed}");
+	console_log!("elapsed 1: {elapsed}");
 
 	wasm_bindgen_futures::spawn_local(async move {
 		console_log!("inside spawn_local");
@@ -99,7 +96,8 @@ pub async fn account_subscription() -> Result<()> {
 	rpc.confirm_transaction(&signature).await?;
 
 	let elapsed = js_sys::Date::now() - date.get_time();
-	console_log!("elapsed: {elapsed}");
+	console_log!("airdrop 1 signature: {signature}");
+	console_log!("elapsed 2: {elapsed}");
 
 	let recent_blockhash = rpc.get_latest_blockhash().await.unwrap();
 	let transaction = solana_transaction::Transaction::new_signed_with_payer(
@@ -114,24 +112,23 @@ pub async fn account_subscription() -> Result<()> {
 		.await?;
 	rpc.confirm_transaction(&signature).await?;
 	let elapsed = js_sys::Date::now() - date.get_time();
-	console_log!("elapsed: {elapsed}");
-
-	let signature = rpc
-		.request_airdrop(&new_account.pubkey(), sol_str_to_lamports("1.0").unwrap())
-		.await?;
-	rpc.confirm_transaction(&signature).await?;
-
-	let elapsed = js_sys::Date::now() - date.get_time();
-	console_log!("elapsed: {elapsed}");
+	console_log!("elapsed 3: {elapsed}");
 
 	let signature = rpc
 		.request_airdrop(&new_account.pubkey(), sol_str_to_lamports("1.0").unwrap())
 		.await?;
 	rpc.confirm_transaction(&signature).await?;
 	let elapsed = js_sys::Date::now() - date.get_time();
-	console_log!("elapsed: {elapsed}");
+	console_log!("airdrop 2 signature: {signature}");
+	console_log!("elapsed 4: {elapsed}");
 
-	Delay::new(Duration::from_secs(5)).await;
+	let signature = rpc
+		.request_airdrop(&new_account.pubkey(), sol_str_to_lamports("1.0").unwrap())
+		.await?;
+	rpc.confirm_transaction(&signature).await?;
+	let elapsed = js_sys::Date::now() - date.get_time();
+	console_log!("airdrop 3 signature: {signature}");
+	console_log!("elapsed 5: {elapsed}");
 
 	unsubscription.run().await?;
 
