@@ -151,12 +151,10 @@ solana-transaction-status-client-types-wasm = { path = "forks/solana-transaction
 solana-transaction-status-wasm = { path = "forks/solana-transaction-status-wasm", version = "3.0.10" }
 
 [workspace.metadata.bin]
-cargo-binstall = { version = "1.15.10" }
-cargo-dylint = { version = "5.0.0" }
 cargo-llvm-cov = { version = "0.6.21" }
 cargo-nextest = { version = "0.9.111" }
+cargo-release = { version = "0.25.20" }
 cargo-semver-checks = { version = "0.45.0" }
-dylint-link = { version = "5.0.0", bins = ["dylint-link"] }
 knope = { version = "0.21.5", bins = ["knope"] }
 wait-for-them = { version = "0.5.1", bins = ["wait-for-them"] }
 wasm-bindgen-cli = { version = "0.2.104", bins = ["wasm-bindgen", "wasm-bindgen-test-runner"] }
