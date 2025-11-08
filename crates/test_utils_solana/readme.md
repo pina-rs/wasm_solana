@@ -20,7 +20,7 @@ Or directly add the following to your `Cargo.toml`:
 
 ```toml
 [dev-dependencies]
-test_utils_solana = "0.7.4"
+test_utils_solana = "0.8.0"
 ```
 
 ### Features

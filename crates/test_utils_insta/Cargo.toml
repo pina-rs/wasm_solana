@@ -1,6 +1,6 @@
 [package]
 name = "test_utils_insta"
-version = "0.1.5"
+version = "0.1.6"
 authors = { workspace = true }
 edition = { workspace = true }
 homepage = { workspace = true }

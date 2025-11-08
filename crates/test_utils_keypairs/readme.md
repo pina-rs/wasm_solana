@@ -6,7 +6,7 @@
 
 ```toml
 [dev-dependencies]
-test_utils_keypairs = "0.1.6"
+test_utils_keypairs = "0.2.0"
 ```
 
 ## Usage

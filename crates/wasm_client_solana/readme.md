@@ -14,7 +14,7 @@ Add the following to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-wasm_client_solana = "0.9.0"
+wasm_client_solana = "0.10.0"
 ```
 
 Or use `cargo add`:

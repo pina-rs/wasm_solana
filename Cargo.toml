@@ -138,11 +138,11 @@ web-sys = { default-features = false, version = "^0.3" }
 zstd = { version = "0.13", default-features = false }
 
 # publishable crates
-memory_wallet = { path = "crates/memory_wallet", version = "0.1.24" }
-test_utils_insta = { path = "crates/test_utils_insta" }
-test_utils_keypairs = { path = "crates/test_utils_keypairs" }
-test_utils_solana = { path = "crates/test_utils_solana", version = "0.7.4" }
-wasm_client_solana = { path = "crates/wasm_client_solana", version = "0.9.0" }
+memory_wallet = { path = "crates/memory_wallet", version = "0.2.0" }
+test_utils_insta = { path = "crates/test_utils_insta", version = "0.1.6" }
+test_utils_keypairs = { path = "crates/test_utils_keypairs", version = "0.2.0" }
+test_utils_solana = { path = "crates/test_utils_solana", version = "0.8.0" }
+wasm_client_solana = { path = "crates/wasm_client_solana", version = "0.10.0" }
 
 # forks
 solana-account-decoder-client-types-wasm = { path = "forks/solana-account-decoder-client-types-wasm", version = "3.0.10" }

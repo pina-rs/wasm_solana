@@ -20,7 +20,7 @@ Or directly add the following to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-memory_wallet = "0.1.24"
+memory_wallet = "0.2.0"
 ```
 
 ### Features

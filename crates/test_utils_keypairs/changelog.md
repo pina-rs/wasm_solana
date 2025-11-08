@@ -42,3 +42,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### <!-- 0 -->🎉 Added
 
 - add `test_utils_keypairs` crate
+## 0.2.0 (2025-11-08)
+
+### Breaking Changes
+
+#### `v3` solana toolchain
+
+Upgrade the solana toolchain to version 3 and begin the process of moving away from `solana_sdk`.
+
+### Documentation
+
+- Update readme versions
