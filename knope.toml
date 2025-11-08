@@ -100,7 +100,7 @@ name = "publish"
 
 [[workflows.steps]]
 type = "Command"
-command = "cargo release publish --workspace --execute --no-confirm"
+command = "cargo workspaces publish --from-git --yes"
 
 [github]
 owner = "pina-rs"

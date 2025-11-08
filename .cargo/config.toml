@@ -110,5 +110,5 @@ coverage_codecov_report = [
 ]
 llvm-cov = ["bin", "cargo-llvm-cov"]
 nextest = ["bin", "cargo-nextest"]
-release = ["bin", "cargo-release"]
 semver-checks = ["bin", "cargo-semver-checks"]
+workspaces = ["bin", "cargo-workspaces"]
