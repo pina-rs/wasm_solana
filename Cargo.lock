@@ -3823,7 +3823,7 @@ dependencies = [
  "solana-account",
  "solana-clock",
  "solana-commitment-config",
- "solana-hash 3.0.0",
+ "solana-hash 4.0.1",
  "solana-keypair",
  "solana-message",
  "solana-native-token",
@@ -6065,7 +6065,7 @@ dependencies = [
  "solana-config-interface",
  "solana-epoch-schedule",
  "solana-fee-calculator",
- "solana-hash 3.0.0",
+ "solana-hash 4.0.1",
  "solana-instruction",
  "solana-loader-v3-interface",
  "solana-nonce",
@@ -7276,7 +7276,6 @@ version = "3.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "8a063723b9e84c14d8c0d2cdf0268207dc7adecf546e31251f9e07c7b00b566c"
 dependencies = [
- "borsh",
  "bytemuck",
  "bytemuck_derive",
  "five8 0.2.1",
@@ -7292,7 +7291,12 @@ version = "4.0.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "6a5d48a6ee7b91fc7b998944ab026ed7b3e2fc8ee3bc58452644a86c2648152f"
 dependencies = [
+ "borsh",
+ "bytemuck",
+ "bytemuck_derive",
  "five8 1.0.0",
+ "serde",
+ "serde_derive",
 ]
 
 [[package]]
@@ -9387,7 +9391,7 @@ dependencies = [
  "solana-account-decoder-client-types-wasm",
  "solana-clock",
  "solana-commitment-config",
- "solana-hash 3.0.0",
+ "solana-hash 4.0.1",
  "solana-instruction",
  "solana-message",
  "solana-pubkey 3.0.0",
@@ -9418,7 +9422,7 @@ dependencies = [
  "solana-account-decoder-wasm",
  "solana-address-lookup-table-interface",
  "solana-clock",
- "solana-hash 3.0.0",
+ "solana-hash 4.0.1",
  "solana-instruction",
  "solana-loader-v2-interface",
  "solana-loader-v3-interface",
@@ -11474,7 +11478,7 @@ dependencies = [
  "solana-epoch-info",
  "solana-epoch-schedule",
  "solana-fee-calculator",
- "solana-hash 3.0.0",
+ "solana-hash 4.0.1",
  "solana-inflation",
  "solana-instruction",
  "solana-keypair",

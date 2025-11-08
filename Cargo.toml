@@ -80,7 +80,7 @@ solana-epoch-info = { default-features = false, features = ["serde"], version = 
 solana-epoch-schedule = { default-features = false, features = ["serde"], version = "^3" }
 solana-faucet = { default-features = false, version = "^3" }
 solana-fee-calculator = { default-features = false, features = ["serde"], version = "^3" }
-solana-hash = { default-features = false, features = ["borsh", "bytemuck", "serde"], version = "^3" }
+solana-hash = { default-features = false, features = ["borsh", "bytemuck", "serde"], version = "^4" }
 solana-inflation = { default-features = false, features = ["serde"], version = "^3" }
 solana-instruction = { default-features = false, features = ["bincode", "borsh", "serde"], version = "^3" }
 solana-keypair = { default-features = false, version = "^3" }
