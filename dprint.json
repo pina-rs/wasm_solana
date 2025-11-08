@@ -44,7 +44,6 @@
 		"**/snapshots",
 		"**/target",
 		"**/node_modules,",
-		"**/changelog.md",
 		".bin/",
 		".local-cache/",
 		"**/dist/**",

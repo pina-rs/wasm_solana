@@ -1,11 +1,20 @@
 # Changelog
 
-All notable changes to this project will be documented in this file.
+## 0.2.0 (2025-11-08)
 
-The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
-and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+### Breaking Changes
 
-## [Unreleased]
+#### `v3` solana toolchain
+
+Upgrade the solana toolchain to version 3 and begin the process of moving away from `solana_sdk`.
+
+### Features
+
+- Remove all references to `solana-sdk` and `solana-program`
+
+### Documentation
+
+- Update readme versions
 
 ## [0.1.24](https://github.com/solapino/wasm_solana/compare/memory_wallet@v0.1.23...memory_wallet@v0.1.24) - 2025-10-03
 
@@ -186,18 +195,3 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - basic tests for `MemoryWallet` now succeed
 - passing tests for `wasm_client_solana`
 - write first tests
-## 0.2.0 (2025-11-08)
-
-### Breaking Changes
-
-#### `v3` solana toolchain
-
-Upgrade the solana toolchain to version 3 and begin the process of moving away from `solana_sdk`.
-
-### Features
-
-- Remove all references to `solana-sdk` and `solana-program`
-
-### Documentation
-
-- Update readme versions
