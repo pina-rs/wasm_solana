@@ -25,14 +25,6 @@ runs:
         restore-keys: |
           ${{ runner.os }}-cargo-bin-${{ inputs.cache-version }}-
 
-    - name: cache eget
-      uses: actions/cache@v4
-      with:
-        path: ./.eget/bin
-        key: ${{ runner.os }}-eget-${{ inputs.cache-version }}-${{ env.GITHUB_JOB }}-${{ hashFiles('.eget/.eget.toml') }}
-        restore-keys: |
-          ${{ runner.os }}-eget-${{ inputs.cache-version }}-${{ env.GITHUB_JOB }}-
-
     - name: install nix
       uses: cachix/install-nix-action@v31
       with:

@@ -133,10 +133,10 @@ direnv allow .
 
 At this point you should see the `nix` commands available in your terminal. Any changes made to the `.envrc` file will require you to run the above command again.
 
-Run the following command to install required rust binaries and solana tooling locally so you don't need to worry about polluting your global namespace or versioning.
+The solana tooling (`agave-validator`, `solana-keygen`, `solana-test-validator`) and `monochange` are provided by `nix` through the devenv shell, sourced from [ifiokjr/nixpkgs](https://github.com/ifiokjr/nixpkgs). Run the following command to install the remaining rust binaries (nextest, llvm-cov, wasm-bindgen-cli, ...) locally via `cargo bin` so you don't need to worry about polluting your global namespace or versioning.
 
 ```bash
-install:all
+install:cargo:bin
 ```
 
 ### Upgrading `devenv`

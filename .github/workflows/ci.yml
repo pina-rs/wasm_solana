@@ -91,7 +91,6 @@ jobs:
           WASM_BINDGEN_TEST_TIMEOUT: 120
         run: |
           sudo prlimit --pid $$ --nofile=1000000:1000000
-          install:eget
           test:validator
         shell: devenv shell -- bash -e {0}
 
