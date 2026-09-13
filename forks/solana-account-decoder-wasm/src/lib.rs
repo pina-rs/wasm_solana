@@ -13,8 +13,6 @@ pub mod parse_token_extension;
 pub mod parse_vote;
 pub mod validator_info;
 
-use std::io::Write;
-
 use base64::Engine;
 use base64::prelude::BASE64_STANDARD;
 use serde::Deserialize;
@@ -157,6 +155,7 @@ fn slice_data(data: &[u8], data_slice_config: Option<UiDataSliceConfig>) -> &[u8
 
 #[cfg(test)]
 mod test {
+	#[cfg(feature = "zstd")]
 	use assert_matches::assert_matches;
 	use solana_account::Account;
 	use solana_account::AccountSharedData;

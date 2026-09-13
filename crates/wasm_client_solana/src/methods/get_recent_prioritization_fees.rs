@@ -6,6 +6,9 @@ use solana_pubkey::Pubkey;
 use crate::impl_http_method;
 use crate::rpc_response::RpcPrioritizationFee;
 
+// serde's `serialize_with` requires exactly this signature for an `Option`
+// field.
+#[allow(clippy::ref_option)]
 fn serialize_pubkey_strings<S: Serializer>(
 	accounts: &Option<Vec<Pubkey>>,
 	serializer: S,

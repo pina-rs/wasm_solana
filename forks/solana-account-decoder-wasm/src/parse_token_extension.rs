@@ -88,7 +88,7 @@ pub fn parse_extension<S: BaseState + Pack>(
 		ExtensionType::ConfidentialTransferAccount => {
 			account
 				.get_extension::<extension::confidential_transfer::ConfidentialTransferAccount>()
-				.map_or(UiExtension::UnparseableExtension, |&extension| {
+				.map_or(UiExtension::UnparseableExtension, |extension| {
 					UiExtension::ConfidentialTransferAccount(convert_confidential_transfer_account(
 						extension,
 					))
@@ -354,7 +354,7 @@ pub fn convert_confidential_transfer_fee_config(
 }
 
 fn convert_confidential_transfer_account(
-	confidential_transfer_account: extension::confidential_transfer::ConfidentialTransferAccount,
+	confidential_transfer_account: &extension::confidential_transfer::ConfidentialTransferAccount,
 ) -> UiConfidentialTransferAccount {
 	UiConfidentialTransferAccount {
 		approved: confidential_transfer_account.approved.into(),
