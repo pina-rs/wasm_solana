@@ -1,7 +1,8 @@
 name: "ci"
+
 permissions:
-  pull-requests: write
-  contents: write
+  contents: read
+
 on:
   push:
     branches:
@@ -20,7 +21,9 @@ jobs:
     runs-on: blacksmith-2vcpu-ubuntu-2404
     steps:
       - name: checkout repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
 
       - name: setup
         uses: ./.github/actions/devenv
@@ -31,8 +34,38 @@ jobs:
         run: lint:clippy
         shell: devenv shell -c -- bash -e {0}
 
+      - name: lint monochange
+        run: lint:monochange
+        shell: devenv shell -c -- bash -e {0}
+
       - name: lint formatting
         run: lint:format
+        shell: devenv shell -c -- bash -e {0}
+
+  security:
+    timeout-minutes: 60
+    runs-on: blacksmith-2vcpu-ubuntu-2404
+    steps:
+      - name: checkout repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: setup
+        uses: ./.github/actions/devenv
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: audit Rust dependencies
+        run: security:audit
+        shell: devenv shell -c -- bash -e {0}
+
+      - name: check dependency policy
+        run: security:deny
+        shell: devenv shell -c -- bash -e {0}
+
+      - name: audit GitHub Actions workflows
+        run: security:zizmor
         shell: devenv shell -c -- bash -e {0}
 
   test:
@@ -40,13 +73,18 @@ jobs:
     runs-on: blacksmith-2vcpu-ubuntu-2404
     steps:
       - name: checkout repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
 
       - name: setup
         uses: ./.github/actions/devenv
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
 
+      # The validator stack opens thousands of files; raise the soft limit for
+      # every test step below (each step gets a fresh shell, so the limit is
+      # re-applied per step).
       - name: increase open file limit
         run: |
           # WARNING: Setting the limit to 'unlimited' is not recommended.
@@ -78,8 +116,8 @@ jobs:
           sudo prlimit --pid $$ --nofile=1000000:1000000
           cargo test_wasm_client_solana_docs
         shell: devenv shell -- bash -e {0}
-      - name: test `test_utils_solana` with `ssr` and `test_validator`
 
+      - name: test `test_utils_solana` with `ssr` and `test_validator`
         run: |
           sudo prlimit --pid $$ --nofile=1000000:1000000
           cargo test_streams
@@ -99,17 +137,25 @@ jobs:
     runs-on: blacksmith-2vcpu-ubuntu-2404
     steps:
       - name: checkout repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
 
       - name: setup
         uses: ./.github/actions/devenv
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: increase open file limit
+        run: |
+          sudo prlimit --pid $$ --nofile=1000000:1000000
+          echo "ULIMIT: $(ulimit -n)"
+        shell: bash
+
       - name: coverage `memory_wallet_ssr`
         run: |
           sudo prlimit --pid $$ --nofile=1000000:1000000
-            cargo coverage_memory_wallet_ssr
+          cargo coverage_memory_wallet_ssr
         shell: devenv shell -- bash -e {0}
 
       # - name: coverage `memory_wallet_docs`
@@ -140,7 +186,7 @@ jobs:
 
       - name: upload coverage
         if: ${{ github.actor != 'dependabot[bot]' }}
-        uses: codecov/codecov-action@v5
+        uses: codecov/codecov-action@0fb7174895f61a3b6b78fc075e0cd60383518dac # v5
         with:
           files: codecov.json
           fail_ci_if_error: false
@@ -151,7 +197,9 @@ jobs:
     runs-on: blacksmith-2vcpu-ubuntu-2404
     steps:
       - name: checkout repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
 
       - name: setup
         uses: ./.github/actions/devenv

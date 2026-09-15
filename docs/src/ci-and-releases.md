@@ -6,7 +6,7 @@ Every pull request runs (`.github/workflows/ci.yml`):
 
 | Job        | What it does                                                       |
 | ---------- | ------------------------------------------------------------------ |
-| `lint`     | clippy + dprint format check.                                      |
+| `lint`     | clippy, monochange metadata and dprint format check.               |
 | `security` | cargo-audit, cargo-deny, zizmor.                                   |
 | `test`     | SSR suites, doc tests, streams (live validator) and browser tests. |
 | `coverage` | llvm-cov report uploaded to Codecov.                               |

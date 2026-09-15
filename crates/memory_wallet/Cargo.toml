@@ -43,7 +43,7 @@ assert2 = { workspace = true, default-features = true }
 test-log = { workspace = true, features = ["trace"], default-features = true }
 test_utils_insta = { workspace = true }
 test_utils_keypairs = { workspace = true }
-test_utils_solana = { path = "../test_utils_solana", features = ["test_validator"], version = "0.11.2" }
+test_utils_solana = { workspace = true, features = ["test_validator"] }
 tokio = { workspace = true, features = ["test-util", "full"], default-features = true }
 
 [features]

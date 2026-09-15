@@ -7,36 +7,123 @@ inputs:
   cache-version:
     description: The version of the cache to use.
     required: false
-    default: "v1"
+    default: "v2"
+  setup-retries:
+    description: Number of retries for transient nix/devenv setup failures.
+    required: false
+    default: "3"
 
 runs:
   using: composite
   steps:
     - name: cache rust dependencies
-      uses: Swatinem/rust-cache@v2
+      uses: Swatinem/rust-cache@6323deb102c322ba6fcbdcafc7e3dddab59af2b6 # v2.9.2
       with:
-        prefix-key: "${{ inputs.cache-version }}"
+        # Include the devenv/toolchain wiring in the cache key so cached build
+        # scripts don't outlive the Nix environment that produced them.
+        prefix-key: "${{ inputs.cache-version }}-${{ hashFiles('devenv.nix', 'devenv.yaml', 'devenv.lock', 'rust-toolchain.toml', '.github/actions/devenv/action.yml') }}"
 
     - name: cache cargo binaries
-      uses: actions/cache@v4
+      uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
       with:
         path: ./.bin
-        key: ${{ runner.os }}-cargo-bin-${{ inputs.cache-version }}-${{ env.RUSTUP_TOOLCHAIN }}-${{ hashFiles('rust-toolchain.toml', 'Cargo.toml') }}
+        key: ${{ runner.os }}-cargo-bin-${{ inputs.cache-version }}-${{ env.RUSTUP_TOOLCHAIN }}-${{ hashFiles('devenv.nix', 'devenv.yaml', 'devenv.lock', 'rust-toolchain.toml', '.github/actions/devenv/action.yml', 'Cargo.toml') }}
         restore-keys: |
           ${{ runner.os }}-cargo-bin-${{ inputs.cache-version }}-
 
     - name: install nix
-      uses: cachix/install-nix-action@v31
+      uses: cachix/install-nix-action@13d8dd58da0234aa297dedd986986ccb8e7f3e24 # v31.11.1
       with:
         github_access_token: ${{ inputs.github-token }}
+        extra_nix_config: |
+          accept-flake-config = true
+          extra-substituters = https://devenv.cachix.org
+          extra-trusted-public-keys = devenv.cachix.org-1:w1cLUi8dv3hnoSPGAuibQv+f9TZLr6cv/Hm9XgU50cw=
 
     - name: setup nix environment
+      env:
+        SETUP_RETRIES: ${{ inputs.setup-retries }}
       run: |
-        nix profile add --accept-flake-config nixpkgs#cachix
-        cachix use devenv
-        nix profile add nixpkgs#devenv
+        retry() {
+          local attempts="$1"
+          shift
+
+          if [[ ! "$attempts" =~ ^[1-9][0-9]*$ ]]; then
+            echo "setup-retries must be a positive integer." >&2
+            return 2
+          fi
+
+          local attempt=1
+          local delay=5
+          while true; do
+            if "$@"; then
+              return 0
+            fi
+
+            local exit_code=$?
+            if [ "$attempt" -ge "$attempts" ]; then
+              echo "Command failed after ${attempt} attempt(s): $*"
+              return "$exit_code"
+            fi
+
+            echo "Command failed with exit code ${exit_code}: $*"
+            echo "Retrying (${attempt}/${attempts}) in ${delay}s..."
+            sleep "$delay"
+            attempt=$((attempt + 1))
+            delay=$((delay * 2))
+          done
+        }
+
+        attempts="$SETUP_RETRIES"
+        devenv_revision="$(
+          nix eval --impure --raw --expr '
+            let
+              lock = builtins.fromJSON (builtins.readFile ./devenv.lock);
+              revision = lock.nodes.devenv.locked.rev;
+            in
+              if builtins.match "^[0-9a-f]{40}$" revision != null then
+                revision
+              else
+                throw "devenv.lock does not contain an immutable Devenv revision"
+          '
+        )"
+        retry "$attempts" nix profile add --accept-flake-config "github:cachix/devenv/${devenv_revision}#devenv"
       shell: bash
 
     - name: install dependencies
-      run: install:cargo:bin
-      shell: devenv shell -- bash -e {0}
+      env:
+        SETUP_RETRIES: ${{ inputs.setup-retries }}
+      run: |
+        retry() {
+          local attempts="$1"
+          shift
+
+          if [[ ! "$attempts" =~ ^[1-9][0-9]*$ ]]; then
+            echo "setup-retries must be a positive integer." >&2
+            return 2
+          fi
+
+          local attempt=1
+          local delay=5
+          while true; do
+            if "$@"; then
+              return 0
+            fi
+
+            local exit_code=$?
+            if [ "$attempt" -ge "$attempts" ]; then
+              echo "Command failed after ${attempt} attempt(s): $*"
+              return "$exit_code"
+            fi
+
+            echo "Command failed with exit code ${exit_code}: $*"
+            echo "Retrying (${attempt}/${attempts}) in ${delay}s..."
+            sleep "$delay"
+            attempt=$((attempt + 1))
+            delay=$((delay * 2))
+          done
+        }
+
+        attempts="$SETUP_RETRIES"
+        retry "$attempts" devenv shell -- bash -e -c "install:cargo:bin"
+      shell: bash

@@ -1,0 +1,23 @@
+# zizmor configuration
+# https://docs.zizmor.sh/configuration/
+#
+# zizmor discovers this file automatically when scanning workflows.
+# It is located at .github/zizmor.yml per the local discovery rules.
+#
+# Policy: the `security:zizmor` gate requires every workflow and composite
+# action to pass all offline audits with zero findings. Credential persistence
+# stays disabled in every checkout that does not need to authenticate.
+# If an ignore is ever required, add the rule below with a comment explaining
+# why the pattern is intentional and why it is safe.
+
+rules:
+  # Local composite actions (`uses: ./.github/actions/...`) are reviewed in
+  # the same pull requests that modify them, so there is no third-party trust
+  # boundary to harden; the self-repository audit would otherwise flag every
+  # intentional local action reference.
+  self-repository:
+    ignore:
+      - ci.yml
+      - docs-pages.yml
+      - publish.yml
+      - release-pr.yml

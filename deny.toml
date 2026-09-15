@@ -1,0 +1,50 @@
+[graph]
+all-features = true
+
+[advisories]
+db-path = "target/advisory-db"
+db-urls = ["https://github.com/RustSec/advisory-db.git"]
+ignore = []
+
+[licenses]
+allow = [
+	# enum-iterator and enum-iterator-derive (solana-svm feature enumeration).
+	"0BSD",
+	"Apache-2.0",
+	"Apache-2.0 WITH LLVM-exception",
+	"BSD-2-Clause",
+	"BSD-3-Clause",
+	# libbz2-rs-sys (validator snapshot archives).
+	"bzip2-1.0.6",
+	# webpki-roots distributes Mozilla's public certificate trust-store data.
+	"CDLA-Permissive-2.0",
+	# tiny-keccak (faucet keccak256 precompile stack).
+	"CC0-1.0",
+	"ISC",
+	"MIT",
+	"MPL-2.0",
+	# nacl implements the Wallet Standard's experimental encryption scheme.
+	"LGPL-3.0-or-later",
+	"Unicode-3.0",
+	"Unicode-DFS-2016",
+	# The workspace crates themselves are licensed as public domain.
+	"Unlicense",
+	"Zlib",
+]
+confidence-threshold = 0.8
+
+[licenses.private]
+ignore = true
+
+[bans]
+multiple-versions = "warn"
+wildcards = "deny"
+highlight = "all"
+
+[sources]
+unknown-registry = "deny"
+unknown-git = "deny"
+allow-registry = [
+	"https://github.com/rust-lang/crates.io-index",
+]
+allow-git = []

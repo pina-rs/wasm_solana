@@ -7,9 +7,6 @@ pub use wasm_http_provider::HttpProvider;
 
 use crate::ClientRequest;
 use crate::ClientResult;
-use crate::DEFAULT_ERROR_CODE;
-use crate::RpcError;
-use crate::RpcErrorDetails;
 
 #[async_trait]
 pub trait RpcProvider {
@@ -27,6 +24,9 @@ mod ssr_http_provider {
 
 	use super::*;
 	use crate::ClientError;
+	use crate::DEFAULT_ERROR_CODE;
+	use crate::RpcError;
+	use crate::RpcErrorDetails;
 
 	#[derive(Debug, Clone)]
 	pub struct HttpProvider {

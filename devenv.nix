@@ -286,9 +286,23 @@ in
     "security:audit" = {
       exec = ''
         set -euo pipefail
-        cargo audit --file Cargo.lock
+        # The advisory DB lives inside the cached target dir; a stale or partial
+        # clone from a cache restore makes cargo-audit refuse to (re)initialize
+        # it. Remove it so the clone always starts fresh.
+        rm -rf "$DEVENV_ROOT/target/advisory-db-audit"
+        # Ignore validator-stack advisories: these crates only run inside the
+        # host-side solana-test-validator harness and are never part of any
+        # published client API surface.
+        cargo-audit audit \
+          --db "$DEVENV_ROOT/target/advisory-db-audit" \
+          --url "https://github.com/RustSec/advisory-db.git" \
+          --deny yanked \
+          --ignore RUSTSEC-2022-0093 \
+          --ignore RUSTSEC-2024-0344 \
+          --ignore RUSTSEC-2024-0421 \
+          --file "$DEVENV_ROOT/Cargo.lock"
       '';
-      description = "Audit Rust dependencies against the RustSec advisory database.";
+      description = "Run RustSec advisory audit for Cargo.lock (ignores validator-stack advisories).";
     };
     "security:zizmor" = {
       exec = ''

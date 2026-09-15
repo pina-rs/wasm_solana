@@ -5,3 +5,14 @@ updates:
     # Check for updates every Monday
     schedule:
       interval: "weekly"
+    # Rate-limit Dependabot PRs so unexamined bumps cannot run in CI for at
+    # least a week after a compromised release (zizmor: dependabot-cooldown).
+    cooldown:
+      default-days: 7
+
+  - package-ecosystem: "cargo"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    cooldown:
+      default-days: 7
