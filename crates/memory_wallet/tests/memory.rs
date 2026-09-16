@@ -175,6 +175,43 @@ async fn v1_helper_sets_non_zero_compute_budget() -> Result<()> {
 	Ok(())
 }
 
+/// A v1 message must be priceable before it is signed. The cluster reads the
+/// compute budget from the message, so the fee query has to serialize v1 with
+/// the wire format rather than a serde format.
+#[test(tokio::test(flavor = "multi_thread"))]
+async fn get_fee_for_v1_message() -> Result<()> {
+	let runner = create_runner().await;
+	let keypair = get_wallet_keypair();
+	let pubkey = keypair.pubkey();
+	let target_pubkey = Pubkey::new_unique();
+	let instruction = transfer(&pubkey, &target_pubkey, sol_str_to_lamports("0.1").unwrap());
+	let rpc = runner.rpc().clone();
+	let blockhash = rpc.get_latest_blockhash().await?;
+	let transaction = VersionedTransaction::new_unsigned_v1(
+		&pubkey,
+		std::slice::from_ref(&instruction),
+		blockhash,
+	)?;
+
+	// The message must be priceable while still unsigned, and the v1 config
+	// carries the priority fee as a total in lamports.
+	let fee = rpc.get_fee_for_message(&transaction.message).await?;
+
+	check!(fee > 0);
+
+	// A legacy message must keep working through the same API.
+	let legacy = solana_message::Message::new_with_blockhash(
+		std::slice::from_ref(&instruction),
+		Some(&pubkey),
+		&blockhash,
+	);
+	let legacy_fee = rpc.get_fee_for_message(&legacy).await?;
+
+	check!(legacy_fee > 0);
+
+	Ok(())
+}
+
 #[test(tokio::test)]
 async fn banks_client_process_transaction() -> Result<()> {
 	let keypair = get_wallet_keypair();
