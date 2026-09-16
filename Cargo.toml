@@ -44,7 +44,7 @@ futures = { default-features = false, version = "^0.3" }
 futures-timeout = { default-features = false, version = "^0.1" }
 futures-timer = { default-features = false, version = "^3" }
 getrandom = { default-features = false, version = "^0.3" }
-gloo-net = { default-features = false, version = "^0.6" }
+gloo-net = { default-features = false, version = "^0.7" }
 heck = { default-features = false, version = "^0.5" }
 indexmap = { default-features = false, version = "^2" }
 insta = { default-features = false, version = "^1" }
