@@ -29,7 +29,7 @@ assert2 = { default-features = false, version = "^0.3" }
 assert_matches = { default-features = false, version = "^1" }
 async-trait = { default-features = false, version = "^0.1" }
 async-tungstenite = { default-features = false, version = "^0.28.1" }
-base64 = { default-features = false, version = "^0.22" }
+base64 = { default-features = false, version = "^0.23" }
 bincode = { default-features = false, version = "^1" }
 borsh = { default-features = false, version = "^1" }
 bs58 = { default-features = false, version = "^0.5" }
