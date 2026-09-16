@@ -1,0 +1,382 @@
+{
+	"schema_version": "0.5",
+	"kind": "monochange.releaseRecord",
+	"created_at": "2026-09-16T13:01:28Z",
+	"command": "release",
+	"version": "0.12.0",
+	"versions": {
+		"core": "0.12.0"
+	},
+	"release_targets": [
+		{
+			"id": "core",
+			"kind": "group",
+			"version": "0.12.0",
+			"version_format": "primary",
+			"tag": true,
+			"release": true,
+			"tag_name": "v0.12.0",
+			"members": [
+				"memory_wallet",
+				"test_utils_insta",
+				"test_utils_keypairs",
+				"test_utils_solana",
+				"wasm_client_solana"
+			]
+		}
+	],
+	"released_packages": [
+		"memory_wallet",
+		"test_utils_insta",
+		"test_utils_keypairs",
+		"test_utils_solana",
+		"wasm_client_solana"
+	],
+	"changed_files": [
+		"Cargo.lock",
+		"Cargo.toml",
+		"changelog.md",
+		"crates/memory_wallet/Cargo.toml",
+		"crates/test_utils_insta/Cargo.toml",
+		"crates/test_utils_keypairs/Cargo.toml",
+		"crates/test_utils_solana/Cargo.toml",
+		"crates/wasm_client_solana/Cargo.toml"
+	],
+	"package_publications": [
+		{
+			"package": "memory_wallet",
+			"ecosystem": "cargo",
+			"registry": "crates_io",
+			"version": "0.12.0",
+			"mode": "builtin",
+			"trusted_publishing": {
+				"enabled": true,
+				"repository": "pina-rs/wasm_solana",
+				"workflow": "publish.yml",
+				"environment": "publisher"
+			}
+		},
+		{
+			"package": "test_utils_insta",
+			"ecosystem": "cargo",
+			"registry": "crates_io",
+			"version": "0.12.0",
+			"mode": "builtin",
+			"trusted_publishing": {
+				"enabled": true,
+				"repository": "pina-rs/wasm_solana",
+				"workflow": "publish.yml",
+				"environment": "publisher"
+			}
+		},
+		{
+			"package": "test_utils_keypairs",
+			"ecosystem": "cargo",
+			"registry": "crates_io",
+			"version": "0.12.0",
+			"mode": "builtin",
+			"trusted_publishing": {
+				"enabled": true,
+				"repository": "pina-rs/wasm_solana",
+				"workflow": "publish.yml",
+				"environment": "publisher"
+			}
+		},
+		{
+			"package": "test_utils_solana",
+			"ecosystem": "cargo",
+			"registry": "crates_io",
+			"version": "0.12.0",
+			"mode": "builtin",
+			"trusted_publishing": {
+				"enabled": true,
+				"repository": "pina-rs/wasm_solana",
+				"workflow": "publish.yml",
+				"environment": "publisher"
+			},
+			"timeout": {
+				"timeout_seconds": 900,
+				"retries": 2
+			}
+		},
+		{
+			"package": "wasm_client_solana",
+			"ecosystem": "cargo",
+			"registry": "crates_io",
+			"version": "0.12.0",
+			"mode": "builtin",
+			"trusted_publishing": {
+				"enabled": true,
+				"repository": "pina-rs/wasm_solana",
+				"workflow": "publish.yml",
+				"environment": "publisher"
+			}
+		}
+	],
+	"updated_changelogs": [
+		"changelog.md"
+	],
+	"deleted_changesets": [
+		".changeset/restore-security-gate.md",
+		".changeset/support-v1-transactions.md"
+	],
+	"changesets": [
+		{
+			"path": ".changeset/restore-security-gate.md",
+			"summary": "Restore the security CI gate and patch `rustls`",
+			"details": "The MonoChange migration (#130) was stacked on a branch that predated the security tooling in #129, so merging it silently reverted that hardening: the `security` CI job disappeared, `deny.toml` and `.github/zizmor.yml` were deleted, workflow actions were left unpinned, and `devenv.nix` kept calling `security:deny` against the missing policy file.\n\nRestore the gate and the files it needs:\n\n- `security:zizmor` passes again: actions are pinned by commit SHA, the workflow `permissions` are scoped to `contents: read`, checkouts set `persist-credentials: false`, and Dependabot cooldowns are configured.\n- `security:deny` has its `deny.toml` policy back.\n- `security:audit` uses the validator-stack ignore list with a target-local advisory database, and `rustls` moves to 0.23.45 for RUSTSEC-2026-0285.\n- The `wasm_client_solana` `js` build no longer warns about three `ssr`-only imports in `http_provider`.",
+			"targets": [
+				{
+					"id": "memory_wallet",
+					"kind": "package",
+					"bump": "patch",
+					"origin": "direct-change",
+					"evidence_refs": [],
+					"change_type": "fix"
+				},
+				{
+					"id": "wasm_client_solana",
+					"kind": "package",
+					"bump": "patch",
+					"origin": "direct-change",
+					"evidence_refs": [],
+					"change_type": "fix"
+				}
+			],
+			"context": {
+				"provider": "github",
+				"host": "github.com",
+				"capabilities": {
+					"commit_web_urls": true,
+					"actor_profiles": true,
+					"review_request_lookup": true,
+					"related_issues": true,
+					"issue_comments": true
+				},
+				"introduced": {
+					"actor": {
+						"provider": "github",
+						"host": "github.com",
+						"id": null,
+						"login": null,
+						"display_name": "Ifiok Jr.",
+						"url": null,
+						"source": "commit_author"
+					},
+					"commit": {
+						"provider": "github",
+						"host": "github.com",
+						"sha": "60c88079c6e4f00038a29f39c705218ce579a4e5",
+						"short_sha": "60c8807",
+						"url": "https://github.com/pina-rs/wasm_solana/commit/60c88079c6e4f00038a29f39c705218ce579a4e5",
+						"authored_at": "2026-09-15T14:14:08+01:00",
+						"committed_at": "2026-09-15T14:14:08+01:00",
+						"author_name": "Ifiok Jr.",
+						"author_email": "ifiokotung@gmail.com"
+					},
+					"review_request": null
+				},
+				"last_updated": {
+					"actor": {
+						"provider": "github",
+						"host": "github.com",
+						"id": null,
+						"login": null,
+						"display_name": "Ifiok Jr.",
+						"url": null,
+						"source": "commit_author"
+					},
+					"commit": {
+						"provider": "github",
+						"host": "github.com",
+						"sha": "60c88079c6e4f00038a29f39c705218ce579a4e5",
+						"short_sha": "60c8807",
+						"url": "https://github.com/pina-rs/wasm_solana/commit/60c88079c6e4f00038a29f39c705218ce579a4e5",
+						"authored_at": "2026-09-15T14:14:08+01:00",
+						"committed_at": "2026-09-15T14:14:08+01:00",
+						"author_name": "Ifiok Jr.",
+						"author_email": "ifiokotung@gmail.com"
+					},
+					"review_request": null
+				},
+				"related_issues": []
+			}
+		},
+		{
+			"path": ".changeset/support-v1-transactions.md",
+			"summary": "Support v1 transactions",
+			"details": "The `txv1` feature gate (SIMD-0385) is active on mainnet. It raises the transaction size limit to 4096 bytes, moves signatures to the tail behind a `0x81` discriminator, and carries the compute budget in the message rather than in `ComputeBudget` instructions. This client now reads and writes v1 transactions. Sending one previously produced bytes the cluster rejected.\n\n##### Sending\n\n`serialize_and_encode` and `deserialize_and_decode` now use the `wincode` wire format instead of `bincode`. The v1 wire layout is not the serde representation of a `VersionedTransaction`, so `bincode` emitted a `short_vec` signature count where the wire requires a version discriminator and placed signatures in the wrong position. Legacy and v0 byte output is unchanged, which is why the existing snapshots still pass.\n\nThe `bincode` dependency is dropped from `wasm_client_solana`; `wincode` replaces it.\n\n##### Reading\n\n`RpcBlockConfig`, `RpcTransactionConfig` and `RpcBlockSubscribeConfig` default `max_supported_transaction_version` to `1`, and the config-less `get_transaction` now sends a config. Without the field, a v1 transaction makes `getTransaction` return `-32015` and rejects an entire `getBlock`. Use `max_supported_transaction_version: None` to restore the old behavior, or `GetTransactionRequest::new_without_version` for the config-less request. This changes the JSON sent on the wire, so any snapshot of a request built from `Default::default()` will change.\n\n##### New APIs\n\n- `VersionedTransaction::new_unsigned_v1` and `new_unsigned_v1_with_config` build v1 transactions. The first sets non-zero compute limits, because a v1 message defaults `compute_unit_limit` and `loaded_accounts_data_size_limit` to zero and a transaction carrying zeros fails with `MaxLoadedAccountsDataSizeExceeded`.\n- `SerializableMessage` is implemented for legacy, `v0::Message`, `v1::Message` and `VersionedMessage`. `get_fee_for_message` takes `&impl SerializableMessage`, so it accepts v1 messages; the parameter changed from `&Message`.\n- `MAX_SUPPORTED_TRANSACTION_VERSION` and `MAX_LOADED_ACCOUNTS_DATA_SIZE_PER_TRANSACTION` constants.",
+			"targets": [
+				{
+					"id": "wasm_client_solana",
+					"kind": "package",
+					"bump": "major",
+					"origin": "direct-change",
+					"evidence_refs": [],
+					"change_type": "major"
+				},
+				{
+					"id": "memory_wallet",
+					"kind": "package",
+					"bump": "major",
+					"origin": "direct-change",
+					"evidence_refs": [],
+					"change_type": "major"
+				},
+				{
+					"id": "test_utils_insta",
+					"kind": "package",
+					"bump": "major",
+					"origin": "direct-change",
+					"evidence_refs": [],
+					"change_type": "major"
+				},
+				{
+					"id": "test_utils_keypairs",
+					"kind": "package",
+					"bump": "major",
+					"origin": "direct-change",
+					"evidence_refs": [],
+					"change_type": "major"
+				},
+				{
+					"id": "test_utils_solana",
+					"kind": "package",
+					"bump": "major",
+					"origin": "direct-change",
+					"evidence_refs": [],
+					"change_type": "major"
+				}
+			],
+			"context": {
+				"provider": "github",
+				"host": "github.com",
+				"capabilities": {
+					"commit_web_urls": true,
+					"actor_profiles": true,
+					"review_request_lookup": true,
+					"related_issues": true,
+					"issue_comments": true
+				},
+				"introduced": {
+					"actor": {
+						"provider": "github",
+						"host": "github.com",
+						"id": null,
+						"login": "ifiokjr",
+						"display_name": "ifiokjr",
+						"url": "https://github.com/ifiokjr",
+						"source": "review_request_author"
+					},
+					"commit": {
+						"provider": "github",
+						"host": "github.com",
+						"sha": "ca1e443ffe4af2a828b4d36048ff619064671301",
+						"short_sha": "ca1e443",
+						"url": "https://github.com/pina-rs/wasm_solana/commit/ca1e443ffe4af2a828b4d36048ff619064671301",
+						"authored_at": "2026-09-16T13:49:49+01:00",
+						"committed_at": "2026-09-16T13:49:49+01:00",
+						"author_name": "Ifiok Jr.",
+						"author_email": "1160934+ifiokjr@users.noreply.github.com"
+					},
+					"review_request": {
+						"provider": "github",
+						"host": "github.com",
+						"kind": "pull_request",
+						"id": "#149",
+						"title": "feat!: support v1 transactions",
+						"url": "https://github.com/pina-rs/wasm_solana/pull/149",
+						"author": {
+							"provider": "github",
+							"host": "github.com",
+							"id": null,
+							"login": "ifiokjr",
+							"display_name": "ifiokjr",
+							"url": "https://github.com/ifiokjr",
+							"source": "review_request_author"
+						}
+					}
+				},
+				"last_updated": {
+					"actor": {
+						"provider": "github",
+						"host": "github.com",
+						"id": null,
+						"login": "ifiokjr",
+						"display_name": "ifiokjr",
+						"url": "https://github.com/ifiokjr",
+						"source": "review_request_author"
+					},
+					"commit": {
+						"provider": "github",
+						"host": "github.com",
+						"sha": "ca1e443ffe4af2a828b4d36048ff619064671301",
+						"short_sha": "ca1e443",
+						"url": "https://github.com/pina-rs/wasm_solana/commit/ca1e443ffe4af2a828b4d36048ff619064671301",
+						"authored_at": "2026-09-16T13:49:49+01:00",
+						"committed_at": "2026-09-16T13:49:49+01:00",
+						"author_name": "Ifiok Jr.",
+						"author_email": "1160934+ifiokjr@users.noreply.github.com"
+					},
+					"review_request": {
+						"provider": "github",
+						"host": "github.com",
+						"kind": "pull_request",
+						"id": "#149",
+						"title": "feat!: support v1 transactions",
+						"url": "https://github.com/pina-rs/wasm_solana/pull/149",
+						"author": {
+							"provider": "github",
+							"host": "github.com",
+							"id": null,
+							"login": "ifiokjr",
+							"display_name": "ifiokjr",
+							"url": "https://github.com/ifiokjr",
+							"source": "review_request_author"
+						}
+					}
+				},
+				"related_issues": []
+			}
+		}
+	],
+	"changelogs": [
+		{
+			"owner_id": "core",
+			"owner_kind": "group",
+			"output": "default",
+			"stream": "default",
+			"path": "changelog.md",
+			"format": "keep_a_changelog",
+			"notes": {
+				"title": "[0.12.0](https://github.com/pina-rs/wasm_solana/releases/tag/v0.12.0) (2026-09-16)",
+				"summary": [
+					"Grouped release for `core`."
+				],
+				"sections": [
+					{
+						"title": "Breaking Changes",
+						"collapsed": false,
+						"entries": [
+							"#### Support v1 transactions\n_Packages:_ _memory_wallet_, _test_utils_insta_, _test_utils_keypairs_, _test_utils_solana_, _wasm_client_solana_\n\nThe `txv1` feature gate (SIMD-0385) is active on mainnet. It raises the transaction size limit to 4096 bytes, moves signatures to the tail behind a `0x81` discriminator, and carries the compute budget in the message rather than in `ComputeBudget` instructions. This client now reads and writes v1 transactions. Sending one previously produced bytes the cluster rejected.\n\n##### Sending\n\n`serialize_and_encode` and `deserialize_and_decode` now use the `wincode` wire format instead of `bincode`. The v1 wire layout is not the serde representation of a `VersionedTransaction`, so `bincode` emitted a `short_vec` signature count where the wire requires a version discriminator and placed signatures in the wrong position. Legacy and v0 byte output is unchanged, which is why the existing snapshots still pass.\n\nThe `bincode` dependency is dropped from `wasm_client_solana`; `wincode` replaces it.\n\n##### Reading\n\n`RpcBlockConfig`, `RpcTransactionConfig` and `RpcBlockSubscribeConfig` default `max_supported_transaction_version` to `1`, and the config-less `get_transaction` now sends a config. Without the field, a v1 transaction makes `getTransaction` return `-32015` and rejects an entire `getBlock`. Use `max_supported_transaction_version: None` to restore the old behavior, or `GetTransactionRequest::new_without_version` for the config-less request. This changes the JSON sent on the wire, so any snapshot of a request built from `Default::default()` will change.\n\n##### New APIs\n\n- `VersionedTransaction::new_unsigned_v1` and `new_unsigned_v1_with_config` build v1 transactions. The first sets non-zero compute limits, because a v1 message defaults `compute_unit_limit` and `loaded_accounts_data_size_limit` to zero and a transaction carrying zeros fails with `MaxLoadedAccountsDataSizeExceeded`.\n- `SerializableMessage` is implemented for legacy, `v0::Message`, `v1::Message` and `VersionedMessage`. `get_fee_for_message` takes `&impl SerializableMessage`, so it accepts v1 messages; the parameter changed from `&Message`.\n- `MAX_SUPPORTED_TRANSACTION_VERSION` and `MAX_LOADED_ACCOUNTS_DATA_SIZE_PER_TRANSACTION` constants.\n\n_Owner:_ [@ifiokjr](https://github.com/ifiokjr) · _Review:_ [PR #149](https://github.com/pina-rs/wasm_solana/pull/149)"
+						]
+					},
+					{
+						"title": "Fixes",
+						"collapsed": false,
+						"entries": [
+							"#### Restore the security CI gate and patch `rustls`\n_Packages:_ _memory_wallet_, _wasm_client_solana_\n\nThe MonoChange migration (#130) was stacked on a branch that predated the security tooling in #129, so merging it silently reverted that hardening: the `security` CI job disappeared, `deny.toml` and `.github/zizmor.yml` were deleted, workflow actions were left unpinned, and `devenv.nix` kept calling `security:deny` against the missing policy file.\n\nRestore the gate and the files it needs:\n\n- `security:zizmor` passes again: actions are pinned by commit SHA, the workflow `permissions` are scoped to `contents: read`, checkouts set `persist-credentials: false`, and Dependabot cooldowns are configured.\n- `security:deny` has its `deny.toml` policy back.\n- `security:audit` uses the validator-stack ignore list with a target-local advisory database, and `rustls` moves to 0.23.45 for RUSTSEC-2026-0285.\n- The `wasm_client_solana` `js` build no longer warns about three `ssr`-only imports in `http_provider`.\n\n_Owner:_ Ifiok Jr. · _Introduced in:_ [`60c8807`](https://github.com/pina-rs/wasm_solana/commit/60c88079c6e4f00038a29f39c705218ce579a4e5)"
+						]
+					}
+				]
+			},
+			"rendered": "## [0.12.0](https://github.com/pina-rs/wasm_solana/releases/tag/v0.12.0) (2026-09-16)\n\nGrouped release for `core`.\n### Breaking Changes\n\n#### Support v1 transactions\n_Packages:_ _memory_wallet_, _test_utils_insta_, _test_utils_keypairs_, _test_utils_solana_, _wasm_client_solana_\n\nThe `txv1` feature gate (SIMD-0385) is active on mainnet. It raises the transaction size limit to 4096 bytes, moves signatures to the tail behind a `0x81` discriminator, and carries the compute budget in the message rather than in `ComputeBudget` instructions. This client now reads and writes v1 transactions. Sending one previously produced bytes the cluster rejected.\n\n##### Sending\n\n`serialize_and_encode` and `deserialize_and_decode` now use the `wincode` wire format instead of `bincode`. The v1 wire layout is not the serde representation of a `VersionedTransaction`, so `bincode` emitted a `short_vec` signature count where the wire requires a version discriminator and placed signatures in the wrong position. Legacy and v0 byte output is unchanged, which is why the existing snapshots still pass.\n\nThe `bincode` dependency is dropped from `wasm_client_solana`; `wincode` replaces it.\n\n##### Reading\n\n`RpcBlockConfig`, `RpcTransactionConfig` and `RpcBlockSubscribeConfig` default `max_supported_transaction_version` to `1`, and the config-less `get_transaction` now sends a config. Without the field, a v1 transaction makes `getTransaction` return `-32015` and rejects an entire `getBlock`. Use `max_supported_transaction_version: None` to restore the old behavior, or `GetTransactionRequest::new_without_version` for the config-less request. This changes the JSON sent on the wire, so any snapshot of a request built from `Default::default()` will change.\n\n##### New APIs\n\n- `VersionedTransaction::new_unsigned_v1` and `new_unsigned_v1_with_config` build v1 transactions. The first sets non-zero compute limits, because a v1 message defaults `compute_unit_limit` and `loaded_accounts_data_size_limit` to zero and a transaction carrying zeros fails with `MaxLoadedAccountsDataSizeExceeded`.\n- `SerializableMessage` is implemented for legacy, `v0::Message`, `v1::Message` and `VersionedMessage`. `get_fee_for_message` takes `&impl SerializableMessage`, so it accepts v1 messages; the parameter changed from `&Message`.\n- `MAX_SUPPORTED_TRANSACTION_VERSION` and `MAX_LOADED_ACCOUNTS_DATA_SIZE_PER_TRANSACTION` constants.\n\n_Owner:_ [@ifiokjr](https://github.com/ifiokjr) · _Review:_ [PR #149](https://github.com/pina-rs/wasm_solana/pull/149)\n\n### Fixes\n\n#### Restore the security CI gate and patch `rustls`\n_Packages:_ _memory_wallet_, _wasm_client_solana_\n\nThe MonoChange migration (#130) was stacked on a branch that predated the security tooling in #129, so merging it silently reverted that hardening: the `security` CI job disappeared, `deny.toml` and `.github/zizmor.yml` were deleted, workflow actions were left unpinned, and `devenv.nix` kept calling `security:deny` against the missing policy file.\n\nRestore the gate and the files it needs:\n\n- `security:zizmor` passes again: actions are pinned by commit SHA, the workflow `permissions` are scoped to `contents: read`, checkouts set `persist-credentials: false`, and Dependabot cooldowns are configured.\n- `security:deny` has its `deny.toml` policy back.\n- `security:audit` uses the validator-stack ignore list with a target-local advisory database, and `rustls` moves to 0.23.45 for RUSTSEC-2026-0285.\n- The `wasm_client_solana` `js` build no longer warns about three `ssr`-only imports in `http_provider`.\n\n_Owner:_ Ifiok Jr. · _Introduced in:_ [`60c8807`](https://github.com/pina-rs/wasm_solana/commit/60c88079c6e4f00038a29f39c705218ce579a4e5)"
+		}
+	],
+	"provider": {
+		"kind": "github",
+		"owner": "pina-rs",
+		"repo": "wasm_solana",
+		"host": null
+	}
+}

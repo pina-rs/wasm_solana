@@ -13,7 +13,7 @@ members = [
 resolver = "2"
 
 [workspace.package]
-version = "0.11.2"
+version = "0.12.0"
 authors = ["Ifiok Jr. <ifiokotung@gmail.com>"]
 edition = "2024"
 homepage = "https://github.com/ifiokjr/wasm_solana"
@@ -145,11 +145,11 @@ solana-epoch-rewards-hasher = { default-features = false, version = "^3.1" }
 solana-keccak-hasher = { default-features = false, version = "^3.1" }
 
 # publishable crates
-memory_wallet = { path = "crates/memory_wallet", version = "0.11.2" }
-test_utils_insta = { path = "crates/test_utils_insta", version = "0.11.2" }
-test_utils_keypairs = { path = "crates/test_utils_keypairs", version = "0.11.2" }
-test_utils_solana = { path = "crates/test_utils_solana", version = "0.11.2" }
-wasm_client_solana = { path = "crates/wasm_client_solana", version = "0.11.2" }
+memory_wallet = { path = "crates/memory_wallet", version = "0.12.0" }
+test_utils_insta = { path = "crates/test_utils_insta", version = "0.12.0" }
+test_utils_keypairs = { path = "crates/test_utils_keypairs", version = "0.12.0" }
+test_utils_solana = { path = "crates/test_utils_solana", version = "0.12.0" }
+wasm_client_solana = { path = "crates/wasm_client_solana", version = "0.12.0" }
 
 # forks
 solana-account-decoder-client-types-wasm = { path = "forks/solana-account-decoder-client-types-wasm", version = "4.0.2" }
