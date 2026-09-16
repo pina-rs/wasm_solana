@@ -23,7 +23,6 @@ crate-type = ["cdylib", "lib"]
 async-trait = { workspace = true, default-features = true }
 async-tungstenite = { features = ["futures-03-sink"], workspace = true, default-features = true }
 base64 = { workspace = true, default-features = true }
-bincode = { workspace = true, default-features = true }
 bs58 = { workspace = true, default-features = true }
 bv = { workspace = true, features = ["serde"], default-features = true }
 cfg-if = { workspace = true, default-features = true }
@@ -88,6 +87,7 @@ wallet_standard = { workspace = true, features = ["solana"], default-features = 
 wasm-bindgen = { workspace = true, default-features = true }
 wasm-bindgen-futures = { workspace = true, default-features = true }
 web-sys = { workspace = true, features = ["console", "HtmlDocument", "Window", "AbortController", "Request", "RequestInit", "AbortSignal", "Response", "Headers"], default-features = true }
+wincode = { workspace = true, default-features = true }
 zstd = { workspace = true, optional = true, default-features = true }
 
 [dev-dependencies]

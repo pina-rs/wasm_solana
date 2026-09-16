@@ -12,7 +12,6 @@ use solana_commitment_config::CommitmentLevel;
 use solana_epoch_info::EpochInfo;
 use solana_epoch_schedule::EpochSchedule;
 use solana_hash::Hash;
-use solana_message::Message;
 use solana_pubkey::Pubkey;
 use solana_signature::Signature;
 use solana_transaction::versioned::VersionedTransaction;
@@ -407,8 +406,18 @@ impl SolanaRpcClient {
 		Ok(response.result.into())
 	}
 
-	pub async fn get_fee_for_message(&self, message: &Message) -> ClientResult<u64> {
-		let request = GetFeeForMessageRequest::new(message.to_owned());
+	/// Get the fee the network will charge for a particular message.
+	///
+	/// Accepts every message version, so a v1 message can be priced before it
+	/// is signed. A v1 message carries its compute unit limit and loaded
+	/// accounts data size limit in the message itself; both default to zero,
+	/// so set them on the message first or the transaction will fail with
+	/// `MaxLoadedAccountsDataSizeExceeded`.
+	pub async fn get_fee_for_message(
+		&self,
+		message: &impl SerializableMessage,
+	) -> ClientResult<u64> {
+		let request = GetFeeForMessageRequest::new(message);
 		let response: ClientResponse<GetFeeForMessageResponse> = self.send(request).await?;
 
 		Ok(response.result.into())

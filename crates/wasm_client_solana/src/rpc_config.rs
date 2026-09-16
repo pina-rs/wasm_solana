@@ -1,11 +1,9 @@
 use base64::Engine;
 use base64::prelude::BASE64_STANDARD;
-use bincode::serialize;
 use serde::Deserialize;
 use serde::Deserializer;
 use serde::Serialize;
 use serde::Serializer;
-use serde::de::DeserializeOwned;
 use serde_with::DisplayFromStr;
 use serde_with::serde_as;
 use serde_with::skip_serializing_none;
@@ -17,10 +15,14 @@ use solana_hash::Hash;
 use solana_pubkey::Pubkey;
 use solana_signature::Signature;
 use typed_builder::TypedBuilder;
+use wincode::SchemaRead;
+use wincode::SchemaWrite;
+use wincode::config::DefaultConfig;
 
 use super::rpc_filter::RpcFilterType;
 use crate::ClientError;
 use crate::ClientResult;
+use crate::MAX_SUPPORTED_TRANSACTION_VERSION;
 use crate::RpcError;
 use crate::SolanaRpcClient;
 use crate::impl_websocket_method;
@@ -139,12 +141,20 @@ impl Default for BlockhashQuery {
 	}
 }
 
+/// Serialize a transaction-like value using the wire format and encode it as a
+/// string.
+///
+/// The wire format is version dependent. Legacy and v0 transactions use the
+/// `short_vec` signature prefix, while v1 transactions place the message first
+/// and the signatures at the tail. `wincode` emits the correct layout for every
+/// version, so this must be used instead of a serde based format such as
+/// `bincode`, which produces bytes the cluster rejects for v1.
 pub fn serialize_and_encode<T>(input: &T, encoding: UiTransactionEncoding) -> ClientResult<String>
 where
-	T: Serialize,
+	T: SchemaWrite<DefaultConfig, Src = T>,
 {
-	let serialized =
-		serialize(input).map_err(|e| RpcError::new(format!("Serialization failed: {e}")))?;
+	let serialized = wincode::serialize(input)
+		.map_err(|e| RpcError::new(format!("Serialization failed: {e}")))?;
 	let encoded = match encoding {
 		UiTransactionEncoding::Base58 => bs58::encode(serialized).into_string(),
 		UiTransactionEncoding::Base64 => BASE64_STANDARD.encode(serialized),
@@ -158,13 +168,13 @@ where
 	Ok(encoded)
 }
 
-pub fn deserialize_and_decode<T: DeserializeOwned>(
-	content: &str,
-	encoding: UiTransactionEncoding,
-) -> ClientResult<T> {
+pub fn deserialize_and_decode<T>(content: &str, encoding: UiTransactionEncoding) -> ClientResult<T>
+where
+	T: for<'de> SchemaRead<'de, DefaultConfig, Dst = T>,
+{
 	let decoded = match encoding {
 		UiTransactionEncoding::Base64 => {
-			bincode::deserialize(
+			wincode::deserialize(
 				&BASE64_STANDARD
 					.decode(content)
 					.map_err(|e| ClientError::Other(e.to_string()))?,
@@ -172,7 +182,7 @@ pub fn deserialize_and_decode<T: DeserializeOwned>(
 			.map_err(|e| ClientError::Other(e.to_string()))?
 		}
 		UiTransactionEncoding::Base58 => {
-			bincode::deserialize(
+			wincode::deserialize(
 				&bs58::decode(content)
 					.into_vec()
 					.map_err(|e| ClientError::Other(e.to_string()))?,
@@ -489,7 +499,7 @@ pub trait EncodingConfig {
 }
 
 #[skip_serializing_none]
-#[derive(Debug, Clone, Copy, Default, PartialEq, Eq, Serialize, Deserialize, TypedBuilder)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, TypedBuilder)]
 #[builder(field_defaults(default, setter(strip_option)))]
 #[serde(rename_all = "camelCase")]
 pub struct RpcBlockConfig {
@@ -498,7 +508,20 @@ pub struct RpcBlockConfig {
 	pub rewards: Option<bool>,
 	#[serde(flatten)]
 	pub commitment: Option<CommitmentConfig>,
+	#[builder(default = Some(MAX_SUPPORTED_TRANSACTION_VERSION))]
 	pub max_supported_transaction_version: Option<u8>,
+}
+
+impl Default for RpcBlockConfig {
+	fn default() -> Self {
+		Self {
+			encoding: None,
+			transaction_details: None,
+			rewards: None,
+			commitment: None,
+			max_supported_transaction_version: Some(MAX_SUPPORTED_TRANSACTION_VERSION),
+		}
+	}
 }
 
 impl EncodingConfig for RpcBlockConfig {
@@ -534,14 +557,25 @@ impl From<RpcBlockConfig> for RpcEncodingConfigWrapper<RpcBlockConfig> {
 }
 
 #[skip_serializing_none]
-#[derive(Debug, Clone, Copy, Default, PartialEq, Eq, Serialize, Deserialize, TypedBuilder)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, TypedBuilder)]
 #[builder(field_defaults(default, setter(strip_option)))]
 #[serde(rename_all = "camelCase")]
 pub struct RpcTransactionConfig {
 	pub encoding: Option<UiTransactionEncoding>,
 	#[serde(flatten)]
 	pub commitment: Option<CommitmentConfig>,
+	#[builder(default = Some(MAX_SUPPORTED_TRANSACTION_VERSION))]
 	pub max_supported_transaction_version: Option<u8>,
+}
+
+impl Default for RpcTransactionConfig {
+	fn default() -> Self {
+		Self {
+			encoding: None,
+			commitment: None,
+			max_supported_transaction_version: Some(MAX_SUPPORTED_TRANSACTION_VERSION),
+		}
+	}
 }
 
 impl EncodingConfig for RpcTransactionConfig {
@@ -614,7 +648,7 @@ pub struct RpcAccountSubscribeConfig {
 }
 
 #[skip_serializing_none]
-#[derive(Debug, Clone, Default, PartialEq, Eq, Serialize, Deserialize, TypedBuilder)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, TypedBuilder)]
 #[builder(field_defaults(default, setter(strip_option)))]
 #[serde(rename_all = "camelCase")]
 pub struct RpcBlockSubscribeConfig {
@@ -623,7 +657,20 @@ pub struct RpcBlockSubscribeConfig {
 	pub encoding: Option<UiTransactionEncoding>,
 	pub transaction_details: Option<TransactionDetails>,
 	pub show_rewards: Option<bool>,
+	#[builder(default = Some(MAX_SUPPORTED_TRANSACTION_VERSION))]
 	pub max_supported_transaction_version: Option<u8>,
+}
+
+impl Default for RpcBlockSubscribeConfig {
+	fn default() -> Self {
+		Self {
+			commitment: None,
+			encoding: None,
+			transaction_details: None,
+			show_rewards: None,
+			max_supported_transaction_version: Some(MAX_SUPPORTED_TRANSACTION_VERSION),
+		}
+	}
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]

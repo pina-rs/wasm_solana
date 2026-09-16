@@ -13,6 +13,7 @@ use solana_message::AddressLookupTableAccount;
 use solana_message::CompileError;
 use solana_message::VersionedMessage;
 use solana_message::v0;
+use solana_message::v1;
 use solana_pubkey::Pubkey;
 use solana_signature::Signature;
 use solana_signer::SignerError;
@@ -27,9 +28,11 @@ use wallet_standard::WalletSolanaPubkey;
 use wallet_standard::WalletSolanaSignMessage;
 use wallet_standard::WalletSolanaSignTransaction;
 
+use crate::COMPUTE_UNIT_DEFAULT_LIMIT;
 use crate::COMPUTE_UNIT_MAX_LIMIT;
 use crate::ClientError;
 use crate::ClientResult;
+use crate::MAX_LOADED_ACCOUNTS_DATA_SIZE_PER_TRANSACTION;
 use crate::MAX_LOOKUP_ADDRESSES_PER_TRANSACTION;
 use crate::SolanaRpcClient;
 
@@ -47,6 +50,37 @@ pub trait VersionedTransactionExtension {
 		instructions: &[Instruction],
 		address_lookup_tables: &[AddressLookupTableAccount],
 		recent_blockhash: Hash,
+	) -> Result<VersionedTransaction, CompileError>;
+	/// Create a new unsigned v1 transaction from the payer and instructions
+	/// with a recent blockhash.
+	///
+	/// The v1 format raises the transaction size limit to 4096 bytes and moves
+	/// the compute budget into the message itself. It does not support address
+	/// lookup tables, so every account is listed inline and the account limit
+	/// is 64.
+	///
+	/// Unlike the message default, `config` limits are given non-zero defaults.
+	/// A v1 message defaults `compute_unit_limit` and
+	/// `loaded_accounts_data_size_limit` to zero, and a transaction carrying
+	/// zeros fails with `MaxLoadedAccountsDataSizeExceeded`. Prefer
+	/// [`VersionedTransactionExtension::new_unsigned_v1_with_config`] to set
+	/// both precisely.
+	fn new_unsigned_v1(
+		payer: &Pubkey,
+		instructions: &[Instruction],
+		recent_blockhash: Hash,
+	) -> Result<VersionedTransaction, CompileError>;
+	/// Create a new unsigned v1 transaction with an explicit compute budget.
+	///
+	/// `compute_unit_limit` and `loaded_accounts_data_size_limit` must be
+	/// non-zero. Simulate once with both limits at their maximum, then set them
+	/// from the observed `unitsConsumed` and `loadedAccountsDataSize`, rounding
+	/// the data size up to the next 32 KiB page.
+	fn new_unsigned_v1_with_config(
+		payer: &Pubkey,
+		instructions: &[Instruction],
+		recent_blockhash: Hash,
+		config: v1::TransactionConfig,
 	) -> Result<VersionedTransaction, CompileError>;
 	fn new_unsigned(message: VersionedMessage) -> VersionedTransaction;
 	/// Attempt to sign this transaction with provided signers.
@@ -129,6 +163,35 @@ impl VersionedTransactionExtension for VersionedTransaction {
 		let versioned_message = VersionedMessage::V0(message);
 
 		Ok(Self::new_unsigned(versioned_message))
+	}
+
+	fn new_unsigned_v1(
+		payer: &Pubkey,
+		instructions: &[Instruction],
+		recent_blockhash: Hash,
+	) -> Result<Self, CompileError> {
+		Self::new_unsigned_v1_with_config(
+			payer,
+			instructions,
+			recent_blockhash,
+			v1::TransactionConfig::empty()
+				.with_compute_unit_limit(COMPUTE_UNIT_DEFAULT_LIMIT as u32)
+				.with_loaded_accounts_data_size_limit(
+					MAX_LOADED_ACCOUNTS_DATA_SIZE_PER_TRANSACTION as u32,
+				),
+		)
+	}
+
+	fn new_unsigned_v1_with_config(
+		payer: &Pubkey,
+		instructions: &[Instruction],
+		recent_blockhash: Hash,
+		config: v1::TransactionConfig,
+	) -> Result<Self, CompileError> {
+		let message =
+			v1::Message::try_compile_with_config(payer, instructions, recent_blockhash, config)?;
+
+		Ok(Self::new_unsigned(VersionedMessage::V1(message)))
 	}
 
 	/// Create an unsigned transction from a [`VersionedMessage`].

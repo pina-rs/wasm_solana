@@ -11919,7 +11919,6 @@ dependencies = [
  "async-trait",
  "async-tungstenite 0.28.2",
  "base64 0.22.1",
- "bincode",
  "bs58",
  "bv",
  "cfg-if 1.0.4",
@@ -11993,6 +11992,7 @@ dependencies = [
  "wasm-bindgen-futures",
  "wasm-bindgen-test",
  "web-sys",
+ "wincode",
  "zstd",
 ]
 
