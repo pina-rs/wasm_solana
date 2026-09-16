@@ -6,19 +6,24 @@ use solana_clock::UnixTimestamp;
 
 use crate::impl_http_method;
 
+/// Request for the `getBlockTime` RPC method, which returns the estimated
+/// production time of a block as a Unix timestamp.
 #[derive(Debug, Serialize_tuple, Deserialize_tuple)]
 pub struct GetBlockTimeRequest {
+	/// Slot of the block to query.
 	pub slot: u64,
 }
 
 impl_http_method!(GetBlockTimeRequest, "getBlockTime");
 
 impl GetBlockTimeRequest {
+	/// Creates a request for the block at `slot`.
 	pub fn new(slot: u64) -> Self {
 		Self { slot }
 	}
 }
 
+/// Response for the `getBlockTime` RPC method.
 #[derive(Debug, Serialize, Deserialize, PartialEq, Eq)]
 pub struct GetBlockTimeResponse(Option<UnixTimestamp>);
 

@@ -8,20 +8,27 @@ use solana_pubkey::Pubkey;
 
 use crate::impl_http_method;
 
+/// Request for the `getSlotLeaders` RPC method, which returns the identity
+/// pubkeys of the leaders scheduled for a range of slots.
 #[skip_serializing_none]
 #[derive(Debug, Default, Serialize_tuple)]
 pub struct GetSlotLeadersRequest {
+	/// First slot of the range. Defaults to the current slot when omitted.
 	pub start_slot: Option<u64>,
+	/// Number of leaders to return. Defaults to the node's maximum when
+	/// omitted.
 	pub limit: Option<u64>,
 }
 
 impl_http_method!(GetSlotLeadersRequest, "getSlotLeaders");
 
 impl GetSlotLeadersRequest {
+	/// Creates a request using the node's default start slot and limit.
 	pub fn new() -> Self {
 		Self::default()
 	}
 
+	/// Creates a request for `limit` leaders beginning at `start_slot`.
 	pub fn new_with_config(start_slot: u64, limit: u64) -> Self {
 		Self {
 			start_slot: Some(start_slot),
@@ -30,6 +37,7 @@ impl GetSlotLeadersRequest {
 	}
 }
 
+/// Response for the `getSlotLeaders` RPC method.
 #[serde_as]
 #[derive(Debug, Deserialize, IntoIterator)]
 pub struct GetSlotLeadersResponse(#[serde_as(as = "Vec<DisplayFromStr>")] Vec<Pubkey>);

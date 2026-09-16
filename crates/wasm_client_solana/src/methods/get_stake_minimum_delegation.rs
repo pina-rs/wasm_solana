@@ -6,6 +6,8 @@ use solana_commitment_config::CommitmentConfig;
 use super::Context;
 use crate::impl_http_method;
 
+/// Request for the `getStakeMinimumDelegation` RPC method, which returns the
+/// minimum delegation, in lamports, required by the stake program.
 #[skip_serializing_none]
 #[derive(Debug, Serialize_tuple)]
 pub struct GetStakeMinimumDelegationRequest {
@@ -24,10 +26,14 @@ impl Default for GetStakeMinimumDelegationRequest {
 }
 
 impl GetStakeMinimumDelegationRequest {
+	/// Creates a request that evaluates the minimum delegation at the client's
+	/// default commitment.
 	pub fn new() -> Self {
 		Self { config: None }
 	}
 
+	/// Creates a request that evaluates the minimum delegation at the given
+	/// commitment level.
 	pub fn new_with_config(config: CommitmentConfig) -> Self {
 		Self {
 			config: Some(config),
@@ -35,9 +41,12 @@ impl GetStakeMinimumDelegationRequest {
 	}
 }
 
+/// Response for the `getStakeMinimumDelegation` RPC method.
 #[derive(Debug, Deserialize, PartialEq, Eq)]
 pub struct GetStakeMinimumDelegationResponse {
+	/// The slot that the RPC node used to evaluate the request.
 	pub context: Context,
+	/// Minimum stake delegation in lamports.
 	pub value: u64,
 }
 

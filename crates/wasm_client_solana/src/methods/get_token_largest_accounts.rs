@@ -9,18 +9,25 @@ use solana_pubkey::Pubkey;
 use super::Context;
 use crate::impl_http_method;
 
+/// Request for the `getTokenLargestAccounts` RPC method, which returns the 20
+/// largest token accounts for a mint.
 #[serde_as]
 #[skip_serializing_none]
 #[derive(Debug, Serialize_tuple)]
 pub struct GetTokenLargestAccountsRequest {
+	/// Base58 pubkey of the token mint.
 	#[serde_as(as = "DisplayFromStr")]
 	pub pubkey: Pubkey,
+	/// Commitment level for the request. Defaults to the client's commitment
+	/// when omitted.
 	pub config: Option<CommitmentConfig>,
 }
 
 impl_http_method!(GetTokenLargestAccountsRequest, "getTokenLargestAccounts");
 
 impl GetTokenLargestAccountsRequest {
+	/// Creates a request that evaluates the largest accounts at the client's
+	/// default commitment.
 	pub fn new(pubkey: Pubkey) -> Self {
 		Self {
 			pubkey,
@@ -28,6 +35,8 @@ impl GetTokenLargestAccountsRequest {
 		}
 	}
 
+	/// Creates a request that evaluates the largest accounts at the given
+	/// commitment level.
 	pub fn new_with_config(pubkey: Pubkey, config: CommitmentConfig) -> Self {
 		Self {
 			pubkey,
@@ -36,23 +45,33 @@ impl GetTokenLargestAccountsRequest {
 	}
 }
 
+/// A single token account returned by `getTokenLargestAccounts`.
 #[serde_as]
 #[derive(Debug, Deserialize, PartialEq)]
 #[serde(rename_all = "camelCase")]
 pub struct TokenLargestAccountsValue {
+	/// Base58 pubkey of the token account.
 	#[serde_as(as = "DisplayFromStr")]
 	pub address: Pubkey,
+	/// Raw token amount as a decimal string, without decimal point.
 	pub amount: String,
+	/// Number of decimals the mint uses.
 	pub decimals: u8,
+	/// Token amount scaled by `decimals`, or `None` when the node cannot
+	/// represent it exactly.
 	pub ui_amount: Option<f64>,
+	/// Token amount scaled by `decimals`, as a decimal string.
 	pub ui_amount_string: String,
 }
 
 impl Eq for TokenLargestAccountsValue {}
 
+/// Response for the `getTokenLargestAccounts` RPC method.
 #[derive(Debug, Deserialize, PartialEq, Eq)]
 pub struct GetTokenLargestAccountsResponse {
+	/// The slot that the RPC node used to evaluate the request.
 	pub context: Context,
+	/// The largest token accounts, sorted by balance in descending order.
 	pub value: Vec<TokenLargestAccountsValue>,
 }
 

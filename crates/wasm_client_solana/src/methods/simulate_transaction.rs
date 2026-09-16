@@ -14,9 +14,19 @@ use crate::solana_account_decoder::UiAccount;
 use crate::solana_transaction_status::UiTransactionEncoding;
 use crate::solana_transaction_status::UiTransactionReturnData;
 
+/// Request for the `simulateTransaction` RPC method, which dry-runs a signed
+/// transaction against the current bank without submitting it.
+///
+/// The transaction serializes with the version dependent `wincode` wire format,
+/// so legacy and v0 transactions place a `short_vec` signature count first
+/// while v1 transactions place the message first behind a `0x81` discriminator
+/// with signatures at the tail.
 #[derive(Debug, PartialEq, Eq)]
 pub struct SimulateTransactionRequest {
+	/// The signed transaction to simulate.
 	pub transaction: VersionedTransaction,
+	/// Config controlling signature verification, blockhash replacement,
+	/// account encoding, and the accounts to return.
 	pub config: Option<RpcSimulateTransactionConfig>,
 }
 
@@ -76,6 +86,8 @@ impl<'de> Deserialize<'de> for SimulateTransactionRequest {
 impl_http_method!(SimulateTransactionRequest, "simulateTransaction");
 
 impl SimulateTransactionRequest {
+	/// Creates a request that replaces the recent blockhash and skips signature
+	/// verification, so unsigned transactions can be simulated.
 	pub fn new(transaction: VersionedTransaction) -> Self {
 		Self {
 			transaction,
@@ -87,6 +99,7 @@ impl SimulateTransactionRequest {
 		}
 	}
 
+	/// Creates a request with an explicit simulate config.
 	pub fn new_with_config(
 		transaction: VersionedTransaction,
 		config: RpcSimulateTransactionConfig,
@@ -98,19 +111,29 @@ impl SimulateTransactionRequest {
 	}
 }
 
+/// Simulation result for a single transaction.
 #[derive(Serialize, Deserialize, Debug, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
 pub struct SimulateTransactionResponseValue {
+	/// Transaction error, or `None` when the simulation succeeded.
 	pub err: Option<TransactionError>,
+	/// Program log messages emitted during simulation.
 	pub logs: Option<Vec<String>>,
+	/// Post-simulation account states, present only when the request asked for
+	/// accounts.
 	pub accounts: Option<Vec<Option<UiAccount>>>,
+	/// Compute units consumed by the simulation.
 	pub units_consumed: Option<u64>,
+	/// Data returned by the program, in the requested encoding.
 	pub return_data: Option<UiTransactionReturnData>,
 }
 
+/// Response for the `simulateTransaction` RPC method.
 #[derive(Debug, Serialize, Deserialize, PartialEq, Eq)]
 pub struct SimulateTransactionResponse {
+	/// The slot that the RPC node used to evaluate the request.
 	pub context: Context,
+	/// Simulation result for the submitted transaction.
 	pub value: SimulateTransactionResponseValue,
 }
 

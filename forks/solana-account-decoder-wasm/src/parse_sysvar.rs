@@ -28,6 +28,11 @@ use crate::UiFeeCalculator;
 use crate::parse_account_data::ParsableAccount;
 use crate::parse_account_data::ParseAccountError;
 
+/// Parse a sysvar account by matching its `pubkey` against the known sysvar
+/// addresses and deserializing `data` into the matching [`SysvarAccountType`].
+///
+/// Returns [`ParseAccountError::AccountNotParsable`] when the pubkey is not a
+/// known sysvar or the data cannot be deserialized.
 pub fn parse_sysvar(data: &[u8], pubkey: &Pubkey) -> Result<SysvarAccountType, ParseAccountError> {
 	#[allow(deprecated)]
 	let parsed_account = {
@@ -121,31 +126,49 @@ pub fn parse_sysvar(data: &[u8], pubkey: &Pubkey) -> Result<SysvarAccountType, P
 	))
 }
 
+/// The parsed contents of a sysvar account, tagged by sysvar type in JSON.
 #[derive(Debug, Serialize, Deserialize, PartialEq)]
 #[serde(rename_all = "camelCase", tag = "type", content = "info")]
 pub enum SysvarAccountType {
+	/// The `Clock` sysvar.
 	Clock(UiClock),
+	/// The `EpochSchedule` sysvar.
 	EpochSchedule(EpochSchedule),
+	/// The deprecated `Fees` sysvar.
 	#[allow(deprecated)]
 	Fees(UiFees),
+	/// The deprecated `RecentBlockhashes` sysvar.
 	#[allow(deprecated)]
 	RecentBlockhashes(Vec<UiRecentBlockhashesEntry>),
+	/// The `Rent` sysvar.
 	Rent(UiRent),
+	/// The `Rewards` sysvar.
 	Rewards(UiRewards),
+	/// The `SlotHashes` sysvar.
 	SlotHashes(Vec<UiSlotHashEntry>),
+	/// The `SlotHistory` sysvar.
 	SlotHistory(UiSlotHistory),
+	/// The `StakeHistory` sysvar.
 	StakeHistory(Vec<UiStakeHistoryEntry>),
+	/// The `LastRestartSlot` sysvar.
 	LastRestartSlot(UiLastRestartSlot),
+	/// The `EpochRewards` sysvar.
 	EpochRewards(UiEpochRewards),
 }
 
+/// Parsed `Clock` sysvar.
 #[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct UiClock {
+	/// The current bank slot.
 	pub slot: Slot,
+	/// The current epoch.
 	pub epoch: Epoch,
+	/// Unix timestamp of the first slot in the current epoch.
 	pub epoch_start_timestamp: UnixTimestamp,
+	/// The epoch for which the leader schedule was last calculated.
 	pub leader_schedule_epoch: Epoch,
+	/// Approximate Unix timestamp of the current slot.
 	pub unix_timestamp: UnixTimestamp,
 }
 
@@ -161,9 +184,11 @@ impl From<Clock> for UiClock {
 	}
 }
 
+/// Parsed deprecated `Fees` sysvar.
 #[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct UiFees {
+	/// The fee schedule in effect.
 	pub fee_calculator: UiFeeCalculator,
 }
 #[allow(deprecated)]
@@ -175,9 +200,11 @@ impl From<Fees> for UiFees {
 	}
 }
 
+/// Parsed `Rent` sysvar.
 #[derive(Debug, Serialize, Deserialize, PartialEq, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct UiRent {
+	/// Lamports charged per byte of account data for rent exemption.
 	pub lamports_per_byte: StringAmount,
 }
 
@@ -189,9 +216,11 @@ impl From<Rent> for UiRent {
 	}
 }
 
+/// Parsed `Rewards` sysvar.
 #[derive(Debug, Serialize, Deserialize, PartialEq, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct UiRewards {
+	/// The value, in lamports, of a single reward point.
 	pub validator_point_value: f64,
 }
 
@@ -203,24 +232,33 @@ impl From<Rewards> for UiRewards {
 	}
 }
 
+/// A single entry of the deprecated `RecentBlockhashes` sysvar.
 #[derive(Debug, Serialize, Deserialize, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
 pub struct UiRecentBlockhashesEntry {
+	/// The recent blockhash.
 	pub blockhash: String,
+	/// The fee schedule associated with the blockhash.
 	pub fee_calculator: UiFeeCalculator,
 }
 
+/// A single entry of the `SlotHashes` sysvar.
 #[derive(Debug, Serialize, Deserialize, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
 pub struct UiSlotHashEntry {
+	/// The slot the hash was recorded for.
 	pub slot: Slot,
+	/// The slot's hash.
 	pub hash: String,
 }
 
+/// Parsed `SlotHistory` sysvar.
 #[derive(Debug, Serialize, Deserialize, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
 pub struct UiSlotHistory {
+	/// The next slot to be recorded in the history.
 	pub next_slot: Slot,
+	/// The history bitmap, rendered as a string of `0` and `1` characters.
 	pub bits: String,
 }
 
@@ -239,28 +277,41 @@ impl std::fmt::Debug for SlotHistoryBits {
 	}
 }
 
+/// A single entry of the `StakeHistory` sysvar.
 #[derive(Debug, Serialize, Deserialize, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
 pub struct UiStakeHistoryEntry {
+	/// The epoch the entry applies to.
 	pub epoch: Epoch,
+	/// Total stake activating, deactivating, and effective during the epoch.
 	pub stake_history: StakeHistoryEntry,
 }
 
+/// Parsed `LastRestartSlot` sysvar.
 #[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct UiLastRestartSlot {
+	/// The most recent slot at which the cluster restarted.
 	pub last_restart_slot: Slot,
 }
 
+/// Parsed `EpochRewards` sysvar.
 #[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct UiEpochRewards {
+	/// Block height at which epoch rewards distribution started.
 	pub distribution_starting_block_height: u64,
+	/// Number of partitions used to distribute rewards.
 	pub num_partitions: u64,
+	/// The blockhash of the parent block of the first block of the epoch.
 	pub parent_blockhash: String,
+	/// Total reward points for the epoch, as a string.
 	pub total_points: String,
+	/// Total rewards for the epoch, as a string.
 	pub total_rewards: String,
+	/// Portion of the rewards distributed so far, as a string.
 	pub distributed_rewards: String,
+	/// Whether reward distribution is still in progress.
 	pub active: bool,
 }
 

@@ -33,6 +33,8 @@ use tempfile::tempdir;
 use typed_builder::TypedBuilder;
 use wasm_client_solana::SolanaRpcClient;
 
+/// Configuration for a [`TestValidatorRunner`], built with its
+/// [`TypedBuilder`](typed_builder::TypedBuilder) implementation.
 #[derive(Debug, Clone, TypedBuilder)]
 pub struct TestValidatorRunnerProps {
 	/// The ports to use for this runner. Defaults to all three ports being
@@ -98,13 +100,19 @@ impl TestValidatorRunnerProps {
 	}
 }
 
+/// Description of an upgradeable program to load into the [`TestValidator`].
 #[derive(Debug, Clone, TypedBuilder)]
 pub struct TestProgramInfo {
+	/// The address the program is loaded at.
 	pub program_id: Pubkey,
+	/// Path to the compiled program `.so` file.
 	#[builder(setter(into))]
 	pub program_path: PathBuf,
+	/// Authority allowed to upgrade the program. Defaults to no authority.
 	#[builder(default = Pubkey::default())]
 	pub upgrade_authority: Pubkey,
+	/// The loader program that owns this program. Defaults to the upgradeable
+	/// BPF loader.
 	#[builder(default = solana_sdk_ids::bpf_loader_upgradeable::ID)]
 	pub loader: Pubkey,
 }
@@ -127,14 +135,19 @@ impl From<TestProgramInfo> for UpgradeableProgramInfo {
 	}
 }
 
+/// The ports a [`TestValidatorRunner`] binds to.
 #[derive(Debug, Copy, Clone, TypedBuilder)]
 pub struct TestValidatorPorts {
+	/// Port for the JSON RPC endpoint.
 	#[builder(default = 8899)]
 	pub rpc: u16,
+	/// Port for the pubsub (websocket) endpoint.
 	#[builder(default = 8900)]
 	pub pubsub: u16,
+	/// Port for the faucet endpoint used by airdrops.
 	#[builder(default = 9900)]
 	pub faucet: u16,
+	/// Inclusive range of ports used for gossip.
 	#[builder(default = (8001, 8021))]
 	pub gossip_range: (u16, u16),
 }
@@ -146,6 +159,8 @@ impl Default for TestValidatorPorts {
 }
 
 impl TestValidatorPorts {
+	/// Find a free set of ports, returning `None` if none could be found within
+	/// the retry budget.
 	pub fn try_random_ports() -> Option<Self> {
 		find_ports().map(|(rpc, pubsub, faucet, gossip_range)| {
 			Self {
@@ -157,6 +172,7 @@ impl TestValidatorPorts {
 		})
 	}
 
+	/// Find a free set of ports, panicking if none could be found.
 	pub fn random_ports() -> Self {
 		Self::try_random_ports().unwrap()
 	}
@@ -303,34 +319,42 @@ impl TestValidatorRunner {
 		Self::run_internal(props).await.unwrap()
 	}
 
+	/// URL of the validator's JSON RPC endpoint.
 	pub fn rpc_url(&self) -> String {
 		self.validator.rpc_url()
 	}
 
+	/// URL of the validator's pubsub (websocket) endpoint.
 	pub fn pubsub_url(&self) -> String {
 		self.validator.rpc_pubsub_url()
 	}
 
+	/// The RPC client connected to this validator.
 	pub fn rpc(&self) -> &SolanaRpcClient {
 		&self.rpc
 	}
 
+	/// The underlying [`TestValidator`] instance.
 	pub fn validator(&self) -> &TestValidator {
 		&self.validator
 	}
 
+	/// The genesis configuration used to start the validator.
 	pub fn genesis(&self) -> &TestValidatorGenesis {
 		&self.genesis
 	}
 
+	/// The ports the validator is listening on.
 	pub fn ports(&self) -> TestValidatorPorts {
 		self.ports
 	}
 
+	/// The validator's mint keypair, funded with 500 SOL.
 	pub fn mint_keypair(&self) -> &Keypair {
 		&self.mint_keypair
 	}
 
+	/// Path to the temporary ledger directory backing the validator.
 	pub fn ledger_path(&self) -> PathBuf {
 		self.ledger_path.path().to_owned()
 	}

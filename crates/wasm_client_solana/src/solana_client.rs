@@ -85,8 +85,9 @@ use crate::solana_transaction_status::UiTransactionEncoding;
 /// as timeout handling, retries, and waiting on transaction [commitment
 /// levels][cl]. Some methods simply pass through to the underlying RPC
 /// protocol. Not all RPC methods are encapsulated by this type, but
-/// `SolanaRpcClient` does expose a generic [`send`](SolanaRpcClient::send)
-/// method for making any [`ClientRequest`].
+/// `SolanaRpcClient` exposes a generic request API through the
+/// [`RpcProvider`] trait for making any
+/// [`ClientRequest`](crate::ClientRequest).
 ///
 /// The documentation for most [`SolanaRpcClient`] methods contains an "RPC
 /// Reference" section that links to the documentation for the underlying
@@ -183,6 +184,8 @@ impl SolanaRpcClient {
 		}
 	}
 
+	/// Create a client that uses one endpoint for HTTP requests and another
+	/// for websocket subscriptions, with the given commitment level.
 	pub fn new_with_ws_and_commitment(
 		http_endpoint: &str,
 		ws_endpoint: &str,
@@ -213,10 +216,13 @@ impl SolanaRpcClient {
 		self.provider.url()
 	}
 
+	/// The commitment level applied to requests that do not set their own.
 	pub fn commitment(&self) -> CommitmentLevel {
 		self.commitment_config.commitment
 	}
 
+	/// The commitment configuration applied to requests that do not set
+	/// their own.
 	pub fn commitment_config(&self) -> CommitmentConfig {
 		self.commitment_config
 	}
@@ -242,6 +248,8 @@ impl SolanaRpcClient {
 		}
 	}
 
+	/// Return the account stored at `pubkey`, or `None` when the node knows
+	/// of no such account.
 	pub async fn get_account_with_config(
 		&self,
 		pubkey: &Pubkey,
@@ -259,6 +267,7 @@ impl SolanaRpcClient {
 		}
 	}
 
+	/// Return the account stored at `pubkey` as of `commitment_config`.
 	pub async fn get_account_with_commitment(
 		&self,
 		pubkey: &Pubkey,
@@ -275,6 +284,7 @@ impl SolanaRpcClient {
 		.await
 	}
 
+	/// Return the account stored at `pubkey`, failing when it does not exist.
 	pub async fn get_account(&self, pubkey: &Pubkey) -> ClientResult<Account> {
 		let result = self
 			.get_account_with_commitment(pubkey, self.commitment_config())
@@ -284,10 +294,12 @@ impl SolanaRpcClient {
 		Ok(result)
 	}
 
+	/// Return the raw data of the account stored at `pubkey`.
 	pub async fn get_account_data(&self, pubkey: &Pubkey) -> ClientResult<Vec<u8>> {
 		Ok(self.get_account(pubkey).await?.data)
 	}
 
+	/// Return the lamport balance of `pubkey` as of `commitment_config`.
 	pub async fn get_balance_with_commitment(
 		&self,
 		pubkey: &Pubkey,
@@ -299,11 +311,14 @@ impl SolanaRpcClient {
 		Ok(response.result.value)
 	}
 
+	/// Return the lamport balance of `pubkey` at the client's commitment.
 	pub async fn get_balance(&self, pubkey: &Pubkey) -> ClientResult<u64> {
 		self.get_balance_with_commitment(pubkey, self.commitment_config())
 			.await
 	}
 
+	/// Request an airdrop of `lamports` to `pubkey`, returning the signature
+	/// of the transfer. Only test clusters honour airdrop requests.
 	pub async fn request_airdrop(&self, pubkey: &Pubkey, lamports: u64) -> ClientResult<Signature> {
 		let request =
 			RequestAirdropRequest::new_with_config(*pubkey, lamports, self.commitment_config);
@@ -312,6 +327,8 @@ impl SolanaRpcClient {
 		Ok(response.result.into())
 	}
 
+	/// Return the processing status of each signature, with `None` for
+	/// signatures the node does not know.
 	pub async fn get_signature_statuses(
 		&self,
 		signatures: &[Signature],
@@ -322,6 +339,8 @@ impl SolanaRpcClient {
 		Ok(response.result.value)
 	}
 
+	/// Return the transaction identified by `signature`, decoded according
+	/// to `config`.
 	pub async fn get_transaction_with_config(
 		&self,
 		signature: &Signature,
@@ -336,6 +355,8 @@ impl SolanaRpcClient {
 		}
 	}
 
+	/// Return the transaction identified by `signature`, using the default
+	/// config so that transaction version 1 is requested.
 	pub async fn get_transaction(
 		&self,
 		signature: &Signature,
@@ -349,6 +370,8 @@ impl SolanaRpcClient {
 		}
 	}
 
+	/// Return the latest blockhash together with the last block height at
+	/// which it stays valid.
 	pub async fn get_latest_blockhash_with_config(
 		&self,
 		commitment_config: CommitmentConfig,
@@ -362,6 +385,8 @@ impl SolanaRpcClient {
 		))
 	}
 
+	/// Return the latest blockhash and its last valid block height as of
+	/// `commitment_config`.
 	pub async fn get_latest_blockhash_with_commitment(
 		&self,
 		commitment_config: CommitmentConfig,
@@ -370,6 +395,7 @@ impl SolanaRpcClient {
 			.await
 	}
 
+	/// Return the latest blockhash at the client's commitment.
 	pub async fn get_latest_blockhash(&self) -> ClientResult<Hash> {
 		let result = self
 			.get_latest_blockhash_with_commitment(self.commitment_config())
@@ -378,6 +404,8 @@ impl SolanaRpcClient {
 		Ok(result.0)
 	}
 
+	/// Check whether `blockhash` is still usable for a transaction at
+	/// `commitment_config`.
 	pub async fn is_blockhash_valid(
 		&self,
 		blockhash: &Hash,
@@ -395,6 +423,8 @@ impl SolanaRpcClient {
 		Ok(response.result.value)
 	}
 
+	/// Return the lamports an account of `data_len` bytes needs to be rent
+	/// exempt.
 	pub async fn get_minimum_balance_for_rent_exemption(
 		&self,
 		data_len: usize,
@@ -423,6 +453,11 @@ impl SolanaRpcClient {
 		Ok(response.result.into())
 	}
 
+	/// Send a signed transaction using `config`, returning its signature.
+	///
+	/// Fails when the node reports a signature other than the one the
+	/// transaction carries, since the submitted transaction cannot then be
+	/// identified.
 	pub async fn send_transaction_with_config(
 		&self,
 		transaction: &VersionedTransaction,
@@ -450,6 +485,8 @@ impl SolanaRpcClient {
 		}
 	}
 
+	/// Send a signed transaction encoded as base64, preflighting at the
+	/// client's commitment.
 	pub async fn send_transaction(
 		&self,
 		transaction: &VersionedTransaction,
@@ -465,6 +502,11 @@ impl SolanaRpcClient {
 		.await
 	}
 
+	/// Poll the signature status until the transaction reaches
+	/// `commitment_config`, returning whether it succeeded.
+	///
+	/// Returns `false` if the status is still unknown after
+	/// `MAX_RETRIES` polls, so a `false` result does not prove failure.
 	pub async fn confirm_transaction_with_commitment(
 		&self,
 		signature: &Signature,
@@ -505,11 +547,15 @@ impl SolanaRpcClient {
 		Ok(is_success)
 	}
 
+	/// Poll the signature until the transaction confirms at the client's
+	/// commitment.
 	pub async fn confirm_transaction(&self, signature: &Signature) -> ClientResult<bool> {
 		self.confirm_transaction_with_commitment(signature, self.commitment_config())
 			.await
 	}
 
+	/// Send a signed transaction with `config` and wait for it to reach
+	/// `commitment_config` before returning its signature.
 	pub async fn send_and_confirm_transaction_with_config(
 		&self,
 		transaction: &VersionedTransaction,
@@ -526,6 +572,8 @@ impl SolanaRpcClient {
 		Ok(tx_hash)
 	}
 
+	/// Send a signed transaction and wait for it to reach
+	/// `commitment_config` before returning its signature.
 	pub async fn send_and_confirm_transaction_with_commitment(
 		&self,
 		transaction: &VersionedTransaction,
@@ -543,6 +591,8 @@ impl SolanaRpcClient {
 		.await
 	}
 
+	/// Send a signed transaction and wait for it to reach the client's
+	/// commitment before returning its signature.
 	pub async fn send_and_confirm_transaction(
 		&self,
 		transaction: &VersionedTransaction,
@@ -551,6 +601,8 @@ impl SolanaRpcClient {
 			.await
 	}
 
+	/// Return every account owned by `pubkey` that matches `config`, with
+	/// the commitment falling back to the client's default.
 	pub async fn get_program_accounts_with_config(
 		&self,
 		pubkey: &Pubkey,
@@ -590,6 +642,7 @@ impl SolanaRpcClient {
 		Ok(pubkey_accounts)
 	}
 
+	/// Return every account owned by `pubkey`, decoded as base64.
 	pub async fn get_program_accounts(
 		&self,
 		pubkey: &Pubkey,
@@ -607,6 +660,7 @@ impl SolanaRpcClient {
 		.await
 	}
 
+	/// Return the current slot at `commitment_config`.
 	pub async fn get_slot_with_commitment(
 		&self,
 		commitment_config: CommitmentConfig,
@@ -617,11 +671,17 @@ impl SolanaRpcClient {
 		Ok(response.result.into())
 	}
 
+	/// Return the current slot at the client's commitment.
 	pub async fn get_slot(&self) -> ClientResult<Slot> {
 		self.get_slot_with_commitment(self.commitment_config())
 			.await
 	}
 
+	/// Return the confirmed block at `slot`, decoded according to `config`.
+	///
+	/// `config` defaults to requesting transaction version 1, because a v1
+	/// transaction makes the node reject the entire block with `-32015` when
+	/// the version is omitted.
 	pub async fn get_block_with_config(
 		&self,
 		slot: Slot,
@@ -633,12 +693,14 @@ impl SolanaRpcClient {
 		Ok(response.result.into())
 	}
 
+	/// Return the software version of the node.
 	pub async fn get_version(&self) -> ClientResult<RpcVersionInfo> {
 		let response: ClientResponse<GetVersionResponse> = self.send(GetVersionRequest).await?;
 
 		Ok(response.result.into())
 	}
 
+	/// Return the slot of the earliest block still held by the node.
 	pub async fn get_first_available_block(&self) -> ClientResult<Slot> {
 		let request = GetFirstAvailableBlockRequest;
 		let response: ClientResponse<GetFirstAvailableBlockResponse> = self.send(request).await?;
@@ -646,6 +708,8 @@ impl SolanaRpcClient {
 		Ok(response.result.into())
 	}
 
+	/// Return the estimated production time of the block at `slot` as a Unix
+	/// timestamp.
 	pub async fn get_block_time(&self, slot: Slot) -> ClientResult<UnixTimestamp> {
 		let request = GetBlockTimeRequest::new(slot);
 		let response: ClientResponse<GetBlockTimeResponse> = self.send(request).await?;
@@ -657,6 +721,7 @@ impl SolanaRpcClient {
 		}
 	}
 
+	/// Return the current block height at `commitment_config`.
 	pub async fn get_block_height_with_commitment(
 		&self,
 		commitment_config: CommitmentConfig,
@@ -667,11 +732,13 @@ impl SolanaRpcClient {
 		Ok(response.result.into())
 	}
 
+	/// Return the current block height at the client's commitment.
 	pub async fn get_block_height(&self) -> ClientResult<u64> {
 		self.get_block_height_with_commitment(self.commitment_config())
 			.await
 	}
 
+	/// Return the genesis hash of the cluster the node belongs to.
 	pub async fn get_genesis_hash(&self) -> ClientResult<Hash> {
 		let request = GetGenesisHashRequest;
 		let response: ClientResponse<GetGenesisHashResponse> = self.send(request).await?;
@@ -684,6 +751,7 @@ impl SolanaRpcClient {
 		Ok(hash)
 	}
 
+	/// Return the current epoch info at `commitment_config`.
 	pub async fn get_epoch_info_with_commitment(
 		&self,
 		commitment_config: CommitmentConfig,
@@ -694,11 +762,13 @@ impl SolanaRpcClient {
 		Ok(response.result.into())
 	}
 
+	/// Return the current epoch info at the client's commitment.
 	pub async fn get_epoch_info(&self) -> ClientResult<EpochInfo> {
 		self.get_epoch_info_with_commitment(self.commitment_config())
 			.await
 	}
 
+	/// Return up to `limit` recent performance samples.
 	pub async fn get_recent_performance_samples_with_limit(
 		&self,
 		limit: usize,
@@ -710,6 +780,8 @@ impl SolanaRpcClient {
 		Ok(response.result.into())
 	}
 
+	/// Return as many recent performance samples as the node reports by
+	/// default.
 	pub async fn get_recent_performance_samples(&self) -> ClientResult<Vec<RpcPerfSample>> {
 		let request = GetRecentPerformanceSamplesRequest::new();
 		let response: ClientResponse<GetRecentPerformanceSamplesResponse> =
@@ -718,6 +790,8 @@ impl SolanaRpcClient {
 		Ok(response.result.into())
 	}
 
+	/// Return recent prioritization fees without filtering by writable account
+	/// locks.
 	pub async fn get_recent_prioritization_fees(&self) -> ClientResult<Vec<RpcPrioritizationFee>> {
 		let request = GetRecentPrioritizationFeesRequest::new();
 		let response: ClientResponse<GetRecentPrioritizationFeesResponse> =
@@ -726,6 +800,8 @@ impl SolanaRpcClient {
 		Ok(response.result.into())
 	}
 
+	/// Return recent prioritization fees paid by transactions that lock every
+	/// account in `addresses` as writable.
 	pub async fn get_recent_prioritization_fees_with_accounts(
 		&self,
 		addresses: Vec<Pubkey>,
@@ -737,6 +813,8 @@ impl SolanaRpcClient {
 		Ok(response.result.into())
 	}
 
+	/// Return up to `limit` confirmed slots starting from `start_slot` at
+	/// `commitment_config`.
 	pub async fn get_blocks_with_limit_and_commitment(
 		&self,
 		start_slot: Slot,
@@ -750,6 +828,8 @@ impl SolanaRpcClient {
 		Ok(response.result.into())
 	}
 
+	/// Return up to `limit` confirmed slots starting from `start_slot`, at
+	/// the client's commitment.
 	pub async fn get_blocks_with_limit(
 		&self,
 		start_slot: Slot,
@@ -759,6 +839,8 @@ impl SolanaRpcClient {
 			.await
 	}
 
+	/// Return the 20 largest accounts by lamport balance, filtered by
+	/// `config`.
 	pub async fn get_largest_accounts_with_config(
 		&self,
 		config: RpcLargestAccountsConfig,
@@ -774,6 +856,7 @@ impl SolanaRpcClient {
 		Ok(response.result.value)
 	}
 
+	/// Return the lamport supply of the cluster as described by `config`.
 	pub async fn get_supply_with_config(&self, config: RpcSupplyConfig) -> ClientResult<RpcSupply> {
 		let request = GetSupplyRequest::new_with_config(config);
 		let response: ClientResponse<GetSupplyResponse> = self.send(request).await?;
@@ -781,6 +864,8 @@ impl SolanaRpcClient {
 		Ok(response.result.value)
 	}
 
+	/// Return the minimum delegation, in lamports, required by the stake
+	/// program at `commitment`.
 	pub async fn get_stake_minimum_delegation_with_commitment(
 		&self,
 		commitment: CommitmentLevel,
@@ -793,11 +878,15 @@ impl SolanaRpcClient {
 		Ok(response.result.value)
 	}
 
+	/// Return the minimum delegation in lamports required by the stake
+	/// program, at the client's commitment.
 	pub async fn get_stake_minimum_delegation(&self) -> ClientResult<u64> {
 		self.get_stake_minimum_delegation_with_commitment(self.commitment())
 			.await
 	}
 
+	/// Return the lamport supply of the cluster at `commitment`, without the
+	/// list of non-circulating accounts.
 	pub async fn get_supply_with_commitment(
 		&self,
 		commitment: CommitmentLevel,
@@ -809,10 +898,13 @@ impl SolanaRpcClient {
 		.await
 	}
 
+	/// Return the lamport supply of the cluster at the client's commitment.
 	pub async fn get_supply(&self) -> ClientResult<RpcSupply> {
 		self.get_supply_with_commitment(self.commitment()).await
 	}
 
+	/// Return the number of transactions the node has processed, as
+	/// described by `config`.
 	pub async fn get_transaction_count_with_config(
 		&self,
 		config: RpcContextConfig,
@@ -823,6 +915,7 @@ impl SolanaRpcClient {
 		Ok(response.result.into())
 	}
 
+	/// Return the number of transactions processed at `commitment_config`.
 	pub async fn get_transaction_count_with_commitment(
 		&self,
 		commitment_config: CommitmentConfig,
@@ -834,11 +927,17 @@ impl SolanaRpcClient {
 		.await
 	}
 
+	/// Return the number of transactions processed at the client's
+	/// commitment.
 	pub async fn get_transaction_count(&self) -> ClientResult<u64> {
 		self.get_transaction_count_with_commitment(self.commitment_config())
 			.await
 	}
 
+	/// Return the accounts stored at `pubkeys`.
+	///
+	/// Accounts the node fails to decode are omitted from the result rather
+	/// than returned as `None`.
 	pub async fn get_multiple_accounts_with_config(
 		&self,
 		pubkeys: &[Pubkey],
@@ -861,6 +960,7 @@ impl SolanaRpcClient {
 			.collect())
 	}
 
+	/// Return the accounts stored at `pubkeys` as of `commitment_config`.
 	pub async fn get_multiple_accounts_with_commitment(
 		&self,
 		pubkeys: &[Pubkey],
@@ -876,6 +976,7 @@ impl SolanaRpcClient {
 		.await
 	}
 
+	/// Return the accounts stored at `pubkeys` at the client's commitment.
 	pub async fn get_multiple_accounts(
 		&self,
 		pubkeys: &[Pubkey],
@@ -884,6 +985,7 @@ impl SolanaRpcClient {
 			.await
 	}
 
+	/// Return contact information for every node known to the queried node.
 	pub async fn get_cluster_nodes(&self) -> ClientResult<Vec<RpcContactInfoWasm>> {
 		let response: ClientResponse<GetClusterNodesResponse> =
 			self.send(GetClusterNodesRequest).await?;
@@ -891,6 +993,7 @@ impl SolanaRpcClient {
 		Ok(response.result.into())
 	}
 
+	/// Return the status of vote accounts selected by `config`.
 	pub async fn get_vote_accounts_with_config(
 		&self,
 		config: RpcGetVoteAccountsConfig,
@@ -901,6 +1004,8 @@ impl SolanaRpcClient {
 		Ok(response.result.into())
 	}
 
+	/// Return the status of vote accounts at `commitment_config`, including
+	/// delinquent validators.
 	pub async fn get_vote_accounts_with_commitment(
 		&self,
 		commitment_config: CommitmentConfig,
@@ -912,11 +1017,13 @@ impl SolanaRpcClient {
 		.await
 	}
 
+	/// Return the status of vote accounts at the client's commitment.
 	pub async fn get_vote_accounts(&self) -> ClientResult<RpcVoteAccountStatus> {
 		self.get_vote_accounts_with_commitment(self.commitment_config())
 			.await
 	}
 
+	/// Return the epoch schedule of the cluster.
 	pub async fn get_epoch_schedule(&self) -> ClientResult<EpochSchedule> {
 		let response: ClientResponse<GetEpochScheduleResponse> =
 			self.send(GetEpochScheduleRequest).await?;
@@ -924,6 +1031,8 @@ impl SolanaRpcClient {
 		Ok(response.result.into())
 	}
 
+	/// Return the signatures of transactions that involve `address`, newest
+	/// first, as filtered by `config`.
 	pub async fn get_signatures_for_address_with_config(
 		&self,
 		address: &Pubkey,
@@ -943,6 +1052,7 @@ impl SolanaRpcClient {
 		Ok(response.result.into())
 	}
 
+	/// Return the lowest slot the node retains ledger information for.
 	pub async fn minimum_ledger_slot(&self) -> ClientResult<Slot> {
 		let response: ClientResponse<MinimumLedgerSlotResponse> =
 			self.send(MinimumLedgerSlotRequest).await?;
@@ -950,6 +1060,11 @@ impl SolanaRpcClient {
 		Ok(response.result.into())
 	}
 
+	/// Return the confirmed slots between `start_slot` and `end_slot`
+	/// inclusive, where `None` for `end_slot` runs up to the latest slot.
+	///
+	/// `getBlocks` rejects the [`Processed`](CommitmentLevel::Processed)
+	/// commitment level.
 	pub async fn get_blocks_with_commitment(
 		&self,
 		start_slot: Slot,
@@ -962,6 +1077,8 @@ impl SolanaRpcClient {
 		Ok(response.result.into())
 	}
 
+	/// Return the confirmed slots between `start_slot` and `end_slot`
+	/// inclusive, at the client's commitment.
 	pub async fn get_blocks(
 		&self,
 		start_slot: Slot,
@@ -971,6 +1088,8 @@ impl SolanaRpcClient {
 			.await
 	}
 
+	/// Return the leader schedule for the epoch containing `slot`, or for
+	/// the current epoch when `slot` is `None`.
 	pub async fn get_leader_schedule_with_config(
 		&self,
 		slot: Option<Slot>,
@@ -985,6 +1104,8 @@ impl SolanaRpcClient {
 		Ok(response.result.into())
 	}
 
+	/// Return the leader schedule at `commitment_config` for the epoch
+	/// containing `slot`.
 	pub async fn get_leader_schedule_with_commitment(
 		&self,
 		slot: Option<Slot>,
@@ -1000,6 +1121,8 @@ impl SolanaRpcClient {
 		.await
 	}
 
+	/// Return block production info for the identity and slot range in
+	/// `config`.
 	pub async fn get_block_production_with_config(
 		&self,
 		config: RpcBlockProductionConfig,
@@ -1010,6 +1133,8 @@ impl SolanaRpcClient {
 		Ok(response.result.value)
 	}
 
+	/// Return block production info for the whole cluster at
+	/// `commitment_config`.
 	pub async fn get_block_production_with_commitment(
 		&self,
 		commitment_config: CommitmentConfig,
@@ -1021,11 +1146,14 @@ impl SolanaRpcClient {
 		.await
 	}
 
+	/// Return block production info for the whole cluster at the client's
+	/// commitment.
 	pub async fn get_block_production(&self) -> ClientResult<RpcBlockProduction> {
 		self.get_block_production_with_commitment(self.commitment_config())
 			.await
 	}
 
+	/// Return the inflation governor parameters at `commitment_config`.
 	pub async fn get_inflation_governor_with_commitment(
 		&self,
 		commitment_config: CommitmentConfig,
@@ -1036,11 +1164,13 @@ impl SolanaRpcClient {
 		Ok(response.result.into())
 	}
 
+	/// Return the current inflation governor parameters.
 	pub async fn get_inflation_governor(&self) -> ClientResult<RpcInflationGovernor> {
 		self.get_inflation_governor_with_commitment(self.commitment_config())
 			.await
 	}
 
+	/// Return the inflation rate of the current epoch.
 	pub async fn get_inflation_rate(&self) -> ClientResult<RpcInflationRate> {
 		let response: ClientResponse<GetInflationRateResponse> =
 			self.send(GetInflationRateRequest).await?;
@@ -1048,6 +1178,10 @@ impl SolanaRpcClient {
 		Ok(response.result.into())
 	}
 
+	/// Return the inflation reward each of `addresses` earned in `epoch`, or
+	/// `None` where no reward was paid.
+	///
+	/// When `epoch` is `None` the node reports the previous epoch.
 	pub async fn get_inflation_reward_with_config(
 		&self,
 		addresses: &[Pubkey],
@@ -1066,6 +1200,8 @@ impl SolanaRpcClient {
 		Ok(response.result.into())
 	}
 
+	/// Return the inflation reward each of `addresses` earned in the previous
+	/// epoch.
 	pub async fn get_inflation_reward(
 		&self,
 		addresses: &[Pubkey],
@@ -1073,6 +1209,9 @@ impl SolanaRpcClient {
 		self.get_inflation_reward_with_config(addresses, None).await
 	}
 
+	/// Return the parsed SPL token account stored at `pubkey`.
+	///
+	/// Fails when the account does not exist or is not a token account.
 	pub async fn get_token_account_with_commitment(
 		&self,
 		pubkey: &Pubkey,
@@ -1108,11 +1247,15 @@ impl SolanaRpcClient {
 		Err(RpcError::new(format!("AccountNotFound: pubkey={pubkey}")).into())
 	}
 
+	/// Return the parsed SPL token account stored at `pubkey`, failing when
+	/// it is not a token account.
 	pub async fn get_token_account(&self, pubkey: &Pubkey) -> ClientResult<Option<UiTokenAccount>> {
 		self.get_token_account_with_commitment(pubkey, self.commitment_config())
 			.await
 	}
 
+	/// Return the parsed token accounts owned by `owner` that match
+	/// `token_account_filter`.
 	pub async fn get_token_accounts_by_owner_with_commitment(
 		&self,
 		owner: &Pubkey,
@@ -1140,6 +1283,8 @@ impl SolanaRpcClient {
 		Ok(response.result.value)
 	}
 
+	/// Return the parsed token accounts owned by `owner` that match
+	/// `token_account_filter`, at the client's commitment.
 	pub async fn get_token_accounts_by_owner(
 		&self,
 		owner: &Pubkey,
@@ -1153,6 +1298,7 @@ impl SolanaRpcClient {
 		.await
 	}
 
+	/// Return the token balance held by the account at `pubkey`.
 	pub async fn get_token_account_balance_with_commitment(
 		&self,
 		pubkey: &Pubkey,
@@ -1164,11 +1310,14 @@ impl SolanaRpcClient {
 		Ok(response.result.value)
 	}
 
+	/// Return the token balance held by the account at `pubkey`, at the
+	/// client's commitment.
 	pub async fn get_token_account_balance(&self, pubkey: &Pubkey) -> ClientResult<UiTokenAmount> {
 		self.get_token_account_balance_with_commitment(pubkey, self.commitment_config())
 			.await
 	}
 
+	/// Return the total supply of the token mint `mint`.
 	pub async fn get_token_supply_with_commitment(
 		&self,
 		mint: &Pubkey,
@@ -1180,11 +1329,15 @@ impl SolanaRpcClient {
 		Ok(response.result.value)
 	}
 
+	/// Return the total supply of the token mint `mint`, at the client's
+	/// commitment.
 	pub async fn get_token_supply(&self, mint: &Pubkey) -> ClientResult<UiTokenAmount> {
 		self.get_token_supply_with_commitment(mint, self.commitment_config())
 			.await
 	}
 
+	/// Simulate a transaction against the bank state described by `config`,
+	/// without submitting it.
 	pub async fn simulate_transaction_with_config(
 		&self,
 		transaction: &VersionedTransaction,
@@ -1212,6 +1365,8 @@ impl SolanaRpcClient {
 		.await
 	}
 
+	/// Check whether the node is healthy; an unhealthy node answers with an
+	/// error instead.
 	pub async fn get_health(&self) -> ClientResult<GetHealthResponse> {
 		let response: ClientResponse<GetHealthResponse> = self.send(GetHealthRequest).await?;
 
@@ -1293,6 +1448,7 @@ impl SolanaRpcClient {
 		Ok(response.result)
 	}
 
+	/// Return the stake activation state of the stake account at `pubkey`.
 	pub async fn get_stake_activation(
 		&self,
 		pubkey: Pubkey,
@@ -1303,6 +1459,8 @@ impl SolanaRpcClient {
 		Ok(response.result)
 	}
 
+	/// Return the stake activation state of `pubkey` for the epoch selected
+	/// by `config`.
 	pub async fn get_stake_activation_with_config(
 		&self,
 		pubkey: Pubkey,
@@ -1314,6 +1472,8 @@ impl SolanaRpcClient {
 		Ok(response.result)
 	}
 
+	/// Return the parsed token accounts whose delegate is `pubkey`, selected
+	/// by `filter` and decoded with `config`.
 	pub async fn get_token_accounts_by_delegate_with_config(
 		&self,
 		pubkey: Pubkey,
@@ -1331,6 +1491,7 @@ impl SolanaRpcClient {
 		Ok(response.result)
 	}
 
+	/// Return the parsed token accounts whose delegate is `pubkey`.
 	pub async fn get_token_accounts_by_delegate(
 		&self,
 		pubkey: Pubkey,
@@ -1347,6 +1508,7 @@ impl SolanaRpcClient {
 		Ok(response.result)
 	}
 
+	/// Return the 20 largest token accounts for the mint `pubkey`.
 	pub async fn get_token_largest_accounts(
 		&self,
 		pubkey: Pubkey,
@@ -1357,6 +1519,7 @@ impl SolanaRpcClient {
 		Ok(response.result)
 	}
 
+	/// Return the 20 largest accounts for the mint `pubkey` at `config`.
 	pub async fn get_token_largest_accounts_with_config(
 		&self,
 		pubkey: Pubkey,
@@ -1443,7 +1606,7 @@ impl SolanaRpcClient {
 
 	/// Subscribe to block events.
 	///
-	/// Receives messages of type [`RpcBlockUpdate`] when a block is confirmed
+	/// Receives messages of type `RpcBlockUpdate` when a block is confirmed
 	/// or finalized.
 	///
 	/// This method is disabled by default. It can be enabled by passing
@@ -1466,7 +1629,7 @@ impl SolanaRpcClient {
 
 	/// Subscribe to transaction log events.
 	///
-	/// Receives messages of type [`RpcLogsResponse`] when a transaction is
+	/// Receives messages of type `RpcLogsResponse` when a transaction is
 	/// committed.
 	///
 	/// # RPC Reference

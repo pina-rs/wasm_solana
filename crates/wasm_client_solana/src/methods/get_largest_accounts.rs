@@ -7,19 +7,25 @@ use crate::impl_http_method;
 use crate::rpc_config::RpcLargestAccountsConfig;
 use crate::rpc_response::RpcAccountBalance;
 
+/// Request for the `getLargestAccounts` RPC method, which returns the 20
+/// largest accounts by lamport balance.
 #[skip_serializing_none]
 #[derive(Debug, Default, Serialize_tuple)]
 pub struct GetLargestAccountsRequest {
+	/// Config filtering by account type (circulating or non-circulating) and
+	/// selecting the commitment level.
 	pub config: Option<RpcLargestAccountsConfig>,
 }
 
 impl_http_method!(GetLargestAccountsRequest, "getLargestAccounts");
 
 impl GetLargestAccountsRequest {
+	/// Creates a request using the node's default largest accounts config.
 	pub fn new() -> Self {
 		Self::default()
 	}
 
+	/// Creates a request scoped by the given largest accounts config.
 	pub fn new_with_config(config: RpcLargestAccountsConfig) -> Self {
 		Self {
 			config: Some(config),
@@ -27,9 +33,12 @@ impl GetLargestAccountsRequest {
 	}
 }
 
+/// Response for the `getLargestAccounts` RPC method.
 #[derive(Debug, Deserialize, PartialEq, Eq)]
 pub struct GetLargestAccountsResponse {
+	/// The slot that the RPC node used to evaluate the request.
 	pub context: Context,
+	/// Address and lamport balance of each of the largest accounts.
 	pub value: Vec<RpcAccountBalance>,
 }
 

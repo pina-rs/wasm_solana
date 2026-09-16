@@ -6,19 +6,27 @@ use solana_commitment_config::CommitmentConfig;
 use crate::impl_http_method;
 use crate::rpc_response::RpcInflationGovernor;
 
+/// Request for the `getInflationGovernor` RPC method, which returns the
+/// cluster's current inflation parameters.
 #[skip_serializing_none]
 #[derive(Debug, Default, Serialize_tuple)]
 pub struct GetInflationGovernorRequest {
+	/// Commitment level for the request. Defaults to the client's commitment
+	/// when omitted.
 	pub config: Option<CommitmentConfig>,
 }
 
 impl_http_method!(GetInflationGovernorRequest, "getInflationGovernor");
 
 impl GetInflationGovernorRequest {
+	/// Creates a request that evaluates the governor at the client's default
+	/// commitment.
 	pub fn new() -> Self {
 		Self::default()
 	}
 
+	/// Creates a request that evaluates the governor at the given commitment
+	/// level.
 	pub fn new_with_config(config: CommitmentConfig) -> Self {
 		Self {
 			config: Some(config),
@@ -26,6 +34,7 @@ impl GetInflationGovernorRequest {
 	}
 }
 
+/// Response for the `getInflationGovernor` RPC method.
 #[derive(Debug, Deserialize, PartialEq, Eq)]
 pub struct GetInflationGovernorResponse(RpcInflationGovernor);
 

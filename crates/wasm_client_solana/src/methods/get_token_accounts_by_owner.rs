@@ -10,18 +10,25 @@ use crate::rpc_config::RpcAccountInfoConfig;
 use crate::rpc_config::RpcKeyedAccount;
 use crate::rpc_config::RpcTokenAccountsFilter;
 
+/// Request for the `getTokenAccountsByOwner` RPC method, which returns the SPL
+/// token accounts owned by a wallet and filtered by mint or token program.
 #[serde_as]
 #[derive(Debug, Serialize_tuple)]
 pub struct GetTokenAccountsByOwnerRequest {
+	/// Base58 pubkey of the wallet that owns the token accounts.
 	#[serde_as(as = "DisplayFromStr")]
 	pub owner: Pubkey,
+	/// Filter restricting the result to a single mint or token program.
 	pub filter: RpcTokenAccountsFilter,
+	/// Config controlling the encoding, data slice, commitment, and minimum
+	/// context slot of the query.
 	pub config: Option<RpcAccountInfoConfig>,
 }
 
 impl_http_method!(GetTokenAccountsByOwnerRequest, "getTokenAccountsByOwner");
 
 impl GetTokenAccountsByOwnerRequest {
+	/// Creates a request using the default account info config.
 	pub fn new(owner: Pubkey, filter: RpcTokenAccountsFilter) -> Self {
 		Self {
 			owner,
@@ -30,6 +37,7 @@ impl GetTokenAccountsByOwnerRequest {
 		}
 	}
 
+	/// Creates a request with an explicit account info config.
 	pub fn new_with_config(
 		owner: Pubkey,
 		filter: RpcTokenAccountsFilter,
@@ -43,9 +51,12 @@ impl GetTokenAccountsByOwnerRequest {
 	}
 }
 
+/// Response for the `getTokenAccountsByOwner` RPC method.
 #[derive(Debug, Deserialize, PartialEq, Eq)]
 pub struct GetTokenAccountsByOwnerResponse {
+	/// The slot that the RPC node used to evaluate the request.
 	pub context: Context,
+	/// The matching token accounts, each paired with its pubkey.
 	pub value: Vec<RpcKeyedAccount>,
 }
 

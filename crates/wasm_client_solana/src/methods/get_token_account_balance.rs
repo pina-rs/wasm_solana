@@ -10,18 +10,25 @@ use super::Context;
 use crate::impl_http_method;
 use crate::solana_account_decoder::parse_token::UiTokenAmount;
 
+/// Request for the `getTokenAccountBalance` RPC method, which returns the SPL
+/// token balance of a token account.
 #[serde_as]
 #[skip_serializing_none]
 #[derive(Debug, Serialize_tuple)]
 pub struct GetTokenAccountBalanceRequest {
+	/// Base58 pubkey of the token account to query.
 	#[serde_as(as = "DisplayFromStr")]
 	pub account: Pubkey,
+	/// Commitment level for the request. Defaults to the client's commitment
+	/// when omitted.
 	pub config: Option<CommitmentConfig>,
 }
 
 impl_http_method!(GetTokenAccountBalanceRequest, "getTokenAccountBalance");
 
 impl GetTokenAccountBalanceRequest {
+	/// Creates a request that evaluates the balance at the client's default
+	/// commitment.
 	pub fn new(account: Pubkey) -> Self {
 		Self {
 			account,
@@ -29,6 +36,8 @@ impl GetTokenAccountBalanceRequest {
 		}
 	}
 
+	/// Creates a request that evaluates the balance at the given commitment
+	/// level.
 	pub fn new_with_config(account: Pubkey, config: CommitmentConfig) -> Self {
 		Self {
 			account,
@@ -37,9 +46,12 @@ impl GetTokenAccountBalanceRequest {
 	}
 }
 
+/// Response for the `getTokenAccountBalance` RPC method.
 #[derive(Debug, Deserialize, PartialEq, Eq)]
 pub struct GetTokenAccountBalanceResponse {
+	/// The slot that the RPC node used to evaluate the request.
 	pub context: Context,
+	/// Token amount with raw units, decimals, and the UI amount.
 	pub value: UiTokenAmount,
 }
 

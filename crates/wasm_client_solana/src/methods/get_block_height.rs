@@ -7,19 +7,27 @@ use solana_commitment_config::CommitmentConfig;
 
 use crate::impl_http_method;
 
+/// Request for the `getBlockHeight` RPC method, which returns the current
+/// block height of the ledger, excluding skipped slots.
 #[skip_serializing_none]
 #[derive(Debug, Default, Serialize_tuple, Deserialize_tuple)]
 pub struct GetBlockHeightRequest {
+	/// Commitment level for the request. Defaults to the client's commitment
+	/// when omitted.
 	pub config: Option<CommitmentConfig>,
 }
 
 impl_http_method!(GetBlockHeightRequest, "getBlockHeight");
 
 impl GetBlockHeightRequest {
+	/// Creates a request that evaluates the block height at the client's
+	/// default commitment.
 	pub fn new() -> Self {
 		Self::default()
 	}
 
+	/// Creates a request that evaluates the block height at the given
+	/// commitment level.
 	pub fn new_with_config(config: CommitmentConfig) -> Self {
 		Self {
 			config: Some(config),
@@ -27,6 +35,7 @@ impl GetBlockHeightRequest {
 	}
 }
 
+/// Response for the `getBlockHeight` RPC method.
 #[derive(Debug, Serialize, Deserialize, PartialEq, Eq)]
 pub struct GetBlockHeightResponse(u64);
 

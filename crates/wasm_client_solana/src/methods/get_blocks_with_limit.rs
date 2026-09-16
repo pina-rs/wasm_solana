@@ -8,18 +8,26 @@ use solana_commitment_config::CommitmentConfig;
 
 use crate::impl_http_method;
 
+/// Request for the `getBlocksWithLimit` RPC method, which returns up to `limit`
+/// confirmed block slots starting from `start_slot`.
 #[skip_serializing_none]
 #[derive(Debug, Serialize_tuple, Deserialize_tuple)]
 #[serde(rename_all = "camelCase")]
 pub struct GetBlocksWithLimitRequest {
+	/// First slot to return, inclusive.
 	pub start_slot: Slot,
+	/// Maximum number of block slots to return.
 	pub limit: usize,
+	/// Commitment level for the request. Defaults to the client's commitment
+	/// when omitted.
 	pub config: Option<CommitmentConfig>,
 }
 
 impl_http_method!(GetBlocksWithLimitRequest, "getBlocksWithLimit");
 
 impl GetBlocksWithLimitRequest {
+	/// Creates a request for at most `limit` blocks starting at `start_slot` at
+	/// the client's default commitment.
 	pub fn new(start_slot: Slot, limit: usize) -> Self {
 		Self {
 			start_slot,
@@ -28,6 +36,8 @@ impl GetBlocksWithLimitRequest {
 		}
 	}
 
+	/// Creates a request for at most `limit` blocks starting at `start_slot` at
+	/// the given commitment level.
 	pub fn new_with_config(start_slot: Slot, limit: usize, config: CommitmentConfig) -> Self {
 		Self {
 			start_slot,
@@ -37,6 +47,7 @@ impl GetBlocksWithLimitRequest {
 	}
 }
 
+/// Response for the `getBlocksWithLimit` RPC method.
 #[derive(Debug, Serialize, Deserialize, PartialEq, Eq)]
 pub struct GetBlocksWithLimitResponse(Vec<Slot>);
 

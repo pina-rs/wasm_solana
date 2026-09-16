@@ -7,6 +7,8 @@ use crate::impl_http_method;
 use crate::rpc_config::RpcSupplyConfig;
 use crate::rpc_response::RpcSupply;
 
+/// Request for the `getSupply` RPC method, which returns the total, circulating
+/// and non-circulating supply in lamports.
 #[skip_serializing_none]
 #[derive(Debug, Serialize_tuple, Default)]
 pub struct GetSupplyRequest {
@@ -16,10 +18,13 @@ pub struct GetSupplyRequest {
 impl_http_method!(GetSupplyRequest, "getSupply");
 
 impl GetSupplyRequest {
+	/// Creates a request using the default supply config, which omits the
+	/// non-circulating accounts list.
 	pub fn new() -> Self {
 		Self::default()
 	}
 
+	/// Creates a request with an explicit supply config.
 	pub fn new_with_config(config: RpcSupplyConfig) -> Self {
 		Self {
 			config: Some(config),
@@ -27,9 +32,12 @@ impl GetSupplyRequest {
 	}
 }
 
+/// Response for the `getSupply` RPC method.
 #[derive(Debug, Deserialize, PartialEq, Eq)]
 pub struct GetSupplyResponse {
+	/// The slot that the RPC node used to evaluate the request.
 	pub context: Context,
+	/// Total, circulating, and non-circulating lamport supply.
 	pub value: RpcSupply,
 }
 

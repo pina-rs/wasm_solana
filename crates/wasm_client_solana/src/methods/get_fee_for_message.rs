@@ -19,6 +19,7 @@ use crate::impl_http_method;
 /// that the node needs to resolve; v1 messages carry their compute budget in
 /// the message itself rather than in `ComputeBudget` instructions.
 pub trait SerializableMessage {
+	/// Serializes the message using the version dependent wire format.
 	fn serialize(&self) -> Vec<u8>;
 }
 
@@ -46,15 +47,22 @@ impl SerializableMessage for VersionedMessage {
 	}
 }
 
+/// Request for the `getFeeForMessage` RPC method, which returns the fee the
+/// cluster would charge for a message at the current blockhash.
 #[skip_serializing_none]
 #[derive(Debug, Serialize_tuple)]
 pub struct GetFeeForMessageRequest {
+	/// Wire-format message bytes, serialized to the wire as base64.
 	#[serde(serialize_with = "ser_message")]
 	pub message: Vec<u8>,
+	/// Commitment level for the request. Defaults to the client's commitment
+	/// when omitted.
 	pub config: Option<CommitmentConfig>,
 }
 
 impl GetFeeForMessageRequest {
+	/// Creates a request that prices the message at the client's default
+	/// commitment.
 	pub fn new(message: &impl SerializableMessage) -> Self {
 		Self {
 			message: message.serialize(),
@@ -62,6 +70,7 @@ impl GetFeeForMessageRequest {
 		}
 	}
 
+	/// Creates a request that prices the message at the given commitment level.
 	pub fn new_with_config(message: &impl SerializableMessage, config: CommitmentConfig) -> Self {
 		Self {
 			message: message.serialize(),
@@ -76,12 +85,17 @@ fn ser_message<S: serde::Serializer>(message: &[u8], ser: S) -> Result<S::Ok, S:
 
 impl_http_method!(GetFeeForMessageRequest, "getFeeForMessage");
 
+/// The fee, in lamports, for a priced message. The cluster returns `null` when
+/// the message's blockhash is no longer valid.
 #[derive(Debug, Deserialize, PartialEq, Eq)]
 pub struct FeeForMessageValue(Option<u64>);
 
+/// Response for the `getFeeForMessage` RPC method.
 #[derive(Debug, Deserialize, PartialEq, Eq)]
 pub struct GetFeeForMessageResponse {
+	/// The slot that the RPC node used to evaluate the request.
 	pub context: Context,
+	/// The fee in lamports, or `null` when the blockhash is expired.
 	pub value: FeeForMessageValue,
 }
 

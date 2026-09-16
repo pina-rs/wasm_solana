@@ -3,11 +3,14 @@ use serde::Serialize;
 
 use crate::impl_http_method;
 
+/// Request for the `getGenesisHash` RPC method, which returns the genesis hash
+/// that identifies the cluster.
 #[derive(Debug, Serialize)]
 pub struct GetGenesisHashRequest;
 
 impl_http_method!(GetGenesisHashRequest, "getGenesisHash");
 
+/// Response for the `getGenesisHash` RPC method: the base58 genesis blockhash.
 #[derive(Debug, Deserialize, PartialEq, Eq)]
 pub struct GetGenesisHashResponse(String);
 

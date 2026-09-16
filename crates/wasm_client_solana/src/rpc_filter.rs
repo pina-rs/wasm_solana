@@ -1,3 +1,6 @@
+//! Filters for the account and token queries supported by the RPC node, plus
+//! the version-dependent mapping needed to talk to older nodes.
+
 #![allow(deprecated)]
 
 use std::borrow::Cow;
@@ -15,15 +18,22 @@ const MAX_DATA_SIZE: usize = 128;
 const MAX_DATA_BASE58_SIZE: usize = 175;
 const MAX_DATA_BASE64_SIZE: usize = 172;
 
+/// Filter applied server-side to the accounts returned by `getProgramAccounts`
+/// and related methods.
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub enum RpcFilterType {
+	/// Matches accounts whose data length equals the given number of bytes.
 	DataSize(u64),
+	/// Matches accounts whose data contains the given bytes at a given offset.
 	Memcmp(Memcmp),
+	/// Matches token accounts whose data is a valid token account.
 	TokenAccountState,
 }
 
 impl RpcFilterType {
+	/// Validates the filter before it is sent to the node, rejecting encoded
+	/// data that exceeds the server's size limits.
 	pub fn verify(&self) -> Result<(), RpcFilterError> {
 		match self {
 			RpcFilterType::TokenAccountState | RpcFilterType::DataSize(_) => Ok(()),
@@ -85,6 +95,8 @@ impl RpcFilterType {
 		}
 	}
 
+	/// Returns `true` if the account data satisfies this filter when applied
+	/// client-side.
 	pub fn allows(&self, account: &AccountSharedData) -> bool {
 		match self {
 			RpcFilterType::DataSize(size) => account.data().len() as u64 == *size,
@@ -94,47 +106,62 @@ impl RpcFilterType {
 	}
 }
 
+/// Error produced while validating or decoding an [`RpcFilterType`].
 #[derive(Error, PartialEq, Eq, Debug)]
 pub enum RpcFilterError {
+	/// The encoded filter data decodes to more than 128 bytes.
 	#[error("encoded binary data should be less than 129 bytes")]
 	DataTooLarge,
+	/// The deprecated base58 `Binary` encoding exceeds the server's 175-byte
+	/// limit.
 	#[deprecated(
 		since = "1.8.1",
 		note = "Error for MemcmpEncodedBytes::Binary which is deprecated"
 	)]
 	#[error("encoded binary (base 58) data should be less than 129 bytes")]
 	Base58DataTooLarge,
+	/// The deprecated base58 `Binary` encoding could not be decoded.
 	#[deprecated(
 		since = "1.8.1",
 		note = "Error for MemcmpEncodedBytes::Binary which is deprecated"
 	)]
 	#[error("bs58 decode error")]
 	DecodeError(bs58::decode::Error),
+	/// Base58 data in a memcmp filter could not be decoded.
 	#[error("base58 decode error")]
 	Base58DecodeError(#[from] bs58::decode::Error),
+	/// Base64 data in a memcmp filter could not be decoded.
 	#[error("base64 decode error")]
 	Base64DecodeError(#[from] base64::DecodeError),
 }
 
+/// Encoding used to interpret the bytes of a [`Memcmp`] filter.
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub enum MemcmpEncoding {
+	/// Bytes are given as base58-encoded strings.
 	Binary,
 }
 
+/// Byte pattern of a [`Memcmp`] filter, tagged by the encoding used.
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase", untagged)]
 pub enum MemcmpEncodedBytes {
+	/// Base58-encoded bytes; superseded by the `Base58` variant.
 	#[deprecated(
 		since = "1.8.1",
 		note = "Please use MemcmpEncodedBytes::Base58 instead"
 	)]
 	Binary(String),
+	/// Bytes encoded as a base58 string.
 	Base58(String),
+	/// Bytes encoded as a base64 string.
 	Base64(String),
+	/// Raw, unencoded bytes.
 	Bytes(Vec<u8>),
 }
 
+/// Comparison of account data against a byte pattern at a fixed offset.
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[serde(into = "RpcMemcmp", from = "RpcMemcmp")]
 pub struct Memcmp {
@@ -161,6 +188,7 @@ pub struct Memcmp {
 }
 
 impl Memcmp {
+	/// Creates a filter matching `encoded_bytes` at `offset`.
 	pub fn new(offset: usize, encoded_bytes: MemcmpEncodedBytes) -> Self {
 		Self {
 			offset,
@@ -169,6 +197,7 @@ impl Memcmp {
 		}
 	}
 
+	/// Creates a filter matching raw, unencoded `bytes` at `offset`.
 	pub fn new_raw_bytes(offset: usize, bytes: Vec<u8>) -> Self {
 		Self {
 			offset,
@@ -177,6 +206,8 @@ impl Memcmp {
 		}
 	}
 
+	/// Creates a filter that base58-encodes `bytes` and matches them at
+	/// `offset`.
 	pub fn new_base58_encoded(offset: usize, bytes: &[u8]) -> Self {
 		Self {
 			offset,
@@ -185,6 +216,8 @@ impl Memcmp {
 		}
 	}
 
+	/// Returns the filter's bytes decoded into raw form, or `None` if they are
+	/// not valid in their declared encoding.
 	pub fn bytes(&'_ self) -> Option<Cow<'_, Vec<u8>>> {
 		use MemcmpEncodedBytes::Base58;
 		use MemcmpEncodedBytes::Base64;
@@ -197,6 +230,8 @@ impl Memcmp {
 		}
 	}
 
+	/// Replaces the filter's encoded bytes with their decoded raw form,
+	/// returning an error if decoding fails.
 	pub fn convert_to_raw_bytes(&mut self) -> Result<(), RpcFilterError> {
 		use MemcmpEncodedBytes::Base58;
 		use MemcmpEncodedBytes::Base64;
@@ -217,6 +252,8 @@ impl Memcmp {
 		}
 	}
 
+	/// Returns `true` if `data` contains the filter's bytes at the filter's
+	/// offset. Data shorter than the filter requires never matches.
 	pub fn bytes_match(&self, data: &[u8]) -> bool {
 		match self.bytes() {
 			Some(bytes) => {
@@ -308,6 +345,8 @@ impl From<RpcMemcmp> for Memcmp {
 	}
 }
 
+/// Rewrites memcmp filters into the form expected by the node's RPC version,
+/// returning an error when the node predates base64 memcmp encoding.
 pub fn maybe_map_filters(
 	node_version: Option<semver::Version>,
 	filters: &mut [RpcFilterType],
@@ -355,9 +394,12 @@ impl VersionReq {
 	}
 }
 
+/// Selects which token accounts a token account query should return.
 #[derive(Clone, Copy, Debug, Serialize, Deserialize, PartialEq, Eq)]
 pub enum TokenAccountsFilter {
+	/// Token accounts holding the given mint.
 	Mint(Pubkey),
+	/// Token accounts owned by the given token program.
 	ProgramId(Pubkey),
 }
 

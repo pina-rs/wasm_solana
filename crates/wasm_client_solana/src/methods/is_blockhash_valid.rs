@@ -9,6 +9,8 @@ use super::Context;
 use crate::impl_http_method;
 use crate::rpc_config::RpcContextConfig;
 
+/// Request for the `isBlockhashValid` RPC method, which reports whether a
+/// blockhash is still within its valid block height window.
 #[serde_as]
 #[skip_serializing_none]
 #[derive(Debug, Serialize_tuple, Default)]
@@ -21,6 +23,8 @@ pub struct IsBlockhashValidRequest {
 impl_http_method!(IsBlockhashValidRequest, "isBlockhashValid");
 
 impl IsBlockhashValidRequest {
+	/// Creates a request that checks the blockhash at the client's default
+	/// commitment.
 	pub fn new(blockhash: Hash) -> Self {
 		Self {
 			blockhash,
@@ -28,6 +32,8 @@ impl IsBlockhashValidRequest {
 		}
 	}
 
+	/// Creates a request that checks the blockhash with an explicit context
+	/// config.
 	pub fn new_with_config(blockhash: Hash, config: RpcContextConfig) -> Self {
 		Self {
 			blockhash,
@@ -36,9 +42,12 @@ impl IsBlockhashValidRequest {
 	}
 }
 
+/// Response for the `isBlockhashValid` RPC method.
 #[derive(Debug, Deserialize, PartialEq, Eq)]
 pub struct IsBlockhashValidResponse {
+	/// The slot that the RPC node used to evaluate the request.
 	pub context: Context,
+	/// `true` when the blockhash is still valid for building transactions.
 	pub value: bool,
 }
 

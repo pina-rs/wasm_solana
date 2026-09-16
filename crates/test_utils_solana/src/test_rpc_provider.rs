@@ -44,6 +44,11 @@ use wasm_client_solana::solana_transaction_status::TransactionStatus;
 
 use crate::ProgramTestContextExtension;
 
+/// An [`RpcProvider`] implementation backed by a [`ProgramTestContext`].
+///
+/// Lets client code built against a real RPC endpoint run against an in-process
+/// banks client during tests. Create a client with
+/// [`TestRpcProvider::to_rpc_client`].
 #[derive(Clone, Deref, DerefMut)]
 pub struct TestRpcProvider(pub Arc<Mutex<ProgramTestContext>>);
 

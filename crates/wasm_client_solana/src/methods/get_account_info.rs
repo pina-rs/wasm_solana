@@ -24,7 +24,10 @@ use crate::solana_account_decoder::UiAccount;
 /// ```
 #[derive(Debug, TypedBuilder)]
 pub struct GetAccountInfoRequest {
+	/// Base58 pubkey of the account to query.
 	pub pubkey: Pubkey,
+	/// Config controlling the encoding, data slice, commitment, and minimum
+	/// context slot of the query.
 	#[builder(default = RpcAccountInfoConfig::builder().build())]
 	pub config: RpcAccountInfoConfig,
 }
@@ -87,9 +90,14 @@ impl<'de> Deserialize<'de> for GetAccountInfoRequest {
 impl_http_method!(GetAccountInfoRequest, "getAccountInfo");
 impl_websocket_method!(GetAccountInfoRequest, "account");
 
+/// Response for the `getAccountInfo` RPC method, also sent as the
+/// `accountNotification` payload for `accountSubscribe`.
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
 pub struct GetAccountInfoResponse {
+	/// The slot that the RPC node used to evaluate the request.
 	pub context: Context,
+	/// Account data, or `None` when no account with that pubkey exists or the
+	/// account is not visible at the requested commitment.
 	pub value: Option<UiAccount>,
 }
 

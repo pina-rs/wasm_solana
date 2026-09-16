@@ -10,18 +10,25 @@ use super::Context;
 use crate::impl_http_method;
 use crate::solana_account_decoder::parse_token::UiTokenAmount;
 
+/// Request for the `getTokenSupply` RPC method, which returns the total supply
+/// of an SPL token mint.
 #[serde_as]
 #[skip_serializing_none]
 #[derive(Debug, Serialize_tuple)]
 pub struct GetTokenSupplyRequest {
+	/// Base58 pubkey of the token mint.
 	#[serde_as(as = "DisplayFromStr")]
 	pub pubkey: Pubkey,
+	/// Commitment level for the request. Defaults to the client's commitment
+	/// when omitted.
 	pub config: Option<CommitmentConfig>,
 }
 
 impl_http_method!(GetTokenSupplyRequest, "getTokenSupply");
 
 impl GetTokenSupplyRequest {
+	/// Creates a request that evaluates the supply at the client's default
+	/// commitment.
 	pub fn new(pubkey: Pubkey) -> Self {
 		Self {
 			pubkey,
@@ -29,6 +36,8 @@ impl GetTokenSupplyRequest {
 		}
 	}
 
+	/// Creates a request that evaluates the supply at the given commitment
+	/// level.
 	pub fn new_with_config(pubkey: Pubkey, config: CommitmentConfig) -> Self {
 		Self {
 			pubkey,
@@ -37,9 +46,12 @@ impl GetTokenSupplyRequest {
 	}
 }
 
+/// Response for the `getTokenSupply` RPC method.
 #[derive(Debug, Deserialize, PartialEq, Eq)]
 pub struct GetTokenSupplyResponse {
+	/// The slot that the RPC node used to evaluate the request.
 	pub context: Context,
+	/// Total supply with raw units, decimals, and the UI amount.
 	pub value: UiTokenAmount,
 }
 

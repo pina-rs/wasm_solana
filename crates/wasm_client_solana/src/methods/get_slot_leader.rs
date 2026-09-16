@@ -7,8 +7,12 @@ use solana_pubkey::Pubkey;
 
 use crate::impl_http_method;
 
+/// Request for the `getSlotLeader` RPC method, which returns the identity
+/// pubkey of the leader scheduled for the current slot.
 #[derive(Debug, Default, Serialize_tuple)]
 pub struct GetSlotLeaderRequest {
+	/// Commitment level for the request. Defaults to the client's commitment
+	/// when omitted.
 	#[serde(skip_serializing_if = "Option::is_none")]
 	pub config: Option<CommitmentConfig>,
 }
@@ -16,10 +20,14 @@ pub struct GetSlotLeaderRequest {
 impl_http_method!(GetSlotLeaderRequest, "getSlotLeader");
 
 impl GetSlotLeaderRequest {
+	/// Creates a request that evaluates the slot leader at the client's default
+	/// commitment.
 	pub fn new() -> Self {
 		Self::default()
 	}
 
+	/// Creates a request that evaluates the slot leader at the given commitment
+	/// level.
 	pub fn new_with_config(config: CommitmentConfig) -> Self {
 		Self {
 			config: Some(config),
@@ -27,6 +35,7 @@ impl GetSlotLeaderRequest {
 	}
 }
 
+/// Response for the `getSlotLeader` RPC method.
 #[serde_as]
 #[derive(Debug, Deserialize, PartialEq, Eq)]
 pub struct GetSlotLeaderResponse(#[serde_as(as = "DisplayFromStr")] Pubkey);

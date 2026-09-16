@@ -13,19 +13,27 @@ use solana_signature::Signature;
 
 use crate::impl_http_method;
 
+/// Request for the `requestAirdrop` RPC method, which transfers lamports from
+/// the faucet to an account. Only available on test clusters.
 #[serde_as]
 #[skip_serializing_none]
 #[derive(Debug, Serialize_tuple, Deserialize_tuple)]
 pub struct RequestAirdropRequest {
+	/// Base58 pubkey of the account receiving the airdrop.
 	#[serde_as(as = "DisplayFromStr")]
 	pub pubkey: Pubkey,
+	/// Number of lamports to airdrop.
 	pub lamports: u64,
+	/// Commitment level for the request. Defaults to the client's commitment
+	/// when omitted.
 	pub config: Option<CommitmentConfig>,
 }
 
 impl_http_method!(RequestAirdropRequest, "requestAirdrop");
 
 impl RequestAirdropRequest {
+	/// Creates a request that submits the airdrop at the client's default
+	/// commitment.
 	pub fn new(pubkey: Pubkey, lamports: u64) -> Self {
 		Self {
 			pubkey,
@@ -34,6 +42,8 @@ impl RequestAirdropRequest {
 		}
 	}
 
+	/// Creates a request that submits the airdrop at the given commitment
+	/// level.
 	pub fn new_with_config(pubkey: Pubkey, lamports: u64, config: CommitmentConfig) -> Self {
 		Self {
 			pubkey,
@@ -43,6 +53,8 @@ impl RequestAirdropRequest {
 	}
 }
 
+/// Response for the `requestAirdrop` RPC method: the signature of the transfer
+/// transaction.
 #[serde_as]
 #[derive(Debug, Serialize, Deserialize, PartialEq, Eq, From, Into)]
 pub struct RequestAirdropResponse(#[serde_as(as = "DisplayFromStr")] pub Signature);

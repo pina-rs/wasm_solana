@@ -28,6 +28,8 @@ use wallet_standard::prelude::*;
 use wasm_client_solana::SolanaRpcClient;
 use wasm_client_solana::prelude::*;
 
+/// An in-memory wallet account, pairing a [`Keypair`] with the optional wallet
+/// standard `label` and `icon` metadata.
 #[derive(Debug, Deref, DerefMut)]
 pub struct MemoryWalletAccountInfo {
 	#[deref]
@@ -79,6 +81,8 @@ impl Clone for MemoryWalletAccountInfo {
 }
 
 impl MemoryWalletAccountInfo {
+	/// Create a new account backed by a randomly generated [`Keypair`] with no
+	/// label or icon.
 	pub fn new() -> Self {
 		Self {
 			keypair: Keypair::new(),
@@ -87,6 +91,8 @@ impl MemoryWalletAccountInfo {
 		}
 	}
 
+	/// Create a new account backed by a randomly generated [`Keypair`] with the
+	/// provided display label.
 	pub fn new_labelled(label: String) -> Self {
 		Self {
 			keypair: Keypair::new(),
@@ -132,6 +138,8 @@ impl WalletAccountInfo for MemoryWalletAccountInfo {
 	}
 }
 
+/// Wallet metadata exposed over the wallet standard, holding the set of
+/// accounts managed by a [`MemoryWallet`].
 #[derive(Clone, Debug)]
 pub struct MemoryWalletInfo {
 	accounts: IndexSet<MemoryWalletAccountInfo>,
@@ -165,6 +173,10 @@ impl WalletInfo for MemoryWalletInfo {
 	}
 }
 
+/// A `wallet-standard` compliant in-memory wallet intended for testing.
+///
+/// Holds its accounts in memory and submits transactions through the wrapped
+/// [`SolanaRpcClient`].
 #[derive(Clone, Debug)]
 pub struct MemoryWallet {
 	wallet: MemoryWalletInfo,
@@ -199,6 +211,8 @@ impl Signer for MemoryWallet {
 }
 
 impl MemoryWallet {
+	/// Create a wallet from the provided accounts, using the first account as
+	/// the connected account.
 	pub fn new(rpc: SolanaRpcClient, accounts: &[Keypair]) -> Self {
 		let accounts = accounts
 			.iter()
@@ -214,6 +228,7 @@ impl MemoryWallet {
 		}
 	}
 
+	/// Add an account and make it the connected (primary) account.
 	pub fn add_primary_account(
 		&mut self,
 		account: impl Into<MemoryWalletAccountInfo>,
@@ -357,6 +372,11 @@ impl WalletSolanaSignTransaction for MemoryWallet {
 	}
 }
 
+/// Output of [`MemoryWallet`]'s `solana:signIn` implementation.
+///
+/// Carries the signature over the sign-in message, the account that signed it,
+/// and the raw `signed_message` bytes (the `NaCl` signed message including the
+/// signature prefix, as returned by wallets supporting the `signIn` feature).
 #[derive(Clone, Debug)]
 pub struct MemorySolanaSignInOutput {
 	signature: Signature,
@@ -423,6 +443,9 @@ impl WalletSolanaSignIn for MemoryWallet {
 	}
 }
 
+/// Output of [`MemoryWallet`]'s `solana:signMessage` implementation.
+///
+/// Contains the signature together with the `NaCl` signed message bytes.
 pub struct MemorySolanaSignMessageOutput {
 	signature: Signature,
 	signed_message: Vec<u8>,
@@ -482,6 +505,10 @@ impl WalletSolanaSignMessage for MemoryWallet {
 	}
 }
 
+/// The wallet standard features supported by [`MemoryWallet`].
+///
+/// Used when reporting the wallet's capabilities to
+/// [`WalletInfo::features`] and [`WalletAccountInfo::features`].
 pub const MEMORY_WALLET_FEATURES: [&str; 7] = [
 	STANDARD_CONNECT,
 	STANDARD_DISCONNECT,
@@ -492,6 +519,8 @@ pub const MEMORY_WALLET_FEATURES: [&str; 7] = [
 	SOLANA_SIGN_AND_SEND_TRANSACTION,
 ];
 
+/// Convenience re-exports of the wallet standard and Solana RPC client
+/// preludes.
 pub mod prelude {
 	pub use wallet_standard::prelude::*;
 	pub use wasm_client_solana::prelude::*;

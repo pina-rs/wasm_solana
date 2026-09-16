@@ -34,7 +34,9 @@ use crate::WebSocketMethod;
 use crate::WebSocketNotification;
 use crate::utils::get_ws_url;
 
+/// Convert a websocket message into the JSON value carried by a notification.
 pub trait ToWebSocketValue {
+	/// Deserialize the message, or report that it was not valid JSON.
 	fn to_websocket_value(&self) -> Result<Value, ClientWebSocketError>;
 }
 
@@ -52,6 +54,11 @@ where
 	}
 }
 
+/// Owns the websocket connection used for pubsub subscriptions.
+///
+/// The stream is split so that many [`Subscription`]s can share one connection:
+/// writes go through a shared sink while each subscription reads from its own
+/// fork of the incoming stream.
 #[derive(Clone, derive_more::Debug)]
 pub struct WebSocketProvider {
 	/// The websocket url.
@@ -65,6 +72,8 @@ pub struct WebSocketProvider {
 }
 
 impl WebSocketProvider {
+	/// Connect to `url`, rewriting an HTTP endpoint into its websocket
+	/// equivalent.
 	pub fn new(url: impl Into<String>) -> Self {
 		let url = get_ws_url(url);
 		let stream = WebSocketStream::new(&url);
@@ -81,6 +90,7 @@ impl WebSocketProvider {
 		}
 	}
 
+	/// The websocket url this provider is connected to.
 	pub fn url(&self) -> &str {
 		&self.url
 	}
@@ -169,6 +179,7 @@ impl Hash for Unsubscription {
 }
 
 impl Unsubscription {
+	/// Send the unsubscribe request and wait until the node acknowledges it.
 	pub async fn run(self) -> Result<(), ClientWebSocketError> {
 		let request = ClientRequest::builder()
 			.id(self.id)
@@ -225,6 +236,8 @@ pub struct Subscription<T: DeserializeOwned + WebSocketNotification> {
 }
 
 impl<T: DeserializeOwned + WebSocketNotification> Subscription<T> {
+	/// Build a subscription over an existing provider connection using the ids
+	/// returned by [`WebSocketProvider::create_subscription`].
 	pub fn new(ws: &WebSocketProvider, id: u32, subscription_id: SubscriptionId) -> Self {
 		Self::builder()
 			.receiver(ws.receiver.clone())

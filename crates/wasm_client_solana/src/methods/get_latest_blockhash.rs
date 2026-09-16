@@ -9,19 +9,27 @@ use super::Context;
 use crate::impl_http_method;
 use crate::rpc_response::RpcBlockhash;
 
+/// Request for the `getLatestBlockhash` RPC method, which returns the most
+/// recent blockhash and the last slot at which it remains valid.
 #[skip_serializing_none]
 #[derive(Debug, Default, Serialize_tuple, Deserialize_tuple)]
 pub struct GetLatestBlockhashRequest {
+	/// Commitment level for the request. Defaults to the client's commitment
+	/// when omitted.
 	pub config: Option<CommitmentConfig>,
 }
 
 impl_http_method!(GetLatestBlockhashRequest, "getLatestBlockhash");
 
 impl GetLatestBlockhashRequest {
+	/// Creates a request that evaluates the latest blockhash at the client's
+	/// default commitment.
 	pub fn new() -> Self {
 		Self::default()
 	}
 
+	/// Creates a request that evaluates the latest blockhash at the given
+	/// commitment level.
 	pub fn new_with_config(config: CommitmentConfig) -> Self {
 		Self {
 			config: Some(config),
@@ -29,9 +37,12 @@ impl GetLatestBlockhashRequest {
 	}
 }
 
+/// Response for the `getLatestBlockhash` RPC method.
 #[derive(Debug, Serialize, Deserialize, PartialEq, Eq)]
 pub struct GetLatestBlockhashResponse {
+	/// The slot that the RPC node used to evaluate the request.
 	pub context: Context,
+	/// The blockhash and its last valid block height.
 	pub value: RpcBlockhash,
 }
 

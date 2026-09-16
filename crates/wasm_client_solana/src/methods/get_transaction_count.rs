@@ -5,20 +5,28 @@ use serde_with::skip_serializing_none;
 use crate::impl_http_method;
 use crate::rpc_config::RpcContextConfig;
 
+/// Request for the `getTransactionCount` RPC method, which returns the number
+/// of transactions processed by the ledger.
 #[skip_serializing_none]
 #[derive(Debug, Default, Serialize_tuple)]
 
 pub struct GetTransactionCountRequest {
+	/// Config selecting the commitment level and minimum context slot of the
+	/// query.
 	pub config: Option<RpcContextConfig>,
 }
 
 impl_http_method!(GetTransactionCountRequest, "getTransactionCount");
 
 impl GetTransactionCountRequest {
+	/// Creates a request that counts transactions at the client's default
+	/// commitment.
 	pub fn new() -> Self {
 		Self::default()
 	}
 
+	/// Creates a request that counts transactions with an explicit context
+	/// config.
 	pub fn new_with_config(config: RpcContextConfig) -> Self {
 		Self {
 			config: Some(config),
@@ -26,6 +34,7 @@ impl GetTransactionCountRequest {
 	}
 }
 
+/// Response for the `getTransactionCount` RPC method.
 #[derive(Debug, Deserialize, PartialEq, Eq)]
 pub struct GetTransactionCountResponse(u64);
 
