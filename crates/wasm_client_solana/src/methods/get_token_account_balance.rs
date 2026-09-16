@@ -27,7 +27,7 @@ pub struct GetTokenAccountBalanceRequest {
 impl_http_method!(GetTokenAccountBalanceRequest, "getTokenAccountBalance");
 
 impl GetTokenAccountBalanceRequest {
-	/// Creates a request that evaluates the balance at the client's default
+	/// Creates a request that evaluates the balance using the node's default
 	/// commitment.
 	pub fn new(account: Pubkey) -> Self {
 		Self {

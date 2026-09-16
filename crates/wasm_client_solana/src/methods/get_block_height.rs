@@ -20,7 +20,7 @@ pub struct GetBlockHeightRequest {
 impl_http_method!(GetBlockHeightRequest, "getBlockHeight");
 
 impl GetBlockHeightRequest {
-	/// Creates a request that evaluates the block height at the client's
+	/// Creates a request that evaluates the block height using the node's
 	/// default commitment.
 	pub fn new() -> Self {
 		Self::default()

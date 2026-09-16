@@ -61,7 +61,7 @@ pub struct GetFeeForMessageRequest {
 }
 
 impl GetFeeForMessageRequest {
-	/// Creates a request that prices the message at the client's default
+	/// Creates a request that prices the message using the node's default
 	/// commitment.
 	pub fn new(message: &impl SerializableMessage) -> Self {
 		Self {

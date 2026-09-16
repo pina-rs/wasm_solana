@@ -19,8 +19,11 @@ pub struct ClientRequest {
 	/// Solana RPC method name, such as `getBalance` or `accountSubscribe`.
 	#[builder(setter(into))]
 	pub method: String,
-	/// Method arguments sent as the JSON-RPC `params` value. Null params are
-	/// omitted from the payload.
+	/// Method arguments sent as the JSON-RPC `params` value.
+	///
+	/// Omitted from the payload when it would carry no information: either
+	/// `null`, or an array whose elements are all `null`. An empty array is
+	/// therefore also omitted.
 	#[serde(skip_serializing_if = "is_null")]
 	#[builder(default = Value::Null, setter(transform = |value: impl Serialize| serde_json::to_value(value).unwrap_or_default()))]
 	pub params: Value,

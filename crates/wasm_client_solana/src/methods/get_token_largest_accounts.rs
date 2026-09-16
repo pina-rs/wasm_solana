@@ -26,7 +26,7 @@ pub struct GetTokenLargestAccountsRequest {
 impl_http_method!(GetTokenLargestAccountsRequest, "getTokenLargestAccounts");
 
 impl GetTokenLargestAccountsRequest {
-	/// Creates a request that evaluates the largest accounts at the client's
+	/// Creates a request that evaluates the largest accounts using the node's
 	/// default commitment.
 	pub fn new(pubkey: Pubkey) -> Self {
 		Self {

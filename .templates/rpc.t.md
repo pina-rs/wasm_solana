@@ -1,6 +1,6 @@
 <!-- {@commitmentField} -->
 
-Commitment level for the request. Defaults to the client's commitment when omitted.
+Commitment level for the request. When omitted the field is left out of the payload, so the node applies its own default. The client's commitment is only applied by the convenience methods that build a config from it, such as `get_balance`.
 
 <!-- {/commitmentField} -->
 

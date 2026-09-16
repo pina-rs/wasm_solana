@@ -885,7 +885,7 @@ impl SolanaRpcClient {
 			.await
 	}
 
-	/// Return the lamport supply of the cluster at `commitment`, without the
+	/// Return the lamport supply of the cluster at `commitment`, including the
 	/// list of non-circulating accounts.
 	pub async fn get_supply_with_commitment(
 		&self,
@@ -936,8 +936,9 @@ impl SolanaRpcClient {
 
 	/// Return the accounts stored at `pubkeys`.
 	///
-	/// Accounts the node fails to decode are omitted from the result rather
-	/// than returned as `None`.
+	/// Accounts that do not exist are omitted from the result, so the returned
+	/// vector is not positionally aligned with `pubkeys`. Accounts that exist
+	/// but cannot be decoded are kept as `None`.
 	pub async fn get_multiple_accounts_with_config(
 		&self,
 		pubkeys: &[Pubkey],

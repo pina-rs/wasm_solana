@@ -19,7 +19,7 @@ pub struct GetTransactionCountRequest {
 impl_http_method!(GetTransactionCountRequest, "getTransactionCount");
 
 impl GetTransactionCountRequest {
-	/// Creates a request that counts transactions at the client's default
+	/// Creates a request that counts transactions using the node's default
 	/// commitment.
 	pub fn new() -> Self {
 		Self::default()

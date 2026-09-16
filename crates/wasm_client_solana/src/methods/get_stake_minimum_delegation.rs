@@ -26,7 +26,7 @@ impl Default for GetStakeMinimumDelegationRequest {
 }
 
 impl GetStakeMinimumDelegationRequest {
-	/// Creates a request that evaluates the minimum delegation at the client's
+	/// Creates a request that evaluates the minimum delegation using the node's
 	/// default commitment.
 	pub fn new() -> Self {
 		Self { config: None }

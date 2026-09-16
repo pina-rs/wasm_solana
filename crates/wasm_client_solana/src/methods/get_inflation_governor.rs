@@ -19,7 +19,7 @@ pub struct GetInflationGovernorRequest {
 impl_http_method!(GetInflationGovernorRequest, "getInflationGovernor");
 
 impl GetInflationGovernorRequest {
-	/// Creates a request that evaluates the governor at the client's default
+	/// Creates a request that evaluates the governor using the node's default
 	/// commitment.
 	pub fn new() -> Self {
 		Self::default()

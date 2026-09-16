@@ -22,7 +22,7 @@ pub struct GetLatestBlockhashRequest {
 impl_http_method!(GetLatestBlockhashRequest, "getLatestBlockhash");
 
 impl GetLatestBlockhashRequest {
-	/// Creates a request that evaluates the latest blockhash at the client's
+	/// Creates a request that evaluates the latest blockhash using the node's
 	/// default commitment.
 	pub fn new() -> Self {
 		Self::default()

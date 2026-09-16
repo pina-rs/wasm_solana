@@ -32,7 +32,7 @@ pub struct RequestAirdropRequest {
 impl_http_method!(RequestAirdropRequest, "requestAirdrop");
 
 impl RequestAirdropRequest {
-	/// Creates a request that submits the airdrop at the client's default
+	/// Creates a request that submits the airdrop using the node's default
 	/// commitment.
 	pub fn new(pubkey: Pubkey, lamports: u64) -> Self {
 		Self {

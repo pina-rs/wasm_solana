@@ -18,8 +18,9 @@ pub struct GetSupplyRequest {
 impl_http_method!(GetSupplyRequest, "getSupply");
 
 impl GetSupplyRequest {
-	/// Creates a request using the default supply config, which omits the
-	/// non-circulating accounts list.
+	/// Creates a request with no explicit supply config, leaving the node to
+	/// apply its own defaults. The response includes the non-circulating
+	/// accounts list.
 	pub fn new() -> Self {
 		Self::default()
 	}

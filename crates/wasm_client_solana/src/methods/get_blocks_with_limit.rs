@@ -26,8 +26,8 @@ pub struct GetBlocksWithLimitRequest {
 impl_http_method!(GetBlocksWithLimitRequest, "getBlocksWithLimit");
 
 impl GetBlocksWithLimitRequest {
-	/// Creates a request for at most `limit` blocks starting at `start_slot` at
-	/// the client's default commitment.
+	/// Creates a request for at most `limit` blocks starting at `start_slot`
+	/// using the node's default commitment.
 	pub fn new(start_slot: Slot, limit: usize) -> Self {
 		Self {
 			start_slot,

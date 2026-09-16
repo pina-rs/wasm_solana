@@ -96,8 +96,14 @@ impl Source {
 
 	/// Check whether a blockhash is still valid for this source.
 	///
-	/// A durable nonce blockhash never expires, so it is always reported valid
-	/// once the nonce account is readable.
+	/// For a cluster blockhash this asks the node whether the hash is still
+	/// usable.
+	///
+	/// For a nonce account the account is only read, not compared against
+	/// `blockhash`. A durable nonce does not expire with age, so any readable
+	/// nonce account reports `true` — including one whose nonce has already
+	/// been advanced, which makes a stale hash appear valid. This matches the
+	/// behavior of the upstream `solana-rpc-client-nonce-utils` crate.
 	///
 	/// # Errors
 	///
@@ -337,8 +343,10 @@ pub struct RpcSimulateTransactionConfig {
 	#[builder(default, setter(into, strip_option(fallback = replace_recent_blockhash_opt)))]
 	pub replace_recent_blockhash: Option<bool>,
 	/// <!-- {=commitmentField|trim|linePrefix:"/// ":true} -->
-	/// Commitment level for the request. Defaults to the client's commitment
-	/// when omitted. <!-- {/commitmentField} -->
+	/// Commitment level for the request. When omitted the field is left out of
+	/// the payload, so the node applies its own default. The client's
+	/// commitment is only applied by the convenience methods that build a
+	/// config from it, such as `get_balance`. <!-- {/commitmentField} -->
 	#[serde(flatten)]
 	#[builder(default, setter(into, strip_option(fallback = commitment_opt)))]
 	pub commitment: Option<CommitmentConfig>,
@@ -371,8 +379,10 @@ pub struct RpcRequestAirdropConfig {
 	#[serde_as(as = "Option<DisplayFromStr>")]
 	pub recent_blockhash: Option<Hash>, // base-58 encoded blockhash
 	/// <!-- {=commitmentField|trim|linePrefix:"/// ":true} -->
-	/// Commitment level for the request. Defaults to the client's commitment
-	/// when omitted. <!-- {/commitmentField} -->
+	/// Commitment level for the request. When omitted the field is left out of
+	/// the payload, so the node applies its own default. The client's
+	/// commitment is only applied by the convenience methods that build a
+	/// config from it, such as `get_balance`. <!-- {/commitmentField} -->
 	#[serde(flatten)]
 	pub commitment: Option<CommitmentConfig>,
 }
@@ -389,8 +399,10 @@ pub struct RpcLeaderScheduleConfig {
 	#[serde_as(as = "Option<DisplayFromStr>")]
 	pub identity: Option<Pubkey>, // validator identity, as a base-58 encoded string
 	/// <!-- {=commitmentField|trim|linePrefix:"/// ":true} -->
-	/// Commitment level for the request. Defaults to the client's commitment
-	/// when omitted. <!-- {/commitmentField} -->
+	/// Commitment level for the request. When omitted the field is left out of
+	/// the payload, so the node applies its own default. The client's
+	/// commitment is only applied by the convenience methods that build a
+	/// config from it, such as `get_balance`. <!-- {/commitmentField} -->
 	#[serde(flatten)]
 	pub commitment: Option<CommitmentConfig>,
 }
@@ -422,8 +434,10 @@ pub struct RpcBlockProductionConfig {
 	/// Slots to report over. Defaults to the current epoch.
 	pub range: Option<RpcBlockProductionConfigRange>, // current epoch if `None`
 	/// <!-- {=commitmentField|trim|linePrefix:"/// ":true} -->
-	/// Commitment level for the request. Defaults to the client's commitment
-	/// when omitted. <!-- {/commitmentField} -->
+	/// Commitment level for the request. When omitted the field is left out of
+	/// the payload, so the node applies its own default. The client's
+	/// commitment is only applied by the convenience methods that build a
+	/// config from it, such as `get_balance`. <!-- {/commitmentField} -->
 	#[serde(flatten)]
 	pub commitment: Option<CommitmentConfig>,
 }
@@ -440,8 +454,10 @@ pub struct RpcGetVoteAccountsConfig {
 	#[serde_as(as = "Option<DisplayFromStr>")]
 	pub vote_pubkey: Option<Pubkey>, // validator vote address, as a base-58 encoded string
 	/// <!-- {=commitmentField|trim|linePrefix:"/// ":true} -->
-	/// Commitment level for the request. Defaults to the client's commitment
-	/// when omitted. <!-- {/commitmentField} -->
+	/// Commitment level for the request. When omitted the field is left out of
+	/// the payload, so the node applies its own default. The client's
+	/// commitment is only applied by the convenience methods that build a
+	/// config from it, such as `get_balance`. <!-- {/commitmentField} -->
 	#[serde(flatten)]
 	pub commitment: Option<CommitmentConfig>,
 	/// Include vote accounts that have no stake.
@@ -491,8 +507,10 @@ pub enum RpcLargestAccountsFilter {
 #[serde(rename_all = "camelCase")]
 pub struct RpcLargestAccountsConfig {
 	/// <!-- {=commitmentField|trim|linePrefix:"/// ":true} -->
-	/// Commitment level for the request. Defaults to the client's commitment
-	/// when omitted. <!-- {/commitmentField} -->
+	/// Commitment level for the request. When omitted the field is left out of
+	/// the payload, so the node applies its own default. The client's
+	/// commitment is only applied by the convenience methods that build a
+	/// config from it, such as `get_balance`. <!-- {/commitmentField} -->
 	#[serde(flatten)]
 	pub commitment: Option<CommitmentConfig>,
 	/// Which accounts to consider.
@@ -504,8 +522,10 @@ pub struct RpcLargestAccountsConfig {
 #[serde(rename_all = "camelCase")]
 pub struct RpcSupplyConfig {
 	/// <!-- {=commitmentField|trim|linePrefix:"/// ":true} -->
-	/// Commitment level for the request. Defaults to the client's commitment
-	/// when omitted. <!-- {/commitmentField} -->
+	/// Commitment level for the request. When omitted the field is left out of
+	/// the payload, so the node applies its own default. The client's
+	/// commitment is only applied by the convenience methods that build a
+	/// config from it, such as `get_balance`. <!-- {/commitmentField} -->
 	#[serde(flatten)]
 	pub commitment: Option<CommitmentConfig>,
 	/// Omit the list of non-circulating accounts from the response.
@@ -522,8 +542,10 @@ pub struct RpcEpochConfig {
 	/// Epoch to query. Defaults to the current epoch.
 	pub epoch: Option<Epoch>,
 	/// <!-- {=commitmentField|trim|linePrefix:"/// ":true} -->
-	/// Commitment level for the request. Defaults to the client's commitment
-	/// when omitted. <!-- {/commitmentField} -->
+	/// Commitment level for the request. When omitted the field is left out of
+	/// the payload, so the node applies its own default. The client's
+	/// commitment is only applied by the convenience methods that build a
+	/// config from it, such as `get_balance`. <!-- {/commitmentField} -->
 	#[serde(flatten)]
 	pub commitment: Option<CommitmentConfig>,
 	/// <!-- {=minContextSlot|trim|linePrefix:"/// ":true} -->
@@ -549,8 +571,10 @@ pub struct RpcAccountInfoConfig {
 	#[builder(default, setter(into, strip_option(fallback = data_slice_opt)))]
 	pub data_slice: Option<UiDataSliceConfig>,
 	/// <!-- {=commitmentField|trim|linePrefix:"/// ":true} -->
-	/// Commitment level for the request. Defaults to the client's commitment
-	/// when omitted. <!-- {/commitmentField} -->
+	/// Commitment level for the request. When omitted the field is left out of
+	/// the payload, so the node applies its own default. The client's
+	/// commitment is only applied by the convenience methods that build a
+	/// config from it, such as `get_balance`. <!-- {/commitmentField} -->
 	#[serde(flatten)]
 	#[builder(default, setter(into, strip_option(fallback = commitment_opt)))]
 	pub commitment: Option<CommitmentConfig>,
@@ -665,8 +689,10 @@ pub struct RpcSignaturesForAddressConfig {
 	/// Maximum number of signatures to return. The node caps this at 1000.
 	pub limit: Option<usize>,
 	/// <!-- {=commitmentField|trim|linePrefix:"/// ":true} -->
-	/// Commitment level for the request. Defaults to the client's commitment
-	/// when omitted. <!-- {/commitmentField} -->
+	/// Commitment level for the request. When omitted the field is left out of
+	/// the payload, so the node applies its own default. The client's
+	/// commitment is only applied by the convenience methods that build a
+	/// config from it, such as `get_balance`. <!-- {/commitmentField} -->
 	#[serde(flatten)]
 	pub commitment: Option<CommitmentConfig>,
 	/// <!-- {=minContextSlot|trim|linePrefix:"/// ":true} -->
@@ -742,8 +768,10 @@ pub struct RpcBlockConfig {
 	/// Include the block's reward entries.
 	pub rewards: Option<bool>,
 	/// <!-- {=commitmentField|trim|linePrefix:"/// ":true} -->
-	/// Commitment level for the request. Defaults to the client's commitment
-	/// when omitted. <!-- {/commitmentField} -->
+	/// Commitment level for the request. When omitted the field is left out of
+	/// the payload, so the node applies its own default. The client's
+	/// commitment is only applied by the convenience methods that build a
+	/// config from it, such as `get_balance`. <!-- {/commitmentField} -->
 	#[serde(flatten)]
 	pub commitment: Option<CommitmentConfig>,
 	/// <!-- {=maxSupportedTransactionVersion|trim|linePrefix:"/// ":true} -->
@@ -819,8 +847,10 @@ pub struct RpcTransactionConfig {
 	/// <!-- {/encodingTransaction} -->
 	pub encoding: Option<UiTransactionEncoding>,
 	/// <!-- {=commitmentField|trim|linePrefix:"/// ":true} -->
-	/// Commitment level for the request. Defaults to the client's commitment
-	/// when omitted. <!-- {/commitmentField} -->
+	/// Commitment level for the request. When omitted the field is left out of
+	/// the payload, so the node applies its own default. The client's
+	/// commitment is only applied by the convenience methods that build a
+	/// config from it, such as `get_balance`. <!-- {/commitmentField} -->
 	#[serde(flatten)]
 	pub commitment: Option<CommitmentConfig>,
 	/// <!-- {=maxSupportedTransactionVersion|trim|linePrefix:"/// ":true} -->
@@ -879,8 +909,10 @@ impl RpcBlocksConfigWrapper {
 #[builder(field_defaults(default, setter(strip_option)))]
 pub struct RpcContextConfig {
 	/// <!-- {=commitmentField|trim|linePrefix:"/// ":true} -->
-	/// Commitment level for the request. Defaults to the client's commitment
-	/// when omitted. <!-- {/commitmentField} -->
+	/// Commitment level for the request. When omitted the field is left out of
+	/// the payload, so the node applies its own default. The client's
+	/// commitment is only applied by the convenience methods that build a
+	/// config from it, such as `get_balance`. <!-- {/commitmentField} -->
 	#[serde(flatten)]
 	pub commitment: Option<CommitmentConfig>,
 	/// <!-- {=minContextSlot|trim|linePrefix:"/// ":true} -->
@@ -900,8 +932,10 @@ pub struct GetConfirmedSignaturesForAddress2Config {
 	/// Maximum number of signatures to return.
 	pub limit: Option<usize>,
 	/// <!-- {=commitmentField|trim|linePrefix:"/// ":true} -->
-	/// Commitment level for the request. Defaults to the client's commitment
-	/// when omitted. <!-- {/commitmentField} -->
+	/// Commitment level for the request. When omitted the field is left out of
+	/// the payload, so the node applies its own default. The client's
+	/// commitment is only applied by the convenience methods that build a
+	/// config from it, such as `get_balance`. <!-- {/commitmentField} -->
 	pub commitment: Option<CommitmentConfig>,
 }
 
@@ -911,8 +945,10 @@ pub struct GetConfirmedSignaturesForAddress2Config {
 #[serde(rename_all = "camelCase")]
 pub struct RpcTransactionLogsConfig {
 	/// <!-- {=commitmentField|trim|linePrefix:"/// ":true} -->
-	/// Commitment level for the request. Defaults to the client's commitment
-	/// when omitted. <!-- {/commitmentField} -->
+	/// Commitment level for the request. When omitted the field is left out of
+	/// the payload, so the node applies its own default. The client's
+	/// commitment is only applied by the convenience methods that build a
+	/// config from it, such as `get_balance`. <!-- {/commitmentField} -->
 	#[serde(flatten)]
 	pub commitment: Option<CommitmentConfig>,
 }
@@ -936,8 +972,10 @@ pub enum RpcTransactionLogsFilter {
 #[builder(field_defaults(default, setter(strip_option)))]
 pub struct RpcAccountSubscribeConfig {
 	/// <!-- {=commitmentField|trim|linePrefix:"/// ":true} -->
-	/// Commitment level for the request. Defaults to the client's commitment
-	/// when omitted. <!-- {/commitmentField} -->
+	/// Commitment level for the request. When omitted the field is left out of
+	/// the payload, so the node applies its own default. The client's
+	/// commitment is only applied by the convenience methods that build a
+	/// config from it, such as `get_balance`. <!-- {/commitmentField} -->
 	#[serde(flatten)]
 	pub commitment: Option<CommitmentConfig>,
 	/// <!-- {=encodingAccount|trim|linePrefix:"/// ":true} -->
@@ -959,8 +997,10 @@ pub struct RpcAccountSubscribeConfig {
 #[serde(rename_all = "camelCase")]
 pub struct RpcBlockSubscribeConfig {
 	/// <!-- {=commitmentField|trim|linePrefix:"/// ":true} -->
-	/// Commitment level for the request. Defaults to the client's commitment
-	/// when omitted. <!-- {/commitmentField} -->
+	/// Commitment level for the request. When omitted the field is left out of
+	/// the payload, so the node applies its own default. The client's
+	/// commitment is only applied by the convenience methods that build a
+	/// config from it, such as `get_balance`. <!-- {/commitmentField} -->
 	#[serde(flatten)]
 	pub commitment: Option<CommitmentConfig>,
 	/// <!-- {=encodingTransaction|trim|linePrefix:"/// ":true} -->
@@ -1013,8 +1053,10 @@ pub enum RpcBlockSubscribeFilter {
 #[builder(field_defaults(default, setter(strip_option)))]
 pub struct RpcSignatureSubscribeConfig {
 	/// <!-- {=commitmentField|trim|linePrefix:"/// ":true} -->
-	/// Commitment level for the request. Defaults to the client's commitment
-	/// when omitted. <!-- {/commitmentField} -->
+	/// Commitment level for the request. When omitted the field is left out of
+	/// the payload, so the node applies its own default. The client's
+	/// commitment is only applied by the convenience methods that build a
+	/// config from it, such as `get_balance`. <!-- {/commitmentField} -->
 	#[serde(flatten)]
 	pub commitment: Option<CommitmentConfig>,
 	/// Also emit a notification when the signature is first received, before it

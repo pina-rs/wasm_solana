@@ -1,9 +1,12 @@
 use std::future::Future;
 
-/// Run a future to completion on the runtime available to the target.
+/// Spawn a future on the runtime available to the target.
 ///
-/// Uses `wasm_bindgen_futures` under the `js` feature, a tokio local set under
-/// `ssr`, and blocks the current thread with the futures executor otherwise.
+/// Uses `wasm_bindgen_futures` under the `js` feature and a tokio local set
+/// under `ssr`. Both schedule the future and return immediately, so this does
+/// not wait for it to finish. With neither feature the future is driven to
+/// completion on the current thread with the futures executor, which does block
+/// until it finishes.
 pub fn spawn_local<F>(fut: F)
 where
 	F: Future<Output = ()> + 'static,

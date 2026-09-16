@@ -21,7 +21,7 @@ pub struct GetEpochInfoRequest {
 impl_http_method!(GetEpochInfoRequest, "getEpochInfo");
 
 impl GetEpochInfoRequest {
-	/// Creates a request that evaluates the epoch info at the client's default
+	/// Creates a request that evaluates the epoch info using the node's default
 	/// commitment.
 	pub fn new() -> Self {
 		Self::default()

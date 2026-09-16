@@ -20,8 +20,8 @@ pub struct GetSlotLeaderRequest {
 impl_http_method!(GetSlotLeaderRequest, "getSlotLeader");
 
 impl GetSlotLeaderRequest {
-	/// Creates a request that evaluates the slot leader at the client's default
-	/// commitment.
+	/// Creates a request that evaluates the slot leader using the node's
+	/// default commitment.
 	pub fn new() -> Self {
 		Self::default()
 	}

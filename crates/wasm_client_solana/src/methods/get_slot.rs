@@ -19,7 +19,7 @@ pub struct GetSlotRequest {
 impl_http_method!(GetSlotRequest, "getSlot");
 
 impl GetSlotRequest {
-	/// Creates a request that evaluates the slot at the client's default
+	/// Creates a request that evaluates the slot using the node's default
 	/// commitment.
 	pub fn new() -> Self {
 		Self::default()

@@ -179,7 +179,13 @@ impl Hash for Unsubscription {
 }
 
 impl Unsubscription {
-	/// Send the unsubscribe request and wait until the node acknowledges it.
+	/// Send the unsubscribe request and wait until the node answers it.
+	///
+	/// Only the response id is checked. The boolean the node returns is
+	/// currently ignored, so a `false` result — meaning the subscription was
+	/// not found, for example because it had already been removed — still
+	/// returns `Ok(())`. Callers that need to distinguish that case must
+	/// inspect the response themselves.
 	pub async fn run(self) -> Result<(), ClientWebSocketError> {
 		let request = ClientRequest::builder()
 			.id(self.id)

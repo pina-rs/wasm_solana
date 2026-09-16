@@ -23,7 +23,7 @@ pub struct IsBlockhashValidRequest {
 impl_http_method!(IsBlockhashValidRequest, "isBlockhashValid");
 
 impl IsBlockhashValidRequest {
-	/// Creates a request that checks the blockhash at the client's default
+	/// Creates a request that checks the blockhash using the node's default
 	/// commitment.
 	pub fn new(blockhash: Hash) -> Self {
 		Self {

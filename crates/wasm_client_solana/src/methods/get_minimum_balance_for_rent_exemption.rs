@@ -24,7 +24,7 @@ impl_http_method!(
 );
 
 impl GetMinimumBalanceForRentExemptionRequest {
-	/// Creates a request that evaluates the exemption at the client's default
+	/// Creates a request that evaluates the exemption using the node's default
 	/// commitment.
 	pub fn new(data_length: usize) -> Self {
 		Self {

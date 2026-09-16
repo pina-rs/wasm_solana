@@ -11,8 +11,8 @@ use crate::rpc_response::RpcVoteAccountStatus;
 #[skip_serializing_none]
 #[derive(Debug, Default, Serialize_tuple)]
 pub struct GetVoteAccountsRequest {
-	/// Config filtering the result by vote pubkey, validator identity, or
-	/// commitment, and whether to include delinquent validators.
+	/// Config filtering the result by vote pubkey or commitment, and whether to
+	/// include unstaked delinquent validators.
 	pub config: Option<RpcGetVoteAccountsConfig>,
 }
 

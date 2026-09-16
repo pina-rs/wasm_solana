@@ -27,7 +27,7 @@ pub struct GetBlocksRequest {
 impl_http_method!(GetBlocksRequest, "getBlocks");
 
 impl GetBlocksRequest {
-	/// Creates a request spanning `start_slot..=end_slot` at the client's
+	/// Creates a request spanning `start_slot..=end_slot` using the node's
 	/// default commitment.
 	pub fn new(start_slot: Slot, end_slot: Option<Slot>) -> Self {
 		Self {

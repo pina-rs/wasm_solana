@@ -28,7 +28,7 @@ pub struct GetBalanceRequest {
 impl_http_method!(GetBalanceRequest, "getBalance");
 
 impl GetBalanceRequest {
-	/// Creates a request that evaluates the balance at the client's default
+	/// Creates a request that evaluates the balance using the node's default
 	/// commitment.
 	pub fn new(pubkey: Pubkey) -> Self {
 		Self {

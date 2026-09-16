@@ -27,7 +27,7 @@ pub struct GetTokenSupplyRequest {
 impl_http_method!(GetTokenSupplyRequest, "getTokenSupply");
 
 impl GetTokenSupplyRequest {
-	/// Creates a request that evaluates the supply at the client's default
+	/// Creates a request that evaluates the supply using the node's default
 	/// commitment.
 	pub fn new(pubkey: Pubkey) -> Self {
 		Self {

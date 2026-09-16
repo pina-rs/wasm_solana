@@ -49,6 +49,16 @@ use crate::ProgramTestContextExtension;
 /// Lets client code built against a real RPC endpoint run against an in-process
 /// banks client during tests. Create a client with
 /// [`TestRpcProvider::to_rpc_client`].
+///
+/// Only a subset of the JSON-RPC surface is implemented. These methods are
+/// served: `getAccountInfo`, `getBalance`, `getLatestBlockhash`,
+/// `getSignatureStatuses`, `getMultipleAccounts`, `requestAirdrop`,
+/// `sendTransaction` and `simulateTransaction`.
+///
+/// # Panics
+///
+/// Any other method panics with `todo!`, even though `send` returns
+/// [`ClientResult`]. Keep test client usage within the supported set above.
 #[derive(Clone, Deref, DerefMut)]
 pub struct TestRpcProvider(pub Arc<Mutex<ProgramTestContext>>);
 
