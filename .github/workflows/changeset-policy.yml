@@ -56,12 +56,18 @@ jobs:
       # devenv-pinned monochange to the rest of the job. `setup-monochange` is
       # false below, which makes the actions require this binary on PATH and
       # fail loudly instead of silently fetching an unpinned release.
+      #
+      # `devenv shell` writes shell-entry chatter (rustup, task output) to
+      # stdout, so the profile travels on file descriptor 3 to keep it out of
+      # the captured value. The profile's `bin` is what the actions need: it
+      # carries monochange, and for semantic classification also the pinned
+      # cargo, rustc, and cargo-semver-checks.
       - name: expose the devenv-pinned monochange
         run: |
           set -euo pipefail
-          profile="$(devenv shell -- bash -c 'printf %s "${DEVENV_PROFILE:-}"')"
-          if [[ -z "$profile" ]]; then
-            echo "devenv profile was not resolved." >&2
+          profile="$(devenv shell -- bash -c 'printf %s "${DEVENV_PROFILE:-}" >&3' 3>&1 1>/dev/null)"
+          if [[ -z "$profile" || ! -x "$profile/bin/monochange" ]]; then
+            echo "devenv profile was not resolved to a directory holding monochange: '$profile'" >&2
             exit 1
           fi
           echo "$profile/bin" >> "$GITHUB_PATH"
