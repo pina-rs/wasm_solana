@@ -4,11 +4,14 @@ use serde::Serialize;
 use crate::impl_http_method;
 use crate::rpc_response::RpcVersionInfo;
 
+/// Request for the `getVersion` RPC method, which returns the software version
+/// of the queried node.
 #[derive(Debug, Serialize)]
 pub struct GetVersionRequest;
 
 impl_http_method!(GetVersionRequest, "getVersion");
 
+/// Response for the `getVersion` RPC method.
 #[derive(Debug, Deserialize, PartialEq, Eq)]
 pub struct GetVersionResponse(RpcVersionInfo);
 

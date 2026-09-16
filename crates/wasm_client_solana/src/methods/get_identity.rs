@@ -6,14 +6,18 @@ use solana_pubkey::Pubkey;
 
 use crate::impl_http_method;
 
+/// Request for the `getIdentity` RPC method, which returns the identity pubkey
+/// of the queried node.
 #[derive(Debug, Serialize)]
 pub struct GetIdentityRequest;
 
 impl_http_method!(GetIdentityRequest, "getIdentity");
 
+/// Response for the `getIdentity` RPC method.
 #[serde_as]
 #[derive(Debug, Deserialize, PartialEq, Eq)]
 pub struct GetIdentityResponse {
+	/// Base58 identity pubkey of the node.
 	#[serde_as(as = "DisplayFromStr")]
 	pub identity: Pubkey,
 }

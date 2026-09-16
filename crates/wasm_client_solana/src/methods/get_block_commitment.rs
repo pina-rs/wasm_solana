@@ -6,14 +6,18 @@ use solana_vote_interface::state::MAX_LOCKOUT_HISTORY;
 
 use crate::impl_http_method;
 
+/// Request for the `getBlockCommitment` RPC method, which returns the stake
+/// weight that has voted for the block at a given slot.
 #[derive(Debug, Serialize_tuple, Deserialize_tuple)]
 pub struct GetBlockCommitmentRequest {
+	/// Slot of the block to query.
 	pub slot: u64,
 }
 
 impl_http_method!(GetBlockCommitmentRequest, "getBlockCommitment");
 
 impl GetBlockCommitmentRequest {
+	/// Creates a request for the block at `slot`.
 	pub fn new(slot: u64) -> Self {
 		Self { slot }
 	}
@@ -21,10 +25,14 @@ impl GetBlockCommitmentRequest {
 
 type BlockCommitmentArray = [u64; MAX_LOCKOUT_HISTORY + 1];
 
+/// Response for the `getBlockCommitment` RPC method.
 #[derive(Debug, Serialize, Deserialize, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
 pub struct GetBlockCommitmentResponse {
+	/// Stake, in lamports, that has voted for the block, indexed by lockout
+	/// depth, or `None` when the block has not been voted on.
 	pub commitment: Option<BlockCommitmentArray>,
+	/// Total active stake, in lamports, of the cluster.
 	pub total_stake: u64,
 }
 

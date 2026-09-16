@@ -1,3 +1,5 @@
+//! Integration tests for `MemoryWallet` against a local validator and the
+//! program test banks client.
 #![cfg(feature = "ssr")]
 
 use anyhow::Result;

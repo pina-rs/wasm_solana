@@ -9,6 +9,8 @@ use crate::impl_http_method;
 use crate::rpc_config::RpcEpochConfig;
 use crate::rpc_response::RpcStakeActivation;
 
+/// Request for the `getStakeActivation` RPC method, which returns the stake
+/// activation state of a stake account for an epoch.
 #[serde_as]
 #[skip_serializing_none]
 #[derive(Debug, Serialize_tuple)]
@@ -21,6 +23,7 @@ pub struct GetStakeActivationRequest {
 impl_http_method!(GetStakeActivationRequest, "getStakeActivation");
 
 impl GetStakeActivationRequest {
+	/// Creates a request using the default epoch config.
 	pub fn new(pubkey: Pubkey) -> Self {
 		Self {
 			pubkey,
@@ -28,6 +31,7 @@ impl GetStakeActivationRequest {
 		}
 	}
 
+	/// Creates a request with an explicit epoch config.
 	pub fn new_with_config(pubkey: Pubkey, config: RpcEpochConfig) -> Self {
 		Self {
 			pubkey,
@@ -36,6 +40,7 @@ impl GetStakeActivationRequest {
 	}
 }
 
+/// Response for the `getStakeActivation` RPC method.
 #[derive(Debug, Deserialize, PartialEq, Eq)]
 pub struct GetStakeActivationResponse(RpcStakeActivation);
 

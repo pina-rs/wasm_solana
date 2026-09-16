@@ -13,9 +13,19 @@ use crate::rpc_config::RpcSendTransactionConfig;
 use crate::rpc_config::serialize_and_encode;
 use crate::solana_transaction_status::UiTransactionEncoding;
 
+/// Request for the `sendTransaction` RPC method, which submits a signed
+/// transaction to the cluster.
+///
+/// The transaction serializes with the version dependent `wincode` wire format,
+/// so legacy and v0 transactions place a `short_vec` signature count first
+/// while v1 transactions place the message first behind a `0x81` discriminator
+/// with signatures at the tail.
 #[derive(Debug, PartialEq, Eq)]
 pub struct SendTransactionRequest {
+	/// The signed transaction to submit.
 	pub transaction: VersionedTransaction,
+	/// Config controlling the encoding, preflight checks, retry behavior, and
+	/// commitment of the submission.
 	pub config: Option<RpcSendTransactionConfig>,
 }
 
@@ -74,6 +84,11 @@ impl<'de> Deserialize<'de> for SendTransactionRequest {
 impl_http_method!(SendTransactionRequest, "sendTransaction");
 
 impl SendTransactionRequest {
+	/// Creates a request that submits the transaction with the node's default
+	/// config. A v1 transaction defaults its compute unit limit and loaded
+	/// accounts data size limit to zero, so it fails with
+	/// `MaxLoadedAccountsDataSizeExceeded` unless those limits are set on the
+	/// transaction itself.
 	pub fn new(transaction: VersionedTransaction) -> Self {
 		Self {
 			transaction,
@@ -81,6 +96,7 @@ impl SendTransactionRequest {
 		}
 	}
 
+	/// Creates a request with an explicit send config.
 	pub fn new_with_config(
 		transaction: VersionedTransaction,
 		config: RpcSendTransactionConfig,
@@ -92,6 +108,8 @@ impl SendTransactionRequest {
 	}
 }
 
+/// Response for the `sendTransaction` RPC method: the first signature of the
+/// submitted transaction, which doubles as its identifier.
 #[serde_as]
 #[derive(Debug, Serialize, Deserialize, PartialEq, Eq)]
 pub struct SendTransactionResponse(#[serde_as(as = "DisplayFromStr")] pub Signature);

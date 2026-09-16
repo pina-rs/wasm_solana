@@ -11,18 +11,25 @@ use solana_pubkey::Pubkey;
 use super::Context;
 use crate::impl_http_method;
 
+/// Request for the `getBalance` RPC method, which returns the lamport balance
+/// of an account at a given commitment.
 #[serde_as]
 #[skip_serializing_none]
 #[derive(Debug, Serialize_tuple, Deserialize_tuple)]
 pub struct GetBalanceRequest {
+	/// Base58 pubkey of the account to query.
 	#[serde_as(as = "DisplayFromStr")]
 	pub pubkey: Pubkey,
+	/// Commitment level for the request. Defaults to the client's commitment
+	/// when omitted.
 	pub config: Option<CommitmentConfig>,
 }
 
 impl_http_method!(GetBalanceRequest, "getBalance");
 
 impl GetBalanceRequest {
+	/// Creates a request that evaluates the balance using the node's default
+	/// commitment.
 	pub fn new(pubkey: Pubkey) -> Self {
 		Self {
 			pubkey,
@@ -30,6 +37,8 @@ impl GetBalanceRequest {
 		}
 	}
 
+	/// Creates a request that evaluates the balance at the given commitment
+	/// level.
 	pub fn new_with_config(pubkey: Pubkey, config: CommitmentConfig) -> Self {
 		Self {
 			pubkey,
@@ -38,9 +47,12 @@ impl GetBalanceRequest {
 	}
 }
 
+/// Response for the `getBalance` RPC method.
 #[derive(Debug, Serialize, Deserialize, PartialEq, Eq)]
 pub struct GetBalanceResponse {
+	/// The slot that the RPC node used to evaluate the request.
 	pub context: Context,
+	/// The account balance in lamports at the requested commitment.
 	pub value: u64,
 }
 

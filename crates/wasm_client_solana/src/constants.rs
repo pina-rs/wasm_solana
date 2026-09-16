@@ -1,5 +1,9 @@
+/// Compute unit ceiling a transaction may request, enforced by the runtime.
 pub const COMPUTE_UNIT_MAX_LIMIT: usize = 1_400_000;
+/// Compute unit limit applied when a caller does not estimate one.
 pub const COMPUTE_UNIT_DEFAULT_LIMIT: usize = 200_000;
+/// Addresses one `extend_lookup_table` instruction may add, which is the chunk
+/// size used when populating a lookup table.
 pub const MAX_LOOKUP_ADDRESSES_PER_TRANSACTION: usize = 30;
 
 /// The maximum account data a transaction may load.

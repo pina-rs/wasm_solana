@@ -6,19 +6,25 @@ use crate::impl_http_method;
 use crate::rpc_config::RpcGetVoteAccountsConfig;
 use crate::rpc_response::RpcVoteAccountStatus;
 
+/// Request for the `getVoteAccounts` RPC method, which returns the current
+/// status of all vote accounts.
 #[skip_serializing_none]
 #[derive(Debug, Default, Serialize_tuple)]
 pub struct GetVoteAccountsRequest {
+	/// Config filtering the result by vote pubkey or commitment, and whether to
+	/// include unstaked delinquent validators.
 	pub config: Option<RpcGetVoteAccountsConfig>,
 }
 
 impl_http_method!(GetVoteAccountsRequest, "getVoteAccounts");
 
 impl GetVoteAccountsRequest {
+	/// Creates a request for all vote accounts, including delinquent ones.
 	pub fn new() -> Self {
 		Self::default()
 	}
 
+	/// Creates a request scoped by the given vote accounts config.
 	pub fn new_with_config(config: RpcGetVoteAccountsConfig) -> Self {
 		Self {
 			config: Some(config),
@@ -26,6 +32,7 @@ impl GetVoteAccountsRequest {
 	}
 }
 
+/// Response for the `getVoteAccounts` RPC method.
 #[derive(Debug, Deserialize, PartialEq, Eq)]
 pub struct GetVoteAccountsResponse(RpcVoteAccountStatus);
 

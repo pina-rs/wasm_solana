@@ -8,18 +8,27 @@ use solana_commitment_config::CommitmentConfig;
 
 use crate::impl_http_method;
 
+/// Request for the `getBlocks` RPC method, which returns the slots of all
+/// confirmed blocks between two slots, inclusive.
 #[skip_serializing_none]
 #[derive(Debug, Serialize_tuple, Deserialize_tuple)]
 #[serde(rename_all = "camelCase")]
 pub struct GetBlocksRequest {
+	/// First slot of the range, inclusive.
 	pub start_slot: Slot,
+	/// Last slot of the range, inclusive. Defaults to the tip of the ledger
+	/// when omitted.
 	pub end_slot: Option<Slot>,
+	/// Commitment level for the request. Defaults to the client's commitment
+	/// when omitted.
 	pub config: Option<CommitmentConfig>,
 }
 
 impl_http_method!(GetBlocksRequest, "getBlocks");
 
 impl GetBlocksRequest {
+	/// Creates a request spanning `start_slot..=end_slot` using the node's
+	/// default commitment.
 	pub fn new(start_slot: Slot, end_slot: Option<Slot>) -> Self {
 		Self {
 			start_slot,
@@ -28,6 +37,8 @@ impl GetBlocksRequest {
 		}
 	}
 
+	/// Creates a request spanning `start_slot..=end_slot` at the given
+	/// commitment level.
 	pub fn new_with_config(
 		start_slot: Slot,
 		end_slot: Option<Slot>,
@@ -41,6 +52,7 @@ impl GetBlocksRequest {
 	}
 }
 
+/// Response for the `getBlocks` RPC method.
 #[derive(Debug, Serialize, Deserialize, PartialEq, Eq)]
 pub struct GetBlocksResponse(Vec<Slot>);
 

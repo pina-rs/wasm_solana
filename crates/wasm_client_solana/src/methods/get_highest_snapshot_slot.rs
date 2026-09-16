@@ -3,14 +3,20 @@ use serde::Serialize;
 
 use crate::impl_http_method;
 
+/// Request for the `getHighestSnapshotSlot` RPC method, which returns the
+/// highest slot covered by a snapshot the node has taken.
 #[derive(Debug, Serialize)]
 pub struct GetHighestSnapshotSlotRequest;
 
 impl_http_method!(GetHighestSnapshotSlotRequest, "getHighestSnapshotSlot");
 
+/// Response for the `getHighestSnapshotSlot` RPC method.
 #[derive(Debug, Deserialize, PartialEq, Eq)]
 pub struct GetHighestSnapshotSlotResponse {
+	/// Highest slot covered by a full snapshot.
 	pub full: u64,
+	/// Highest slot covered by an incremental snapshot, or `None` when no
+	/// incremental snapshot exists.
 	pub incremental: Option<u64>,
 }
 

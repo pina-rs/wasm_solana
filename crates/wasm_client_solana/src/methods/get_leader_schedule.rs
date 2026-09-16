@@ -7,21 +7,30 @@ use crate::impl_http_method;
 use crate::rpc_config::RpcLeaderScheduleConfig;
 use crate::rpc_response::RpcLeaderSchedule;
 
+/// Request for the `getLeaderSchedule` RPC method, which returns the leader
+/// schedule as a map from validator identity pubkey to the slots it leads.
 #[skip_serializing_none]
 #[derive(Debug, Default, Serialize_tuple)]
 pub struct GetLeaderScheduleRequest {
+	/// Slot whose epoch the schedule is returned for. Defaults to the current
+	/// epoch when omitted.
 	#[serialize_always]
 	pub slot: Option<Slot>,
+	/// Config filtering the schedule by validator identity and selecting the
+	/// commitment level.
 	pub config: Option<RpcLeaderScheduleConfig>,
 }
 
 impl_http_method!(GetLeaderScheduleRequest, "getLeaderSchedule");
 
 impl GetLeaderScheduleRequest {
+	/// Creates a request for the leader schedule of the current epoch.
 	pub fn new() -> Self {
 		Self::default()
 	}
 
+	/// Creates a request for the leader schedule of the epoch containing
+	/// `slot`, filtered by `config`.
 	pub fn new_with_slot_and_config(slot: Slot, config: RpcLeaderScheduleConfig) -> Self {
 		Self {
 			slot: Some(slot),
@@ -29,6 +38,8 @@ impl GetLeaderScheduleRequest {
 		}
 	}
 
+	/// Creates a request for the leader schedule of the current epoch, filtered
+	/// by `config`.
 	pub fn new_with_config(config: RpcLeaderScheduleConfig) -> Self {
 		Self {
 			slot: None,
@@ -37,6 +48,7 @@ impl GetLeaderScheduleRequest {
 	}
 }
 
+/// Response for the `getLeaderSchedule` RPC method.
 #[derive(Debug, Deserialize, PartialEq, Eq)]
 pub struct GetLeaderScheduleResponse(Option<RpcLeaderSchedule>);
 

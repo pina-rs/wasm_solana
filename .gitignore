@@ -11,6 +11,9 @@ devenv.local.nix
 
 **/dist/**
 
+# mdt cache (the .templates/ providers and mdt.toml are committed)
+/.mdt/
+
 # insta snapshots
 *.pending-snap
 *.snap.new

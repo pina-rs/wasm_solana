@@ -36,6 +36,8 @@ use wallet_standard::SolanaSignTransactionProps;
 use wallet_standard::prelude::*;
 use wasm_client_solana::prelude::*;
 
+/// Wallet aware helpers for signing and processing transactions through a
+/// [`BanksClient`].
 #[async_trait(?Send)]
 pub trait BanksClientAsyncExtension {
 	/// Sign the transaction with the provided wallet.
@@ -58,6 +60,7 @@ pub trait BanksClientAsyncExtension {
 	) -> WalletResult<BanksTransactionResultWithSimulation>;
 }
 
+/// Convert any displayable error into a [`WalletError`].
 pub fn into_wallet_error<T: Display>(error: T) -> WalletError {
 	WalletError::External(error.to_string())
 }
@@ -139,6 +142,8 @@ impl BanksClientAsyncExtension for BanksClient {
 	}
 }
 
+/// Helpers for populating a [`ProgramTest`] with funded accounts, token
+/// accounts and programs.
 pub trait ProgramTestExtension {
 	/// Adds a requested number of account with initial balance of `1_000` SOL
 	/// to the test environment
@@ -501,6 +506,7 @@ impl ProgramTestExtension for ProgramTest {
 	}
 }
 
+/// Helpers for advancing and funding a running [`ProgramTestContext`].
 #[async_trait(?Send)]
 pub trait ProgramTestContextExtension {
 	/// Create an adhoc funded keypair address.

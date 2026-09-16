@@ -26,6 +26,11 @@ use crate::parse_account_data::ParseAccountError;
 use crate::parse_account_data::SplTokenAdditionalDataV2;
 use crate::parse_token_extension::parse_extension;
 
+/// Deserialize an SPL Token or Token-2022 account into its JSON form.
+///
+/// Token accounts require `additional_data` carrying the mint's decimals and
+/// extension state; accounts without it fail with
+/// [`ParseAccountError::AdditionalDataMissing`].
 pub fn parse_token_v3(
 	data: &[u8],
 	additional_data: Option<&SplTokenAdditionalDataV2>,
@@ -119,6 +124,7 @@ pub fn parse_token_v3(
 	}
 }
 
+/// Convert an on-chain [`AccountState`] into its JSON representation.
 pub fn convert_account_state(state: AccountState) -> UiAccountState {
 	match state {
 		AccountState::Uninitialized => UiAccountState::Uninitialized,
@@ -127,6 +133,9 @@ pub fn convert_account_state(state: AccountState) -> UiAccountState {
 	}
 }
 
+/// Convert a raw token amount into its UI representation using the mint's
+/// decimals, applying interest bearing or scaled UI amount extensions when
+/// configured.
 pub fn token_amount_to_ui_amount_v3(
 	amount: u64,
 	additional_data: &SplTokenAdditionalDataV2,
@@ -168,6 +177,10 @@ pub fn token_amount_to_ui_amount_v3(
 	}
 }
 
+/// Extract the mint pubkey from raw SPL Token account data.
+///
+/// Returns `None` when the data is not a valid token account or is too short
+/// to contain a mint address.
 pub fn get_token_account_mint(data: &[u8]) -> Option<Pubkey> {
 	Account::valid_account_data(data)
 		.then(|| Pubkey::try_from(data.get(..32)?).ok())

@@ -25,6 +25,7 @@ in
       cmake
       curl
       custom.agave
+      custom.mdt
       custom.monochange
       dprint
       gcc
@@ -349,10 +350,18 @@ in
       '';
       description = "Validate monochange release metadata.";
     };
+    "lint:docs" = {
+      exec = ''
+        set -e
+        mdt check
+      '';
+      description = "Check that shared documentation blocks are up to date.";
+    };
     "lint:all" = {
       exec = ''
         set -e
         lint:clippy
+        lint:docs
         lint:monochange
         lint:format
       '';

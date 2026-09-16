@@ -19,6 +19,8 @@ fn serialize_pubkey_strings<S: Serializer>(
 	}
 }
 
+/// Request for the `getRecentPrioritizationFees` RPC method, which returns the
+/// per-slot prioritization fees paid by recent transactions.
 #[derive(Debug, Serialize_tuple)]
 pub struct GetRecentPrioritizationFeesRequest {
 	#[serde(serialize_with = "serialize_pubkey_strings")]
@@ -37,10 +39,13 @@ impl Default for GetRecentPrioritizationFeesRequest {
 }
 
 impl GetRecentPrioritizationFeesRequest {
+	/// Creates a request for the fees of all accounts.
 	pub fn new() -> Self {
 		GetRecentPrioritizationFeesRequest { accounts: None }
 	}
 
+	/// Creates a request for the fees paid by transactions that lock the given
+	/// accounts.
 	pub fn new_with_accounts(accounts: Vec<Pubkey>) -> Self {
 		GetRecentPrioritizationFeesRequest {
 			accounts: Some(accounts),
@@ -48,6 +53,7 @@ impl GetRecentPrioritizationFeesRequest {
 	}
 }
 
+/// Response for the `getRecentPrioritizationFees` RPC method.
 #[derive(Debug, Deserialize, PartialEq, Eq)]
 pub struct GetRecentPrioritizationFeesResponse(Vec<RpcPrioritizationFee>);
 

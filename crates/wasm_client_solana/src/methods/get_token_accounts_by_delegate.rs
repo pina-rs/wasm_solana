@@ -11,13 +11,19 @@ use crate::rpc_config::RpcAccountInfoConfig;
 use crate::rpc_config::RpcKeyedAccount;
 use crate::rpc_config::RpcTokenAccountsFilter;
 
+/// Request for the `getTokenAccountsByDelegate` RPC method, which returns the
+/// SPL token accounts that delegate authority over to a given pubkey.
 #[serde_as]
 #[skip_serializing_none]
 #[derive(Debug, Serialize_tuple)]
 pub struct GetTokenAccountsByDelegateRequest {
+	/// Base58 pubkey of the delegate.
 	#[serde_as(as = "DisplayFromStr")]
 	pub pubkey: Pubkey,
+	/// Filter restricting the result to a single mint or token program.
 	pub filter: RpcTokenAccountsFilter,
+	/// Config controlling the encoding, data slice, commitment, and minimum
+	/// context slot of the query.
 	pub config: Option<RpcAccountInfoConfig>,
 }
 
@@ -27,6 +33,8 @@ impl_http_method!(
 );
 
 impl GetTokenAccountsByDelegateRequest {
+	/// Creates a request filtered by mint using the default account info
+	/// config.
 	pub fn new_mint(pubkey: Pubkey, account_key: Pubkey) -> Self {
 		Self {
 			pubkey,
@@ -35,6 +43,7 @@ impl GetTokenAccountsByDelegateRequest {
 		}
 	}
 
+	/// Creates a request filtered by mint with an explicit account info config.
 	pub fn new_mint_with_config(
 		pubkey: Pubkey,
 		account_key: Pubkey,
@@ -47,6 +56,8 @@ impl GetTokenAccountsByDelegateRequest {
 		}
 	}
 
+	/// Creates a request filtered by token program using the default account
+	/// info config.
 	pub fn new_program(pubkey: Pubkey, account_key: Pubkey) -> Self {
 		Self {
 			pubkey,
@@ -55,6 +66,8 @@ impl GetTokenAccountsByDelegateRequest {
 		}
 	}
 
+	/// Creates a request filtered by token program with an explicit account
+	/// info config.
 	pub fn new_program_with_config(
 		pubkey: Pubkey,
 		account_key: Pubkey,
@@ -68,9 +81,13 @@ impl GetTokenAccountsByDelegateRequest {
 	}
 }
 
+/// Response for the `getTokenAccountsByDelegate` RPC method.
 #[derive(Debug, Deserialize, PartialEq, Eq)]
 pub struct GetTokenAccountsByDelegateResponse {
+	/// The slot that the RPC node used to evaluate the request.
 	pub context: Context,
+	/// The matching token accounts, each paired with its pubkey, or `None` when
+	/// no accounts were found.
 	pub value: Option<Vec<RpcKeyedAccount>>,
 }
 

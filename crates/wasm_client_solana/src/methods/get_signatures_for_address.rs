@@ -9,6 +9,8 @@ use crate::impl_http_method;
 use crate::rpc_config::RpcSignaturesForAddressConfig;
 use crate::rpc_response::RpcConfirmedTransactionStatusWithSignature;
 
+/// Request for the `getSignaturesForAddress` RPC method, which returns
+/// confirmed transaction signatures that involve an address, newest first.
 #[serde_as]
 #[skip_serializing_none]
 #[derive(Debug, Serialize_tuple)]
@@ -21,6 +23,7 @@ pub struct GetSignaturesForAddressRequest {
 impl_http_method!(GetSignaturesForAddressRequest, "getSignaturesForAddress");
 
 impl GetSignaturesForAddressRequest {
+	/// Creates a request using the default page size and no slot bounds.
 	pub fn new(pubkey: Pubkey) -> Self {
 		Self {
 			pubkey,
@@ -28,6 +31,7 @@ impl GetSignaturesForAddressRequest {
 		}
 	}
 
+	/// Creates a request with an explicit paging and filtering config.
 	pub fn new_with_config(pubkey: Pubkey, config: RpcSignaturesForAddressConfig) -> Self {
 		Self {
 			pubkey,
@@ -36,6 +40,7 @@ impl GetSignaturesForAddressRequest {
 	}
 }
 
+/// Response for the `getSignaturesForAddress` RPC method.
 #[derive(Debug, Deserialize, PartialEq, Eq)]
 pub struct GetSignaturesForAddressResponse(Vec<RpcConfirmedTransactionStatusWithSignature>);
 

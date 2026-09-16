@@ -9,6 +9,7 @@ use wallet_standard::WalletError;
 
 use crate::nonce_utils::NonceError;
 
+/// Error code used when the JSON-RPC response carries no status of its own.
 pub const DEFAULT_ERROR_CODE: u16 = 500u16;
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
@@ -26,6 +27,7 @@ impl Default for RpcErrorDetails {
 	}
 }
 
+/// A JSON-RPC error response returned by a Solana node.
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct RpcError {
 	pub(crate) id: u32,
@@ -46,6 +48,10 @@ impl Default for RpcError {
 }
 
 impl RpcError {
+	/// Build an error from a message, using Solana's `303` custom error code.
+	///
+	/// Used for client side failures such as a missing account or a signature
+	/// the node does not know about.
 	pub fn new(message: impl Into<String>) -> Self {
 		let message = message.into();
 		let code = 303;
@@ -64,13 +70,16 @@ impl fmt::Display for RpcError {
 	}
 }
 
+/// Result type returned by every client method in this crate.
 pub type ClientResult<T> = Result<T, ClientError>;
 
+/// Error returned by any client method.
 #[derive(Clone, Debug, Serialize, Deserialize, thiserror::Error)]
 pub enum ClientError {
 	/// An rpc client error.
 	#[error("{0}")]
 	Rpc(#[from] RpcError),
+	/// The websocket transport failed.
 	#[error("Websocket Error: {0}")]
 	WebSocket(#[from] ClientWebSocketError),
 	/// The wallet error.

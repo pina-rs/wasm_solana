@@ -44,6 +44,21 @@ use wasm_client_solana::solana_transaction_status::TransactionStatus;
 
 use crate::ProgramTestContextExtension;
 
+/// An [`RpcProvider`] implementation backed by a [`ProgramTestContext`].
+///
+/// Lets client code built against a real RPC endpoint run against an in-process
+/// banks client during tests. Create a client with
+/// [`TestRpcProvider::to_rpc_client`].
+///
+/// Only a subset of the JSON-RPC surface is implemented. These methods are
+/// served: `getAccountInfo`, `getBalance`, `getLatestBlockhash`,
+/// `getSignatureStatuses`, `getMultipleAccounts`, `requestAirdrop`,
+/// `sendTransaction` and `simulateTransaction`.
+///
+/// # Panics
+///
+/// Any other method panics with `todo!`, even though `send` returns
+/// [`ClientResult`]. Keep test client usage within the supported set above.
 #[derive(Clone, Deref, DerefMut)]
 pub struct TestRpcProvider(pub Arc<Mutex<ProgramTestContext>>);
 
