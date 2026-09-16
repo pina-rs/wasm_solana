@@ -125,7 +125,7 @@ spl-token-confidential-transfer-proof-extraction = { default-features = false, v
 spl-token-group-interface = { default-features = false, version = "^0.7" }
 spl-token-interface = { default-features = false, version = "^3" }
 spl-token-metadata-interface = { default-features = false, version = "^1" }
-tarpc = { default-features = false, version = "^0.29" }
+tarpc = { default-features = false, version = "^0.38" }
 tempfile = { default-features = false, version = "^3" }
 test-case = { default-features = false, version = "^3" }
 test-log = { default-features = false, version = "^0.2" }

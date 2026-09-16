@@ -4635,6 +4635,25 @@ dependencies = [
 ]
 
 [[package]]
+name = "opentelemetry"
+version = "0.32.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "b0142c63252a9e054e68a4c61a5778f7b14f576274d593f8ce883d191a099682"
+dependencies = [
+ "futures-core",
+ "futures-sink",
+ "js-sys",
+ "pin-project-lite",
+ "thiserror 2.0.20",
+]
+
+[[package]]
+name = "opentelemetry-semantic-conventions"
+version = "0.32.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "c913ac17a6c451661ee255f4625d143e51647ae78ebd969b75e41c4442f4fe47"
+
+[[package]]
 name = "pairing"
 version = "0.23.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -6612,7 +6631,7 @@ dependencies = [
  "solana-transaction",
  "solana-transaction-context",
  "solana-transaction-error",
- "tarpc",
+ "tarpc 0.29.0",
  "thiserror 2.0.20",
  "tokio",
  "tokio-serde",
@@ -6635,7 +6654,7 @@ dependencies = [
  "solana-transaction",
  "solana-transaction-context",
  "solana-transaction-error",
- "tarpc",
+ "tarpc 0.29.0",
 ]
 
 [[package]]
@@ -6662,7 +6681,7 @@ dependencies = [
  "solana-signature",
  "solana-transaction",
  "solana-transaction-error",
- "tarpc",
+ "tarpc 0.29.0",
  "tokio",
  "tokio-serde",
  "tokio-util 0.7.19",
@@ -10781,18 +10800,40 @@ dependencies = [
  "fnv",
  "futures 0.3.34",
  "humantime",
- "opentelemetry",
+ "opentelemetry 0.17.0",
  "pin-project",
  "rand 0.8.8",
  "serde",
  "static_assertions",
- "tarpc-plugins",
+ "tarpc-plugins 0.12.0",
  "thiserror 1.0.69",
  "tokio",
  "tokio-serde",
  "tokio-util 0.6.10",
  "tracing",
- "tracing-opentelemetry",
+ "tracing-opentelemetry 0.17.4",
+]
+
+[[package]]
+name = "tarpc"
+version = "0.38.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "4e074d21429aa2864540a8452209323841116b3a5ac1ee7b29b2bbe38c12655b"
+dependencies = [
+ "fnv",
+ "futures 0.3.34",
+ "humantime",
+ "opentelemetry 0.32.0",
+ "opentelemetry-semantic-conventions",
+ "pin-project",
+ "rand 0.10.2",
+ "static_assertions",
+ "tarpc-plugins 0.15.0",
+ "thiserror 2.0.20",
+ "tokio",
+ "tokio-util 0.7.19",
+ "tracing",
+ "tracing-opentelemetry 0.33.0",
 ]
 
 [[package]]
@@ -10804,6 +10845,17 @@ dependencies = [
  "proc-macro2",
  "quote",
  "syn 1.0.109",
+]
+
+[[package]]
+name = "tarpc-plugins"
+version = "0.15.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "57c1932595af3b23fc8635cc23c28c54fb658622e261ad7f8f026da70e69f350"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn 3.0.5",
 ]
 
 [[package]]
@@ -10956,7 +11008,7 @@ dependencies = [
  "solana-transaction",
  "spl-associated-token-account-interface",
  "spl-token-2022-interface",
- "tarpc",
+ "tarpc 0.38.0",
  "tempfile",
  "test-log",
  "test_utils_insta",
@@ -11229,6 +11281,7 @@ dependencies = [
  "futures-util",
  "libc",
  "pin-project-lite",
+ "slab",
  "tokio",
 ]
 
@@ -11445,10 +11498,24 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "fbbe89715c1dbbb790059e2565353978564924ee85017b5fff365c872ff6721f"
 dependencies = [
  "once_cell",
- "opentelemetry",
+ "opentelemetry 0.17.0",
  "tracing",
  "tracing-core",
  "tracing-subscriber",
+]
+
+[[package]]
+name = "tracing-opentelemetry"
+version = "0.33.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "adbc64cba7137545b8044cb1fe9814f7aacf3c6b5f9b45be8bb5db538befdb26"
+dependencies = [
+ "js-sys",
+ "opentelemetry 0.32.0",
+ "tracing",
+ "tracing-core",
+ "tracing-subscriber",
+ "web-time",
 ]
 
 [[package]]
