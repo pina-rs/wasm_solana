@@ -25,7 +25,21 @@ pub struct GetTransactionRequest {
 impl_http_method!(GetTransactionRequest, "getTransaction");
 
 impl GetTransactionRequest {
+	/// Get a transaction with a config that can read every supported version.
+	///
+	/// The `txv1` feature gate is active, so a request that omits
+	/// `maxSupportedTransactionVersion` returns `-32015` when the transaction
+	/// is v1. Use [`GetTransactionRequest::new_without_version`] to keep the
+	/// older behavior.
 	pub fn new(signature: Signature) -> Self {
+		Self {
+			signature,
+			config: Some(RpcTransactionConfig::default()),
+		}
+	}
+
+	/// Get a transaction without constraining the supported version.
+	pub fn new_without_version(signature: Signature) -> Self {
 		Self {
 			signature,
 			config: None,
@@ -88,7 +102,8 @@ mod tests {
     "params": [
       "2nBhEBYYvfaAe16UMNqRHre4YNSskvuYgx3M6E4JP1oDYvZEJHvoPzyUidNgNX5r9sTyN1J9UxtbCXy2rqYcuyuv",
       {
-        "encoding": "json"
+        "encoding": "json",
+        "maxSupportedTransactionVersion": 1
       }
     ]
   }
