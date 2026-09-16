@@ -30,7 +30,7 @@ assert_matches = { default-features = false, version = "^1" }
 async-trait = { default-features = false, version = "^0.1" }
 async-tungstenite = { default-features = false, version = "^0.28.1" }
 base64 = { default-features = false, version = "^0.22" }
-bincode = { default-features = false, version = "^1" }
+bincode = { default-features = false, version = "^3" }
 borsh = { default-features = false, version = "^1" }
 bs58 = { default-features = false, version = "^0.5" }
 bv = { default-features = false, version = "^0.11" }
