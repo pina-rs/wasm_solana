@@ -1,0 +1,118 @@
+name: changeset-policy
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, labeled, unlabeled]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: changeset-policy-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+# The policy check must run on every pull request (its whole purpose is
+# catching missing changesets), so it is the one devenv job without path
+# gating. Change classification is folded into this job so a pull request pays
+# for the nix/devenv setup once instead of twice.
+jobs:
+  check:
+    timeout-minutes: 60
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+      issues: write
+      # Commenting on a pull request needs the pull-requests write scope: with
+      # only `issues: write` the comment API returns 403 "Resource not
+      # accessible by integration", and the action degrades to a warning.
+      pull-requests: write
+    steps:
+      - name: checkout repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          # Checking out the pull request head SHA keeps GitHub's synthetic
+          # test-merge commit out of the source candidate, so classification
+          # reports the branch as authored.
+          ref: ${{ github.event.pull_request.head.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: setup
+        uses: ./.github/actions/devenv
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      # Release comparison needs the tags and the default branch. A shallow
+      # checkout can hide the latest release tag or produce an incomplete merge
+      # base, which downgrades every package to an incomplete decision.
+      - name: fetch default branch and tags
+        run: |
+          set -euo pipefail
+          git fetch --force --tags origin
+          git fetch --force origin main:refs/remotes/origin/main
+        shell: bash
+
+      # The monochange actions run outside `devenv shell`, so expose the
+      # devenv-pinned monochange to the rest of the job. `setup-monochange` is
+      # false below, which makes the actions require this binary on PATH and
+      # fail loudly instead of silently fetching an unpinned release.
+      #
+      # `devenv shell` writes shell-entry chatter (rustup, task output) to
+      # stdout, so the profile travels on file descriptor 3 to keep it out of
+      # the captured value. The profile's `bin` is what the actions need: it
+      # carries monochange, and for semantic classification also the pinned
+      # cargo, rustc, and cargo-semver-checks.
+      - name: expose the devenv-pinned monochange
+        run: |
+          set -euo pipefail
+          profile="$(devenv shell -- bash -c 'printf %s "${DEVENV_PROFILE:-}" >&3' 3>&1 1>/dev/null)"
+          if [[ -z "$profile" || ! -x "$profile/bin/monochange" ]]; then
+            echo "devenv profile was not resolved to a directory holding monochange: '$profile'" >&2
+            exit 1
+          fi
+          echo "$profile/bin" >> "$GITHUB_PATH"
+          "$profile/bin/monochange" --version
+        shell: bash
+
+      # Fails the pull request when changed release-owned paths lack changeset
+      # coverage and posts the remediation comment. Passing `from` instead of
+      # explicit changed paths derives the changed packages from git history and
+      # also compares each attached changeset bump with the classified change
+      # type, so a changeset that understates a high-confidence break fails.
+      - name: enforce changeset policy
+        uses: monochange/actions/changeset-policy@da3911fecf67478deb0ad60f717da5eca649caba # v0.9.1
+        with:
+          setup-monochange: false
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          from: origin/main
+          labels: ${{ join(github.event.pull_request.labels.*.name, ',') }}
+          comment-on-failure: true
+
+      # Surfaces the compatibility evidence for the pull request: public API,
+      # dependency, and metadata changes with a proposed bump per package.
+      # The release pull request only bumps versions and deletes consumed
+      # changesets, so classifying it would report an `unmodeled` fallback for
+      # every package and bury the signal for the pull request under review.
+      # `[changesets.classification].skip_labels` is the upstream replacement
+      # for this condition and arrives in a later monochange release.
+      - name: classify changes
+        if: ${{ !contains(github.event.pull_request.labels.*.name, 'release') }}
+        uses: monochange/actions/change-classification@da3911fecf67478deb0ad60f717da5eca649caba # v0.9.1
+        with:
+          setup-monochange: false
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          # `signature` extracts before/after signatures and reports each change
+          # with a proposed bump, which is the strongest evidence available
+          # without a cargo-semver-checks run.
+          #
+          # `semantic` would add proof-strength Rust evidence, but this
+          # workspace cannot use it yet: `memory_wallet` and `wasm_client_solana`
+          # (and the crates that share their dependency graph) fail to build in
+          # the analyzer's isolated baseline, where `solana-message` 4.4.0 pulls
+          # a second `wincode` 0.6.1 alongside the workspace's pinned 0.5.5 and
+          # fails `SeqLen` resolution. A matrix cell that cannot complete forces
+          # `partial` coverage and review on every pull request that touches
+          # those crates, so no `[ecosystems.cargo.semver_checks]` block is
+          # configured. Add one once the upstream conflict is resolved.
+          detection-level: signature
+          dependency-propagation: public
