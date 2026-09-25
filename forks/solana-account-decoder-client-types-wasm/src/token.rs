@@ -37,6 +37,7 @@ impl UiTokenAmount {
 #[allow(clippy::arithmetic_side_effects)]
 pub fn real_number_string(amount: u64, decimals: u8) -> String {
 	let decimals = decimals as usize;
+
 	if decimals > 0 {
 		// Left-pad zeros to decimals + 1, so we at least have an integer zero
 		let mut s = format!("{:01$}", amount, decimals + 1);
@@ -50,10 +51,12 @@ pub fn real_number_string(amount: u64, decimals: u8) -> String {
 
 pub fn real_number_string_trimmed(amount: u64, decimals: u8) -> String {
 	let mut s = real_number_string(amount, decimals);
+
 	if decimals > 0 {
 		let zeros_trimmed = s.trim_end_matches('0');
 		s = zeros_trimmed.trim_end_matches('.').to_string();
 	}
+
 	s
 }
 

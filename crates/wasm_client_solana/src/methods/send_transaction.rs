@@ -57,10 +57,12 @@ impl<'de> Deserialize<'de> for SendTransactionRequest {
 		struct Inner(String, Option<RpcSendTransactionConfig>);
 
 		let inner = Inner::deserialize(deserializer)?;
+
 		let encoding = match inner.1 {
 			Some(ref config) => config.encoding.unwrap_or(UiTransactionEncoding::Base64),
 			None => UiTransactionEncoding::Base64,
 		};
+
 		let transaction =
 			deserialize_and_decode::<VersionedTransaction>(&inner.0, encoding).unwrap();
 

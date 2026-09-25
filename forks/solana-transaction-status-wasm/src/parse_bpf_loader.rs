@@ -18,11 +18,13 @@ pub fn parse_bpf_loader(
 ) -> Result<ParsedInstructionEnum, ParseInstructionError> {
 	let bpf_loader_instruction: LoaderInstruction = deserialize(&instruction.data)
 		.map_err(|_| ParseInstructionError::InstructionNotParsable(ParsableProgram::BpfLoader))?;
+
 	if instruction.accounts.is_empty() || instruction.accounts[0] as usize >= account_keys.len() {
 		return Err(ParseInstructionError::InstructionKeyMismatch(
 			ParsableProgram::BpfLoader,
 		));
 	}
+
 	match bpf_loader_instruction {
 		LoaderInstruction::Write { offset, bytes } => {
 			check_num_bpf_loader_accounts(&instruction.accounts, 1)?;
@@ -55,6 +57,7 @@ pub fn parse_bpf_upgradeable_loader(
 		deserialize(&instruction.data).map_err(|_| {
 			ParseInstructionError::InstructionNotParsable(ParsableProgram::BpfUpgradeableLoader)
 		})?;
+
 	match instruction.accounts.iter().max() {
 		Some(index) if (*index as usize) < account_keys.len() => {}
 		_ => {
@@ -64,6 +67,7 @@ pub fn parse_bpf_upgradeable_loader(
 			));
 		}
 	}
+
 	match bpf_upgradeable_loader_instruction {
 		UpgradeableLoaderInstruction::InitializeBuffer => {
 			check_num_bpf_upgradeable_loader_accounts(&instruction.accounts, 1)?;
@@ -71,12 +75,14 @@ pub fn parse_bpf_upgradeable_loader(
 				"account": account_keys[instruction.accounts[0] as usize].to_string(),
 			});
 			let map = value.as_object_mut().unwrap();
+
 			if instruction.accounts.len() > 1 {
 				map.insert(
 					"authority".to_string(),
 					json!(account_keys[instruction.accounts[1] as usize].to_string()),
 				);
 			}
+
 			Ok(ParsedInstructionEnum {
 				instruction_type: "initializeBuffer".to_string(),
 				info: value,

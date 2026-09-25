@@ -66,6 +66,7 @@ pub(in crate::parse_token) fn parse_confidential_mint_burn_instruction(
 
 			});
 			let map = value.as_object_mut().unwrap();
+
 			if rotate_supply_data.proof_instruction_offset == 0 {
 				map.insert(
 					"proofAccount".to_string(),
@@ -77,6 +78,7 @@ pub(in crate::parse_token) fn parse_confidential_mint_burn_instruction(
 					json!(account_keys[account_indexes[1] as usize].to_string()),
 				);
 			}
+
 			parse_signers(
 				map,
 				2,
@@ -107,6 +109,7 @@ pub(in crate::parse_token) fn parse_confidential_mint_burn_instruction(
 			});
 			let mut offset = 2;
 			let map = value.as_object_mut().unwrap();
+
 			if offset < account_indexes.len() - 1
 				&& (mint_data.equality_proof_instruction_offset != 0
 					|| mint_data.ciphertext_validity_proof_instruction_offset != 0
@@ -127,30 +130,35 @@ pub(in crate::parse_token) fn parse_confidential_mint_burn_instruction(
 				} else {
 					"equalityProofRecordAccount"
 				};
+
 				map.insert(
 					label.to_string(),
 					json!(account_keys[account_indexes[offset] as usize].to_string()),
 				);
 				offset += 1;
 			}
+
 			if offset < account_indexes.len() - 1 {
 				let label = if mint_data.ciphertext_validity_proof_instruction_offset == 0 {
 					"ciphertextValidityProofContextStateAccount"
 				} else {
 					"ciphertextValidityProofRecordAccount"
 				};
+
 				map.insert(
 					label.to_string(),
 					json!(account_keys[account_indexes[offset] as usize].to_string()),
 				);
 				offset += 1;
 			}
+
 			if offset < account_indexes.len() - 1 {
 				let label = if mint_data.range_proof_instruction_offset == 0 {
 					"rangeProofContextStateAccount"
 				} else {
 					"rangeProofRecordAccount"
 				};
+
 				map.insert(
 					label.to_string(),
 					json!(account_keys[account_indexes[offset] as usize].to_string()),
@@ -188,6 +196,7 @@ pub(in crate::parse_token) fn parse_confidential_mint_burn_instruction(
 			});
 			let mut offset = 2;
 			let map = value.as_object_mut().unwrap();
+
 			if offset < account_indexes.len() - 1
 				&& (burn_data.equality_proof_instruction_offset != 0
 					|| burn_data.ciphertext_validity_proof_instruction_offset != 0
@@ -208,30 +217,35 @@ pub(in crate::parse_token) fn parse_confidential_mint_burn_instruction(
 				} else {
 					"equalityProofRecordAccount"
 				};
+
 				map.insert(
 					label.to_string(),
 					json!(account_keys[account_indexes[offset] as usize].to_string()),
 				);
 				offset += 1;
 			}
+
 			if offset < account_indexes.len() - 1 {
 				let label = if burn_data.ciphertext_validity_proof_instruction_offset == 0 {
 					"ciphertextValidityProofContextStateAccount"
 				} else {
 					"ciphertextValidityProofRecordAccount"
 				};
+
 				map.insert(
 					label.to_string(),
 					json!(account_keys[account_indexes[offset] as usize].to_string()),
 				);
 				offset += 1;
 			}
+
 			if offset < account_indexes.len() - 1 {
 				let label = if burn_data.range_proof_instruction_offset == 0 {
 					"rangeProofContextStateAccount"
 				} else {
 					"rangeProofRecordAccount"
 				};
+
 				map.insert(
 					label.to_string(),
 					json!(account_keys[account_indexes[offset] as usize].to_string()),
@@ -299,6 +313,7 @@ mod test {
 
 	fn check_no_panic(mut instruction: Instruction) {
 		let account_meta = AccountMeta::new_readonly(Pubkey::new_unique(), false);
+
 		for i in 0..20 {
 			instruction.accounts = vec![account_meta.clone(); i];
 			let message = Message::new(&[instruction.clone()], None);

@@ -7,6 +7,7 @@ pub use solana_transaction_status_client_types_wasm::ParsedAccountSource;
 pub fn parse_legacy_message_accounts(message: &Message) -> Vec<ParsedAccount> {
 	let reserved_account_keys = ReservedAccountKeys::new_all_activated().active;
 	let mut accounts: Vec<ParsedAccount> = vec![];
+
 	for (i, account_key) in message.account_keys.iter().enumerate() {
 		accounts.push(ParsedAccount {
 			pubkey: account_key.to_string(),
@@ -16,17 +17,20 @@ pub fn parse_legacy_message_accounts(message: &Message) -> Vec<ParsedAccount> {
 			source: Some(ParsedAccountSource::Transaction),
 		});
 	}
+
 	accounts
 }
 
 pub fn parse_v0_message_accounts(message: &LoadedMessage) -> Vec<ParsedAccount> {
 	let mut accounts: Vec<ParsedAccount> = vec![];
+
 	for (i, account_key) in message.account_keys().iter().enumerate() {
 		let source = if i < message.static_account_keys().len() {
 			ParsedAccountSource::Transaction
 		} else {
 			ParsedAccountSource::LookupTable
 		};
+
 		accounts.push(ParsedAccount {
 			pubkey: account_key.to_string(),
 			writable: message.is_writable(i),
@@ -34,12 +38,14 @@ pub fn parse_v0_message_accounts(message: &LoadedMessage) -> Vec<ParsedAccount> 
 			source: Some(source),
 		});
 	}
+
 	accounts
 }
 
 pub fn parse_v1_message_accounts(message: &solana_message::v1::Message) -> Vec<ParsedAccount> {
 	let reserved_account_keys = ReservedAccountKeys::new_all_activated().active;
 	let mut accounts = Vec::with_capacity(message.account_keys.len());
+
 	for (i, account_key) in message.account_keys.iter().enumerate() {
 		accounts.push(ParsedAccount {
 			pubkey: account_key.to_string(),
@@ -76,6 +82,7 @@ mod test {
 				num_readonly_unsigned_accounts: 1,
 			},
 			account_keys: vec![pubkey0, pubkey1, pubkey2, pubkey3],
+
 			..Message::default()
 		};
 

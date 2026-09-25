@@ -167,6 +167,7 @@ pub struct UiFees {
 	pub fee_calculator: UiFeeCalculator,
 }
 #[allow(deprecated)]
+
 impl From<Fees> for UiFees {
 	fn from(fees: Fees) -> Self {
 		Self {
@@ -235,6 +236,7 @@ impl std::fmt::Debug for SlotHistoryBits {
 				write!(f, "0")?;
 			}
 		}
+
 		Ok(())
 	}
 }
@@ -339,6 +341,7 @@ mod test {
 
 		let rent = Rent {
 			lamports_per_byte: 10,
+
 			..Default::default()
 		};
 		let rent_sysvar = create_account_for_test(&rent);
@@ -418,6 +421,7 @@ mod test {
 			total_rewards: 100,
 			distributed_rewards: 20,
 			active: true,
+
 			..EpochRewards::default()
 		};
 		let epoch_rewards_sysvar = create_account_for_test(&epoch_rewards);

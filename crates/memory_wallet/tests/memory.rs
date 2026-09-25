@@ -224,6 +224,7 @@ async fn banks_client_process_transaction() -> Result<()> {
 	wallet.connect().await?;
 
 	let transaction =
+
 		VersionedTransaction::new_unsigned_v0(&pubkey, &[instruction], &[], Hash::default())?;
 	let props = SolanaSignAndSendTransactionProps::builder()
 		.transaction(transaction)
@@ -250,6 +251,7 @@ async fn banks_client_simulate_transaction() -> Result<()> {
 	wallet.connect().await?;
 
 	let transaction =
+
 		VersionedTransaction::new_unsigned_v0(&pubkey, &[instruction], &[], Hash::default())?;
 	let props = SolanaSignAndSendTransactionProps::builder()
 		.transaction(transaction)
@@ -276,6 +278,7 @@ async fn create_runner() -> TestValidatorRunner {
 
 async fn create_program_test() -> (ProgramTestContext, SolanaRpcClient) {
 	let pubkey = get_wallet_keypair().pubkey();
+
 	let mut program_test = ProgramTest::default();
 	let rpc = SolanaRpcClient::new_with_commitment(LOCALNET, CommitmentConfig::finalized());
 

@@ -58,6 +58,7 @@ impl<'de> Deserialize<'de> for SimulateTransactionRequest {
 		struct Inner(String, Option<RpcSimulateTransactionConfig>);
 
 		let inner = Inner::deserialize(deserializer)?;
+
 		let encoding = match inner.1 {
 			Some(ref config) => config.encoding.unwrap_or(UiTransactionEncoding::Base64),
 			None => UiTransactionEncoding::Base64,

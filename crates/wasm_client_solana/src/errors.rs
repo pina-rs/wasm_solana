@@ -40,6 +40,7 @@ impl Default for RpcError {
 		Self {
 			id: 0,
 			jsonrpc: String::from("2.0"),
+
 			error: RpcErrorDetails::default(),
 		}
 	}
@@ -53,6 +54,7 @@ impl RpcError {
 
 		RpcError {
 			error,
+
 			..Default::default()
 		}
 	}

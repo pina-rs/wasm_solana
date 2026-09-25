@@ -98,6 +98,7 @@ impl SplTokenAdditionalData {
 	pub fn with_decimals(decimals: u8) -> Self {
 		Self {
 			decimals,
+
 			..Default::default()
 		}
 	}
@@ -124,6 +125,7 @@ impl SplTokenAdditionalDataV2 {
 	pub fn with_decimals(decimals: u8) -> Self {
 		Self {
 			decimals,
+
 			..Default::default()
 		}
 	}
@@ -139,6 +141,7 @@ pub fn parse_account_data_v3(
 		.get(program_id)
 		.ok_or(ParseAccountError::ProgramNotParsable)?;
 	let additional_data = additional_data.unwrap_or_default();
+
 	let parsed_json = match program_name {
 		ParsableAccount::AddressLookupTable => {
 			serde_json::to_value(parse_address_lookup_table(data)?)?
@@ -158,6 +161,7 @@ pub fn parse_account_data_v3(
 		ParsableAccount::Sysvar => serde_json::to_value(parse_sysvar(data, pubkey)?)?,
 		ParsableAccount::Vote => serde_json::to_value(parse_vote(data, pubkey)?)?,
 	};
+
 	Ok(ParsedAccount {
 		program: format!("{program_name:?}").to_kebab_case(),
 		parsed: parsed_json,

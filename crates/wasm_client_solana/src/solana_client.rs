@@ -493,6 +493,7 @@ impl SolanaRpcClient {
 					}
 					CommitmentLevel::Processed => true,
 				};
+
 				if commitment_matches {
 					is_success = signature_status.err.is_none();
 					break;
@@ -579,6 +580,7 @@ impl SolanaRpcClient {
 			.ok_or_else(|| RpcError::new("Program account doesn't exist."))?;
 
 		let mut pubkey_accounts: Vec<(Pubkey, Account)> = Vec::with_capacity(accounts.len());
+
 		for RpcKeyedAccount { pubkey, account } in accounts {
 			pubkey_accounts.push((
 				*pubkey,
@@ -587,6 +589,7 @@ impl SolanaRpcClient {
 					.ok_or_else(|| RpcError::new(format!("Unable to decode {pubkey}")))?,
 			));
 		}
+
 		Ok(pubkey_accounts)
 	}
 
@@ -651,6 +654,7 @@ impl SolanaRpcClient {
 		let response: ClientResponse<GetBlockTimeResponse> = self.send(request).await?;
 
 		let maybe_timestamp: Option<UnixTimestamp> = response.result.into();
+
 		match maybe_timestamp {
 			Some(timestamp) => Ok(timestamp),
 			None => Err(RpcError::new(format!("Block Not Found: slot={slot}")).into()),
@@ -980,6 +984,7 @@ impl SolanaRpcClient {
 			Some(s) => GetLeaderScheduleRequest::new_with_slot_and_config(s, config),
 			None => GetLeaderScheduleRequest::new_with_config(config),
 		};
+
 		let response: ClientResponse<GetLeaderScheduleResponse> = self.send(request).await?;
 
 		Ok(response.result.into())
@@ -1095,6 +1100,7 @@ impl SolanaRpcClient {
 			&& let UiAccountData::Json(account_data) = acc.data
 		{
 			let token_account_type: TokenAccountType =
+
 				match serde_json::from_value(account_data.parsed) {
 					Ok(t) => t,
 					Err(e) => return Err(RpcError::new(e.to_string()).into()),

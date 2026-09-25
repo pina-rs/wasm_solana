@@ -36,6 +36,7 @@ mod ssr_http_provider {
 	}
 
 	#[async_trait]
+
 	impl RpcProvider for HttpProvider {
 		fn url(&self) -> String {
 			self.url.clone()
@@ -100,6 +101,7 @@ mod ssr_http_provider {
 
 			RpcError {
 				error,
+
 				..Default::default()
 			}
 		}
@@ -148,6 +150,7 @@ mod wasm_http_provider {
 	}
 
 	impl<F: Future<Output = Result<gloo_net::http::Response, gloo_net::Error>>> Future
+
 		for AbortableRequest<F>
 	{
 		type Output = Result<gloo_net::http::Response, gloo_net::Error>;
@@ -168,6 +171,7 @@ mod wasm_http_provider {
 
 	#[pinned_drop]
 	impl<F: Future<Output = Result<gloo_net::http::Response, gloo_net::Error>>> PinnedDrop
+
 		for AbortableRequest<F>
 	{
 		fn drop(self: Pin<&mut Self>) {
@@ -182,6 +186,7 @@ mod wasm_http_provider {
 	pub struct HttpProvider(String);
 
 	#[async_trait]
+
 	impl RpcProvider for HttpProvider {
 		fn url(&self) -> String {
 			self.0.clone()
@@ -223,6 +228,7 @@ mod wasm_http_provider {
 			Self::Other(value.to_string())
 		}
 	}
+
 	impl From<gloo_net::Error> for ClientError {
 		fn from(value: gloo_net::Error) -> Self {
 			Self::Other(value.to_string())

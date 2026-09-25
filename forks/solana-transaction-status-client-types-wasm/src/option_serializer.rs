@@ -80,6 +80,7 @@ impl<T> OptionSerializer<T> {
 	pub fn unwrap_or(self, default: T) -> T {
 		match self {
 			OptionSerializer::Some(val) => val,
+
 			_ => default,
 		}
 	}
@@ -110,6 +111,7 @@ impl<T> OptionSerializer<T> {
 	{
 		match self {
 			OptionSerializer::Some(t) => f(t),
+
 			_ => default,
 		}
 	}
@@ -121,6 +123,7 @@ impl<T> OptionSerializer<T> {
 	{
 		match self {
 			OptionSerializer::Some(t) => f(t),
+
 			_ => default(),
 		}
 	}

@@ -17,6 +17,7 @@ use crate::parse_account_data::ParseAccountError;
 pub fn parse_stake(data: &[u8]) -> Result<StakeAccountType, ParseAccountError> {
 	let stake_state: StakeStateV2 = deserialize(data)
 		.map_err(|_| ParseAccountError::AccountNotParsable(ParsableAccount::Stake))?;
+
 	let parsed_account = match stake_state {
 		StakeStateV2::Uninitialized => StakeAccountType::Uninitialized,
 		StakeStateV2::Initialized(meta) => {
@@ -33,6 +34,7 @@ pub fn parse_stake(data: &[u8]) -> Result<StakeAccountType, ParseAccountError> {
 		}
 		StakeStateV2::RewardsPool => StakeAccountType::RewardsPool,
 	};
+
 	Ok(parsed_account)
 }
 

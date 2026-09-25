@@ -2,7 +2,6 @@
 
 //! Tests for the `solana_client_wasm` crate are placed here since this depends
 //! on `wasm_client_solana`.
-
 use std::time::Duration;
 
 use assert2::check;

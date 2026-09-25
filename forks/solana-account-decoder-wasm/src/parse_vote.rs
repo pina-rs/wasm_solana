@@ -157,6 +157,7 @@ mod test {
 	#[test]
 	fn test_parse_vote() {
 		let vote_pubkey = Pubkey::new_unique();
+
 		let vote_state = VoteStateV4::default();
 		let mut vote_account_data: Vec<u8> = vec![0; VoteStateV4::size_of()];
 		let versioned = VoteStateVersions::new_v4(vote_state.clone());
@@ -170,6 +171,7 @@ mod test {
 			authorized_voters: vec![],
 			prior_voters: vec![],
 			epoch_credits: vec![],
+
 			last_timestamp: BlockTimestamp::default(),
 			inflation_rewards_commission_bps: vote_state.inflation_rewards_commission_bps,
 			inflation_rewards_collector: vote_state.inflation_rewards_collector.to_string(),

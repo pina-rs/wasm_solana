@@ -88,12 +88,15 @@ pub(in crate::parse_token) fn parse_token_metadata_instruction(
 				"metadata": account_keys[account_indexes[0] as usize].to_string(),
 			});
 			let map = value.as_object_mut().unwrap();
+
 			if let Some(start) = *start {
 				map.insert("start".to_string(), json!(start));
 			}
+
 			if let Some(end) = *end {
 				map.insert("end".to_string(), json!(end));
 			}
+
 			Ok(ParsedInstructionEnum {
 				instruction_type: "emitTokenMetadata".to_string(),
 				info: value,

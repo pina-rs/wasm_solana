@@ -34,6 +34,7 @@ impl GetTransactionRequest {
 	pub fn new(signature: Signature) -> Self {
 		Self {
 			signature,
+
 			config: Some(RpcTransactionConfig::default()),
 		}
 	}

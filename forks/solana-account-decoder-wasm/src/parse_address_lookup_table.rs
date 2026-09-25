@@ -85,6 +85,7 @@ mod test {
 			last_extended_slot,
 			last_extended_slot_start_index,
 			authority: Some(authority),
+
 			..LookupTableMeta::default()
 		};
 		let num_addresses = 42;
@@ -97,6 +98,7 @@ mod test {
 		let lookup_table_data = AddressLookupTable::serialize_for_tests(lookup_table).unwrap();
 
 		let parsing_result = parse_address_lookup_table(&lookup_table_data).unwrap();
+
 		if let LookupTableAccountType::LookupTable(ui_lookup_table) = parsing_result {
 			assert_eq!(
 				ui_lookup_table.deactivation_slot,

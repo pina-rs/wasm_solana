@@ -137,6 +137,7 @@ pub fn parse_ui_instruction(
 	stack_height: Option<u32>,
 ) -> UiInstruction {
 	let program_id = &account_keys[instruction.program_id_index as usize];
+
 	if let Ok(parsed_instruction) = parse(program_id, instruction, account_keys, stack_height) {
 		UiInstruction::Parsed(UiParsedInstruction::Parsed(parsed_instruction))
 	} else {
@@ -210,11 +211,13 @@ fn build_simple_ui_transaction_status_meta(
 			.post_token_balances
 			.map(|balance| balance.into_iter().map(Into::into).collect())
 			.into(),
+
 		rewards: if show_rewards {
 			meta.rewards.into()
 		} else {
 			OptionSerializer::Skip
 		},
+
 		loaded_addresses: OptionSerializer::Skip,
 		return_data: OptionSerializer::Skip,
 		compute_units_consumed: OptionSerializer::Skip,
@@ -251,6 +254,7 @@ fn parse_ui_transaction_status_meta(
 			.post_token_balances
 			.map(|balance| balance.into_iter().map(Into::into).collect())
 			.into(),
+
 		rewards: if show_rewards { meta.rewards } else { None }.into(),
 		loaded_addresses: OptionSerializer::Skip,
 		return_data: OptionSerializer::or_skip(
@@ -408,6 +412,7 @@ impl ConfirmedBlock {
 				)
 			}
 		};
+
 		Ok(UiConfirmedBlock {
 			previous_blockhash: self.previous_blockhash,
 			blockhash: self.blockhash,
@@ -419,6 +424,7 @@ impl ConfirmedBlock {
 			} else {
 				None
 			},
+
 			num_reward_partitions: self.num_partitions,
 			block_time: self.block_time,
 			block_height: self.block_height,
@@ -578,9 +584,11 @@ impl VersionedTransactionWithStatusMeta {
 					if !show_rewards {
 						meta.rewards = OptionSerializer::None;
 					}
+
 					meta
 				}
 			}),
+
 			version,
 		})
 	}
@@ -861,6 +869,7 @@ impl Encodable for v0::Message {
 	fn encode(&self, encoding: UiTransactionEncoding) -> Self::Encoded {
 		if encoding == UiTransactionEncoding::JsonParsed {
 			let account_keys = AccountKeys::new(&self.account_keys, None);
+
 			let loaded_addresses = LoadedAddresses::default();
 			let loaded_message =
 				LoadedMessage::new_borrowed(self, &loaded_addresses, &HashSet::new());
@@ -1107,6 +1116,7 @@ mod test {
 				num_readonly_unsigned_accounts: 1,
 			},
 			account_keys: vec![pubkey1, pubkey2],
+
 			recent_blockhash: solana_hash::Hash::default(),
 			instructions: vec![],
 			address_table_lookups: vec![],
@@ -1127,6 +1137,7 @@ mod test {
 			pre_token_balances: None,
 			post_token_balances: None,
 			rewards: None,
+
 			loaded_addresses: LoadedAddresses::default(),
 			return_data: None,
 			compute_units_consumed: None,

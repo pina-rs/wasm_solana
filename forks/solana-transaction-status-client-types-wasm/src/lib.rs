@@ -324,6 +324,7 @@ impl<'de> DeserializeTrait<'de> for UiTransactionError {
 		D: Deserializer<'de>,
 	{
 		let value = serde_json::Value::deserialize(deserializer)?;
+
 		if let Some(obj) = value.as_object()
 			&& let Some(arr) = obj.get("InstructionError").and_then(|v| v.as_array())
 		{
@@ -348,6 +349,7 @@ impl<'de> DeserializeTrait<'de> for UiTransactionError {
 				from_value(instruction_error.clone())
 			}
 			.map_err(|e| DeserializeError::custom(e.to_string()))?;
+
 			return Ok(UiTransactionError(TransactionError::InstructionError(
 				outer_instruction_index,
 				err,
@@ -538,11 +540,13 @@ impl From<TransactionTokenBalance> for UiTransactionTokenBalance {
 			account_index: token_balance.account_index,
 			mint: token_balance.mint,
 			ui_token_amount: token_balance.ui_token_amount,
+
 			owner: if !token_balance.owner.is_empty() {
 				OptionSerializer::Some(token_balance.owner)
 			} else {
 				OptionSerializer::Skip
 			},
+
 			program_id: if !token_balance.program_id.is_empty() {
 				OptionSerializer::Some(token_balance.program_id)
 			} else {
@@ -705,6 +709,7 @@ impl Default for TransactionStatusMeta {
 			pre_token_balances: None,
 			post_token_balances: None,
 			rewards: None,
+
 			loaded_addresses: LoadedAddresses::default(),
 			return_data: None,
 			compute_units_consumed: None,

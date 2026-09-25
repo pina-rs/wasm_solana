@@ -29,21 +29,25 @@ impl RpcFilterType {
 			RpcFilterType::TokenAccountState | RpcFilterType::DataSize(_) => Ok(()),
 			RpcFilterType::Memcmp(compare) => {
 				let encoding = compare.encoding.as_ref().unwrap_or(&MemcmpEncoding::Binary);
+
 				match encoding {
 					MemcmpEncoding::Binary => {
 						use MemcmpEncodedBytes::Base58;
 						use MemcmpEncodedBytes::Base64;
 						use MemcmpEncodedBytes::Binary;
 						use MemcmpEncodedBytes::Bytes;
+
 						match &compare.bytes {
 							// DEPRECATED
 							Binary(bytes) => {
 								if bytes.len() > MAX_DATA_BASE58_SIZE {
 									return Err(RpcFilterError::Base58DataTooLarge);
 								}
+
 								let bytes = bs58::decode(&bytes)
 									.into_vec()
 									.map_err(RpcFilterError::DecodeError)?;
+
 								if bytes.len() > MAX_DATA_SIZE {
 									Err(RpcFilterError::Base58DataTooLarge)
 								} else {
@@ -54,7 +58,9 @@ impl RpcFilterType {
 								if bytes.len() > MAX_DATA_BASE58_SIZE {
 									return Err(RpcFilterError::DataTooLarge);
 								}
+
 								let bytes = bs58::decode(&bytes).into_vec()?;
+
 								if bytes.len() > MAX_DATA_SIZE {
 									Err(RpcFilterError::DataTooLarge)
 								} else {
@@ -65,7 +71,9 @@ impl RpcFilterType {
 								if bytes.len() > MAX_DATA_BASE64_SIZE {
 									return Err(RpcFilterError::DataTooLarge);
 								}
+
 								let bytes = base64::decode(bytes)?;
+
 								if bytes.len() > MAX_DATA_SIZE {
 									Err(RpcFilterError::DataTooLarge)
 								} else {
@@ -76,6 +84,7 @@ impl RpcFilterType {
 								if bytes.len() > MAX_DATA_SIZE {
 									return Err(RpcFilterError::DataTooLarge);
 								}
+
 								Ok(())
 							}
 						}
@@ -226,6 +235,7 @@ impl Memcmp {
 				if data[self.offset..].len() < bytes.len() {
 					return false;
 				}
+
 				data[self.offset..self.offset + bytes.len()] == bytes[..]
 			}
 			None => false,
@@ -279,6 +289,7 @@ impl From<Memcmp> for RpcMemcmp {
 			}
 			MemcmpEncodedBytes::Bytes(vector) => (DataType::Raw(vector), None),
 		};
+
 		RpcMemcmp {
 			offset: memcmp.offset,
 			bytes,
@@ -300,6 +311,7 @@ impl From<RpcMemcmp> for Memcmp {
 			}
 			_ => unreachable!(),
 		};
+
 		Memcmp {
 			offset: memcmp.offset,
 			bytes,
@@ -331,6 +343,7 @@ pub fn maybe_map_filters(
 			}
 		}
 	}
+
 	Ok(())
 }
 
@@ -347,6 +360,7 @@ impl VersionReq {
 				.map_err(|err| format!("Could not parse version {version:?}: {err:?}"))?;
 			version_reqs.push(version_req);
 		}
+
 		Ok(Self(version_reqs))
 	}
 

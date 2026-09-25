@@ -250,6 +250,7 @@ impl Wallet for MemoryWallet {
 }
 
 #[async_trait(?Send)]
+
 impl WalletStandardConnect for MemoryWallet {
 	async fn connect(&mut self) -> WalletResult<Vec<Self::Account>> {
 		let Some(account) = self.wallet.accounts.first() else {
@@ -270,6 +271,7 @@ impl WalletStandardConnect for MemoryWallet {
 }
 
 #[async_trait(?Send)]
+
 impl WalletStandardDisconnect for MemoryWallet {
 	async fn disconnect(&mut self) -> WalletResult<()> {
 		self.account = None;
@@ -279,6 +281,7 @@ impl WalletStandardDisconnect for MemoryWallet {
 }
 
 #[async_trait(?Send)]
+
 impl WalletSolanaSignAndSendTransaction for MemoryWallet {
 	type Output = Signature;
 
@@ -320,6 +323,7 @@ impl WalletSolanaSignAndSendTransaction for MemoryWallet {
 }
 
 #[async_trait(?Send)]
+
 impl WalletSolanaSignTransaction for MemoryWallet {
 	type Output = VersionedTransaction;
 
@@ -393,6 +397,7 @@ impl SolanaSignInOutput for MemorySolanaSignInOutput {
 }
 
 #[async_trait(?Send)]
+
 impl WalletSolanaSignIn for MemoryWallet {
 	type Output = MemorySolanaSignInOutput;
 
@@ -449,6 +454,7 @@ impl SolanaSignMessageOutput for MemorySolanaSignMessageOutput {
 }
 
 #[async_trait(?Send)]
+
 impl WalletSolanaSignMessage for MemoryWallet {
 	type Output = MemorySolanaSignMessageOutput;
 

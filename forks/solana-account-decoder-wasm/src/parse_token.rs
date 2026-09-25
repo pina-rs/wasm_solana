@@ -41,6 +41,7 @@ pub fn parse_token_v3(
 			.iter()
 			.map(|extension_type| parse_extension::<Account>(extension_type, &account))
 			.collect();
+
 		return Ok(TokenAccountType::Account(UiTokenAccount {
 			mint: account.base.mint.to_string(),
 			owner: account.base.owner.to_string(),
@@ -49,6 +50,7 @@ pub fn parse_token_v3(
 				COption::Some(pubkey) => Some(pubkey.to_string()),
 				COption::None => None,
 			},
+
 			state: convert_account_state(account.base.state),
 			is_native: account.base.is_native(),
 			rent_exempt_reserve: match account.base.is_native {
@@ -69,20 +71,24 @@ pub fn parse_token_v3(
 				COption::Some(pubkey) => Some(pubkey.to_string()),
 				COption::None => None,
 			},
+
 			extensions: ui_extensions,
 		}));
 	}
+
 	if let Ok(mint) = StateWithExtensions::<Mint>::unpack(data) {
 		let extension_types = mint.get_extension_types().unwrap_or_default();
 		let ui_extensions = extension_types
 			.iter()
 			.map(|extension_type| parse_extension::<Mint>(extension_type, &mint))
 			.collect();
+
 		return Ok(TokenAccountType::Mint(UiMint {
 			mint_authority: match mint.base.mint_authority {
 				COption::Some(pubkey) => Some(pubkey.to_string()),
 				COption::None => None,
 			},
+
 			supply: mint.base.supply.to_string(),
 			decimals: mint.base.decimals,
 			is_initialized: mint.base.is_initialized,
@@ -90,9 +96,11 @@ pub fn parse_token_v3(
 				COption::Some(pubkey) => Some(pubkey.to_string()),
 				COption::None => None,
 			},
+
 			extensions: ui_extensions,
 		}));
 	}
+
 	if data.len() == Multisig::get_packed_len() {
 		let multisig = Multisig::unpack(data)
 			.map_err(|_| ParseAccountError::AccountNotParsable(ParsableAccount::SplToken))?;
@@ -259,6 +267,7 @@ mod test {
 		let second_signer = Pubkey::new_from_array([2; 32]);
 		let third_signer = Pubkey::new_from_array([3; 32]);
 		let mut multisig_data = vec![0; Multisig::get_packed_len()];
+
 		let mut signers = [Pubkey::default(); 11];
 		signers[0] = first_signer;
 		signers[1] = second_signer;
@@ -382,11 +391,13 @@ mod test {
 			pre_update_average_rate: 500.into(),
 			last_update_timestamp: INT_SECONDS_PER_YEAR.into(),
 			current_rate: 500.into(),
+
 			..Default::default()
 		};
 		let additional_data = SplTokenAdditionalDataV2 {
 			decimals: 18,
 			interest_bearing_config: Some((config, INT_SECONDS_PER_YEAR)),
+
 			..Default::default()
 		};
 		const ONE: u64 = 1_000_000_000_000_000_000;
@@ -414,11 +425,13 @@ mod test {
 			pre_update_average_rate: 32767.into(),
 			last_update_timestamp: 0.into(),
 			current_rate: 32767.into(),
+
 			..Default::default()
 		};
 		let additional_data = SplTokenAdditionalDataV2 {
 			decimals: 0,
 			interest_bearing_config: Some((config, INT_SECONDS_PER_YEAR * 1_000)),
+
 			..Default::default()
 		};
 		let token_amount = token_amount_to_ui_amount_v3(u64::MAX, &additional_data);
@@ -431,11 +444,13 @@ mod test {
 		// 2x multiplier
 		let config = ScaledUiAmountConfig {
 			new_multiplier: 2f64.into(),
+
 			..Default::default()
 		};
 		let additional_data = SplTokenAdditionalDataV2 {
 			decimals: 18,
 			scaled_ui_amount_config: Some((config, 0)),
+
 			..Default::default()
 		};
 		const ONE: u64 = 1_000_000_000_000_000_000;
@@ -451,11 +466,13 @@ mod test {
 		// huge case
 		let config = ScaledUiAmountConfig {
 			new_multiplier: f64::INFINITY.into(),
+
 			..Default::default()
 		};
 		let additional_data = SplTokenAdditionalDataV2 {
 			decimals: 0,
 			scaled_ui_amount_config: Some((config, 0)),
+
 			..Default::default()
 		};
 		let token_amount = token_amount_to_ui_amount_v3(u64::MAX, &additional_data);

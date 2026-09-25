@@ -9,6 +9,7 @@ pub(in crate::parse_token) fn parse_transfer_fee_instruction(
 ) -> Result<ParsedInstructionEnum, ParseInstructionError> {
 	let transfer_fee_instruction = TransferFeeInstruction::unpack(instruction_data)
 		.map_err(|_| ParseInstructionError::InstructionNotParsable(ParsableProgram::SplToken))?;
+
 	match transfer_fee_instruction {
 		TransferFeeInstruction::InitializeTransferFeeConfig {
 			transfer_fee_config_authority,
@@ -23,18 +24,21 @@ pub(in crate::parse_token) fn parse_transfer_fee_instruction(
 				"maximumFee": maximum_fee,
 			});
 			let map = value.as_object_mut().unwrap();
+
 			if let COption::Some(transfer_fee_config_authority) = transfer_fee_config_authority {
 				map.insert(
 					"transferFeeConfigAuthority".to_string(),
 					json!(transfer_fee_config_authority.to_string()),
 				);
 			}
+
 			if let COption::Some(withdraw_withheld_authority) = withdraw_withheld_authority {
 				map.insert(
 					"withdrawWithheldAuthority".to_string(),
 					json!(withdraw_withheld_authority.to_string()),
 				);
 			}
+
 			Ok(ParsedInstructionEnum {
 				instruction_type: "initializeTransferFeeConfig".to_string(),
 				info: value,
@@ -99,9 +103,11 @@ pub(in crate::parse_token) fn parse_transfer_fee_instruction(
 			let first_source_account_index = account_indexes
 				.len()
 				.saturating_sub(num_token_accounts as usize);
+
 			for i in account_indexes[first_source_account_index..].iter() {
 				source_accounts.push(account_keys[*i as usize].to_string());
 			}
+
 			map.insert("sourceAccounts".to_string(), json!(source_accounts));
 			parse_signers(
 				map,
@@ -123,9 +129,11 @@ pub(in crate::parse_token) fn parse_transfer_fee_instruction(
 			});
 			let map = value.as_object_mut().unwrap();
 			let mut source_accounts: Vec<String> = vec![];
+
 			for i in account_indexes.iter().skip(1) {
 				source_accounts.push(account_keys[*i as usize].to_string());
 			}
+
 			map.insert("sourceAccounts".to_string(), json!(source_accounts));
 			Ok(ParsedInstructionEnum {
 				instruction_type: "harvestWithheldTokensToMint".to_string(),

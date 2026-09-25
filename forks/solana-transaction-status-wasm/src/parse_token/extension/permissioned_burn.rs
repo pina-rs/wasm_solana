@@ -103,6 +103,7 @@ pub(in crate::parse_token) fn parse_permissioned_burn_instruction(
 			// optional proof material. Reserve those two when walking the
 			// proof accounts.
 			let mut offset = 2;
+
 			if offset < account_indexes.len() - 2
 				&& (burn_data.equality_proof_instruction_offset != 0
 					|| burn_data.ciphertext_validity_proof_instruction_offset != 0
@@ -122,36 +123,42 @@ pub(in crate::parse_token) fn parse_permissioned_burn_instruction(
 				} else {
 					"equalityProofRecordAccount"
 				};
+
 				map.insert(
 					label.to_string(),
 					json!(account_keys[account_indexes[offset] as usize].to_string()),
 				);
 				offset += 1;
 			}
+
 			if offset < account_indexes.len() - 2 {
 				let label = if burn_data.ciphertext_validity_proof_instruction_offset == 0 {
 					"ciphertextValidityProofContextStateAccount"
 				} else {
 					"ciphertextValidityProofRecordAccount"
 				};
+
 				map.insert(
 					label.to_string(),
 					json!(account_keys[account_indexes[offset] as usize].to_string()),
 				);
 				offset += 1;
 			}
+
 			if offset < account_indexes.len() - 2 {
 				let label = if burn_data.range_proof_instruction_offset == 0 {
 					"rangeProofContextStateAccount"
 				} else {
 					"rangeProofRecordAccount"
 				};
+
 				map.insert(
 					label.to_string(),
 					json!(account_keys[account_indexes[offset] as usize].to_string()),
 				);
 				offset += 1;
 			}
+
 			map.insert(
 				"permissionedBurnAuthority".to_string(),
 				json!(account_keys[account_indexes[offset] as usize].to_string()),
@@ -196,6 +203,7 @@ mod test {
 
 	fn check_no_panic(mut instruction: Instruction) {
 		let account_meta = AccountMeta::new_readonly(Pubkey::new_unique(), false);
+
 		for i in 0..20 {
 			instruction.accounts = vec![account_meta.clone(); i];
 			let message = Message::new(&[instruction.clone()], None);

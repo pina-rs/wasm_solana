@@ -197,6 +197,7 @@ impl VersionedTransactionExtension for VersionedTransaction {
 	/// Create an unsigned transction from a [`VersionedMessage`].
 	fn new_unsigned(message: VersionedMessage) -> Self {
 		let signatures =
+
 			vec![Signature::default(); message.header().num_required_signatures as usize];
 
 		Self {
@@ -249,6 +250,7 @@ impl VersionedTransactionExtension for VersionedTransaction {
 			// reset signatures if blockhash has changed
 			self.signatures
 				.iter_mut()
+
 				.for_each(|signature| *signature = Signature::default());
 		}
 
@@ -288,6 +290,7 @@ impl VersionedTransactionExtension for VersionedTransaction {
 			&& self
 				.signatures
 				.iter()
+
 				.all(|signature| *signature != Signature::default())
 	}
 
@@ -328,6 +331,7 @@ impl VersionedTransactionExtension for VersionedTransaction {
 				// reset signatures if blockhash has changed
 				self.signatures
 					.iter_mut()
+
 					.for_each(|signature| *signature = Signature::default());
 			}
 

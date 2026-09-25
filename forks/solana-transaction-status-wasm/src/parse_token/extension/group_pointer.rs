@@ -24,12 +24,15 @@ pub(in crate::parse_token) fn parse_group_pointer_instruction(
 				"mint": account_keys[account_indexes[0] as usize].to_string(),
 			});
 			let map = value.as_object_mut().unwrap();
+
 			if let Some(authority) = Option::<Pubkey>::from(authority) {
 				map.insert("authority".to_string(), json!(authority.to_string()));
 			}
+
 			if let Some(group_address) = Option::<Pubkey>::from(group_address) {
 				map.insert("groupAddress".to_string(), json!(group_address.to_string()));
 			}
+
 			Ok(ParsedInstructionEnum {
 				instruction_type: "initializeGroupPointer".to_string(),
 				info: value,
@@ -45,9 +48,11 @@ pub(in crate::parse_token) fn parse_group_pointer_instruction(
 				"mint": account_keys[account_indexes[0] as usize].to_string(),
 			});
 			let map = value.as_object_mut().unwrap();
+
 			if let Some(group_address) = Option::<Pubkey>::from(group_address) {
 				map.insert("groupAddress".to_string(), json!(group_address.to_string()));
 			}
+
 			parse_signers(
 				map,
 				1,

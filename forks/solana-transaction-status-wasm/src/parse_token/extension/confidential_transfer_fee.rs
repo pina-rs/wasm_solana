@@ -24,9 +24,11 @@ pub(in crate::parse_token) fn parse_confidential_transfer_fee_instruction(
 				"withdrawWithheldAuthorityElGamalPubkey": Option::<PodElGamalPubkey>::from(transfer_fee_config.withdraw_withheld_authority_elgamal_pubkey).map(|k| k.to_string()),
 			});
 			let map = value.as_object_mut().unwrap();
+
 			if let Some(authority) = Option::<Pubkey>::from(transfer_fee_config.authority) {
 				map.insert("authority".to_string(), json!(authority.to_string()));
 			}
+
 			Ok(ParsedInstructionEnum {
 				instruction_type: "initializeConfidentialTransferFeeConfig".to_string(),
 				info: value,
@@ -70,6 +72,7 @@ pub(in crate::parse_token) fn parse_confidential_transfer_fee_instruction(
 					3
 				}
 			};
+
 			parse_signers(
 				map,
 				offset,
@@ -112,6 +115,7 @@ pub(in crate::parse_token) fn parse_confidential_transfer_fee_instruction(
 					"instructionsSysvar".to_string(),
 					json!(account_keys[account_indexes[2] as usize].to_string()),
 				);
+
 				if first_source_account_index > 4 {
 					// Assume that the extra account is a proof account and not
 					// a multisig signer. This might be wrong, but it's the
@@ -125,10 +129,13 @@ pub(in crate::parse_token) fn parse_confidential_transfer_fee_instruction(
 					3
 				}
 			};
+
 			let mut source_accounts: Vec<String> = vec![];
+
 			for i in account_indexes[first_source_account_index..].iter() {
 				source_accounts.push(account_keys[*i as usize].to_string());
 			}
+
 			map.insert("sourceAccounts".to_string(), json!(source_accounts));
 			parse_signers(
 				map,
@@ -152,9 +159,11 @@ pub(in crate::parse_token) fn parse_confidential_transfer_fee_instruction(
 			});
 			let map = value.as_object_mut().unwrap();
 			let mut source_accounts: Vec<String> = vec![];
+
 			for i in account_indexes.iter().skip(1) {
 				source_accounts.push(account_keys[*i as usize].to_string());
 			}
+
 			map.insert("sourceAccounts".to_string(), json!(source_accounts));
 			Ok(ParsedInstructionEnum {
 				instruction_type: "harvestWithheldConfidentialTransferTokensToMint".to_string(),
@@ -223,6 +232,7 @@ mod test {
 
 	fn check_no_panic(mut instruction: Instruction) {
 		let account_meta = AccountMeta::new_readonly(Pubkey::new_unique(), false);
+
 		for i in 0..20 {
 			instruction.accounts = vec![account_meta.clone(); i];
 			let message = Message::new(&[instruction.clone()], None);

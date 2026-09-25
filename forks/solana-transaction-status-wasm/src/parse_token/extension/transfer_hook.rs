@@ -24,12 +24,15 @@ pub(in crate::parse_token) fn parse_transfer_hook_instruction(
 				"mint": account_keys[account_indexes[0] as usize].to_string(),
 			});
 			let map = value.as_object_mut().unwrap();
+
 			if let Some(authority) = Option::<Pubkey>::from(authority) {
 				map.insert("authority".to_string(), json!(authority.to_string()));
 			}
+
 			if let Some(program_id) = Option::<Pubkey>::from(program_id) {
 				map.insert("programId".to_string(), json!(program_id.to_string()));
 			}
+
 			Ok(ParsedInstructionEnum {
 				instruction_type: "initializeTransferHook".to_string(),
 				info: value,
@@ -45,9 +48,11 @@ pub(in crate::parse_token) fn parse_transfer_hook_instruction(
 				"mint": account_keys[account_indexes[0] as usize].to_string(),
 			});
 			let map = value.as_object_mut().unwrap();
+
 			if let Some(program_id) = Option::<Pubkey>::from(program_id) {
 				map.insert("programId".to_string(), json!(program_id.to_string()));
 			}
+
 			parse_signers(
 				map,
 				1,

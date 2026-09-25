@@ -63,6 +63,7 @@ pub fn into_wallet_error<T: Display>(error: T) -> WalletError {
 }
 
 #[async_trait(?Send)]
+
 impl BanksClientAsyncExtension for BanksClient {
 	async fn wallet_sign_transaction<W: WalletSolana + Signer>(
 		&mut self,
@@ -226,6 +227,7 @@ impl ProgramTestExtension for ProgramTest {
 			self.add_account_with_lamports(keypair.pubkey(), keypair.pubkey(), initial_lamports);
 			accounts.push(keypair);
 		}
+
 		accounts
 	}
 
@@ -520,6 +522,7 @@ pub trait ProgramTestContextExtension {
 }
 
 #[async_trait(?Send)]
+
 impl ProgramTestContextExtension for ProgramTestContext {
 	async fn create_funded_keypair(&mut self) -> Result<Keypair, BanksClientError> {
 		let keypair = Keypair::new();
@@ -567,6 +570,7 @@ impl ProgramTestContextExtension for ProgramTestContext {
 		} else {
 			let new_account = Account {
 				lamports,
+
 				..Account::default()
 			}
 			.into();

@@ -145,6 +145,7 @@ mod tests {
 		let value = response.result.value.unwrap();
 		assert!(!value.executable);
 		check!(value.lamports == 1_000_000_000);
+
 		check!(value.owner == Pubkey::default());
 		check!(value.rent_epoch == 2);
 		check!(value.space == Some(80));

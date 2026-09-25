@@ -104,6 +104,7 @@ pub enum BlockhashQuery {
 impl BlockhashQuery {
 	pub fn new(blockhash: Option<Hash>, sign_only: bool, nonce_account: Option<Pubkey>) -> Self {
 		let source = nonce_account.map_or(Source::Cluster, Source::NonceAccount);
+
 		match blockhash {
 			Some(hash) if sign_only => Self::None(hash),
 			Some(hash) if !sign_only => Self::FeeCalculator(source, hash),
@@ -155,6 +156,7 @@ where
 {
 	let serialized = wincode::serialize(input)
 		.map_err(|e| RpcError::new(format!("Serialization failed: {e}")))?;
+
 	let encoded = match encoding {
 		UiTransactionEncoding::Base58 => bs58::encode(serialized).into_string(),
 		UiTransactionEncoding::Base64 => BASE64_STANDARD.encode(serialized),
@@ -165,11 +167,13 @@ where
 			.into());
 		}
 	};
+
 	Ok(encoded)
 }
 
 pub fn deserialize_and_decode<T>(content: &str, encoding: UiTransactionEncoding) -> ClientResult<T>
 where
+
 	T: for<'de> SchemaRead<'de, DefaultConfig, Dst = T>,
 {
 	let decoded = match encoding {
@@ -528,6 +532,7 @@ impl EncodingConfig for RpcBlockConfig {
 	fn new_with_encoding(encoding: &Option<UiTransactionEncoding>) -> Self {
 		Self {
 			encoding: *encoding,
+
 			..Self::default()
 		}
 	}
@@ -537,6 +542,7 @@ impl RpcBlockConfig {
 	pub fn rewards_only() -> Self {
 		Self {
 			transaction_details: Some(TransactionDetails::None),
+
 			..Self::default()
 		}
 	}
@@ -545,6 +551,7 @@ impl RpcBlockConfig {
 		Self {
 			transaction_details: Some(TransactionDetails::None),
 			commitment,
+
 			..Self::default()
 		}
 	}
@@ -582,6 +589,7 @@ impl EncodingConfig for RpcTransactionConfig {
 	fn new_with_encoding(encoding: &Option<UiTransactionEncoding>) -> Self {
 		Self {
 			encoding: *encoding,
+
 			..Self::default()
 		}
 	}

@@ -55,6 +55,7 @@ pub fn parse_token(
 			));
 		}
 	}
+
 	if let Ok(token_instruction) = TokenInstruction::unpack(&instruction.data) {
 		match token_instruction {
 			TokenInstruction::InitializeMint {
@@ -70,12 +71,14 @@ pub fn parse_token(
 					"rentSysvar": account_keys[instruction.accounts[1] as usize].to_string(),
 				});
 				let map = value.as_object_mut().unwrap();
+
 				if let COption::Some(freeze_authority) = freeze_authority {
 					map.insert(
 						"freezeAuthority".to_string(),
 						json!(freeze_authority.to_string()),
 					);
 				}
+
 				Ok(ParsedInstructionEnum {
 					instruction_type: "initializeMint".to_string(),
 					info: value,
@@ -93,12 +96,14 @@ pub fn parse_token(
 					"mintAuthority": mint_authority.to_string(),
 				});
 				let map = value.as_object_mut().unwrap();
+
 				if let COption::Some(freeze_authority) = freeze_authority {
 					map.insert(
 						"freezeAuthority".to_string(),
 						json!(freeze_authority.to_string()),
 					);
 				}
+
 				Ok(ParsedInstructionEnum {
 					instruction_type: "initializeMint2".to_string(),
 					info: value,
@@ -142,9 +147,11 @@ pub fn parse_token(
 			TokenInstruction::InitializeMultisig { m } => {
 				check_num_token_accounts(&instruction.accounts, 3)?;
 				let mut signers: Vec<String> = vec![];
+
 				for i in instruction.accounts[2..].iter() {
 					signers.push(account_keys[*i as usize].to_string());
 				}
+
 				Ok(ParsedInstructionEnum {
 					instruction_type: "initializeMultisig".to_string(),
 					info: json!({
@@ -158,9 +165,11 @@ pub fn parse_token(
 			TokenInstruction::InitializeMultisig2 { m } => {
 				check_num_token_accounts(&instruction.accounts, 2)?;
 				let mut signers: Vec<String> = vec![];
+
 				for i in instruction.accounts[1..].iter() {
 					signers.push(account_keys[*i as usize].to_string());
 				}
+
 				Ok(ParsedInstructionEnum {
 					instruction_type: "initializeMultisig2".to_string(),
 					info: json!({
@@ -237,6 +246,7 @@ pub fn parse_token(
 				new_authority,
 			} => {
 				check_num_token_accounts(&instruction.accounts, 2)?;
+
 				let owned = match authority_type {
 					AuthorityType::MintTokens
 					| AuthorityType::FreezeAccount
@@ -256,6 +266,7 @@ pub fn parse_token(
 					| AuthorityType::PermissionedBurn => "mint",
 					AuthorityType::AccountOwner | AuthorityType::CloseAccount => "account",
 				};
+
 				let mut value = json!({
 					owned: account_keys[instruction.accounts[0] as usize].to_string(),
 					"authorityType": Into::<UiAuthorityType>::into(authority_type),
@@ -482,6 +493,7 @@ pub fn parse_token(
 					"mint": account_keys[instruction.accounts[0] as usize].to_string(),
 				});
 				let map = value.as_object_mut().unwrap();
+
 				if !extension_types.is_empty() {
 					map.insert(
 						"extensionTypes".to_string(),
@@ -493,6 +505,7 @@ pub fn parse_token(
 						),
 					);
 				}
+
 				Ok(ParsedInstructionEnum {
 					instruction_type: "getAccountDataSize".to_string(),
 					info: value,
@@ -554,6 +567,7 @@ pub fn parse_token(
 						ParsableProgram::SplToken,
 					));
 				}
+
 				parse_default_account_state_instruction(
 					&instruction.data[1..],
 					&instruction.accounts,
@@ -569,6 +583,7 @@ pub fn parse_token(
 						ParsableProgram::SplToken,
 					));
 				}
+
 				parse_memo_transfer_instruction(
 					&instruction.data[1..],
 					&instruction.accounts,
@@ -601,6 +616,7 @@ pub fn parse_token(
 						ParsableProgram::SplToken,
 					));
 				}
+
 				parse_interest_bearing_mint_instruction(
 					&instruction.data[1..],
 					&instruction.accounts,
@@ -613,6 +629,7 @@ pub fn parse_token(
 						ParsableProgram::SplToken,
 					));
 				}
+
 				parse_cpi_guard_instruction(
 					&instruction.data[1..],
 					&instruction.accounts,
@@ -632,6 +649,7 @@ pub fn parse_token(
 						ParsableProgram::SplToken,
 					));
 				}
+
 				parse_transfer_hook_instruction(
 					&instruction.data[1..],
 					&instruction.accounts,
@@ -644,6 +662,7 @@ pub fn parse_token(
 						ParsableProgram::SplToken,
 					));
 				}
+
 				parse_confidential_transfer_fee_instruction(
 					&instruction.data[1..],
 					&instruction.accounts,
@@ -676,6 +695,7 @@ pub fn parse_token(
 						ParsableProgram::SplToken,
 					));
 				}
+
 				parse_metadata_pointer_instruction(
 					&instruction.data[1..],
 					&instruction.accounts,
@@ -688,6 +708,7 @@ pub fn parse_token(
 						ParsableProgram::SplToken,
 					));
 				}
+
 				parse_group_pointer_instruction(
 					&instruction.data[1..],
 					&instruction.accounts,
@@ -700,6 +721,7 @@ pub fn parse_token(
 						ParsableProgram::SplToken,
 					));
 				}
+
 				parse_group_member_pointer_instruction(
 					&instruction.data[1..],
 					&instruction.accounts,
@@ -734,9 +756,11 @@ pub fn parse_token(
 					"destination": account_keys[instruction.accounts[1] as usize].to_string(),
 				});
 				let map = value.as_object_mut().unwrap();
+
 				if let COption::Some(amount) = amount {
 					map.insert("amount".to_string(), json!(amount.to_string()));
 				}
+
 				parse_signers(
 					map,
 					2,
@@ -773,6 +797,7 @@ pub fn parse_token(
 			account_keys,
 		)
 	} else if let Ok(token_metadata_instruction) =
+
 		TokenMetadataInstruction::unpack(&instruction.data)
 	{
 		parse_token_metadata_instruction(
@@ -801,6 +826,7 @@ fn parse_batch_instruction(
 	let mut data_cursor: usize = 0;
 	let mut account_cursor: usize = 0;
 	let mut instructions = vec![];
+
 	while data_cursor < data.len() {
 		let num_accounts = *data.get(data_cursor).ok_or_else(not_parsable)? as usize;
 		let data_len = *data.get(data_cursor + 1).ok_or_else(not_parsable)? as usize;
@@ -819,6 +845,7 @@ fn parse_batch_instruction(
 		if inner_data.first() == Some(&255) {
 			return Err(not_parsable());
 		}
+
 		let inner_instruction = CompiledInstruction {
 			program_id_index,
 			accounts: inner_accounts.to_vec(),
@@ -827,6 +854,7 @@ fn parse_batch_instruction(
 		let parsed = parse_token(&inner_instruction, account_keys)?;
 		instructions.push(serde_json::to_value(parsed).map_err(|_| not_parsable())?);
 	}
+
 	Ok(ParsedInstructionEnum {
 		instruction_type: "batch".to_string(),
 		info: json!({ "instructions": instructions }),
@@ -969,9 +997,11 @@ fn parse_signers(
 ) {
 	if accounts.len() > last_nonsigner_index + 1 {
 		let mut signers: Vec<String> = vec![];
+
 		for i in accounts[last_nonsigner_index + 1..].iter() {
 			signers.push(account_keys[*i as usize].to_string());
 		}
+
 		map.insert(
 			multisig_field_name.to_string(),
 			json!(account_keys[accounts[last_nonsigner_index] as usize].to_string()),
@@ -2286,12 +2316,14 @@ mod test {
 
 		let mut data = TokenInstruction::Batch { data: vec![] }.pack();
 		let mut accounts = vec![];
+
 		for ix in [&transfer_ix, &burn_ix] {
 			data.push(ix.accounts.len() as u8);
 			data.push(ix.data.len() as u8);
 			data.extend_from_slice(&ix.data);
 			accounts.extend_from_slice(&ix.accounts);
 		}
+
 		let batch_ix = Instruction {
 			program_id: *program_id,
 			accounts,

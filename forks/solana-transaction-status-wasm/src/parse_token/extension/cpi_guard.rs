@@ -9,6 +9,7 @@ pub(in crate::parse_token) fn parse_cpi_guard_instruction(
 	account_keys: &AccountKeys,
 ) -> Result<ParsedInstructionEnum, ParseInstructionError> {
 	check_num_token_accounts(account_indexes, 2)?;
+
 	let instruction_type_str = match decode_instruction_type(instruction_data)
 		.map_err(|_| ParseInstructionError::InstructionNotParsable(ParsableProgram::SplToken))?
 	{

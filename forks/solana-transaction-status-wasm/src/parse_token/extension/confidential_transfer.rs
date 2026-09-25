@@ -25,9 +25,11 @@ pub(in crate::parse_token) fn parse_confidential_transfer_instruction(
 				"auditorElGamalPubkey": Option::<PodElGamalPubkey>::from(initialize_mint_data.auditor_elgamal_pubkey).map(|k| k.to_string()),
 			});
 			let map = value.as_object_mut().unwrap();
+
 			if let Some(authority) = Option::<Pubkey>::from(initialize_mint_data.authority) {
 				map.insert("authority".to_string(), json!(authority.to_string()));
 			}
+
 			Ok(ParsedInstructionEnum {
 				instruction_type: "initializeConfidentialTransferMint".to_string(),
 				info: value,
@@ -92,6 +94,7 @@ pub(in crate::parse_token) fn parse_confidential_transfer_instruction(
 					3
 				}
 			};
+
 			parse_signers(
 				map,
 				offset,
@@ -140,6 +143,7 @@ pub(in crate::parse_token) fn parse_confidential_transfer_instruction(
 					"instructionsSysvar".to_string(),
 					json!(account_keys[account_indexes[1] as usize].to_string()),
 				);
+
 				if account_indexes.len() > 3 {
 					// Assume that the extra account is a proof account and not
 					// a multisig signer. This might be wrong, but it's the
@@ -153,6 +157,7 @@ pub(in crate::parse_token) fn parse_confidential_transfer_instruction(
 					2
 				}
 			};
+
 			parse_signers(
 				map,
 				offset,
@@ -213,6 +218,7 @@ pub(in crate::parse_token) fn parse_confidential_transfer_instruction(
 			});
 			let mut offset = 2;
 			let map = value.as_object_mut().unwrap();
+
 			if offset < account_indexes.len() - 1
 				&& (withdrawal_data.equality_proof_instruction_offset != 0
 					|| withdrawal_data.range_proof_instruction_offset != 0)
@@ -232,6 +238,7 @@ pub(in crate::parse_token) fn parse_confidential_transfer_instruction(
 				} else {
 					"equalityProofRecordAccount"
 				};
+
 				map.insert(
 					label.to_string(),
 					json!(account_keys[account_indexes[offset] as usize].to_string()),
@@ -245,12 +252,14 @@ pub(in crate::parse_token) fn parse_confidential_transfer_instruction(
 				} else {
 					"rangeProofRecordAccount"
 				};
+
 				map.insert(
 					label.to_string(),
 					json!(account_keys[account_indexes[offset] as usize].to_string()),
 				);
 				offset += 1;
 			}
+
 			parse_signers(
 				map,
 				offset,
@@ -282,6 +291,7 @@ pub(in crate::parse_token) fn parse_confidential_transfer_instruction(
 			});
 			let mut offset = 3;
 			let map = value.as_object_mut().unwrap();
+
 			if offset < account_indexes.len() - 1
 				&& (transfer_data.equality_proof_instruction_offset != 0
 					|| transfer_data.ciphertext_validity_proof_instruction_offset != 0
@@ -302,6 +312,7 @@ pub(in crate::parse_token) fn parse_confidential_transfer_instruction(
 				} else {
 					"equalityProofRecordAccount"
 				};
+
 				map.insert(
 					label.to_string(),
 					json!(account_keys[account_indexes[offset] as usize].to_string()),
@@ -315,6 +326,7 @@ pub(in crate::parse_token) fn parse_confidential_transfer_instruction(
 				} else {
 					"ciphertextValidityProofRecordAccount"
 				};
+
 				map.insert(
 					label.to_string(),
 					json!(account_keys[account_indexes[offset] as usize].to_string()),
@@ -328,6 +340,7 @@ pub(in crate::parse_token) fn parse_confidential_transfer_instruction(
 				} else {
 					"rangeProofRecordAccount"
 				};
+
 				map.insert(
 					label.to_string(),
 					json!(account_keys[account_indexes[offset] as usize].to_string()),
@@ -377,6 +390,7 @@ pub(in crate::parse_token) fn parse_confidential_transfer_instruction(
 
 			let mut offset = 3;
 			let map = value.as_object_mut().unwrap();
+
 			if offset < account_indexes.len() - 1
 				&& (equality_proof_instruction_offset != 0
 					|| transfer_amount_ciphertext_validity_proof_instruction_offset != 0
@@ -399,60 +413,70 @@ pub(in crate::parse_token) fn parse_confidential_transfer_instruction(
 				} else {
 					"equalityProofRecordAccount"
 				};
+
 				map.insert(
 					label.to_string(),
 					json!(account_keys[account_indexes[offset] as usize].to_string()),
 				);
 				offset += 1;
 			}
+
 			if offset < account_indexes.len() - 1 {
 				let label = if transfer_amount_ciphertext_validity_proof_instruction_offset == 0 {
 					"transferAmountCiphertextValidityProofContextStateAccount"
 				} else {
 					"transferAmountCiphertextValidityProofRecordAccount"
 				};
+
 				map.insert(
 					label.to_string(),
 					json!(account_keys[account_indexes[offset] as usize].to_string()),
 				);
 				offset += 1;
 			}
+
 			if offset < account_indexes.len() - 1 {
 				let label = if fee_ciphertext_validity_proof_instruction_offset == 0 {
 					"feeCiphertextValidityProofContextStateAccount"
 				} else {
 					"feeCiphertextValidityProofRecordAccount"
 				};
+
 				map.insert(
 					label.to_string(),
 					json!(account_keys[account_indexes[offset] as usize].to_string()),
 				);
 				offset += 1;
 			}
+
 			if offset < account_indexes.len() - 1 {
 				let label = if fee_sigma_proof_instruction_offset == 0 {
 					"feeSigmaProofContextStateAccount"
 				} else {
 					"feeSigmaProofRecordAccount"
 				};
+
 				map.insert(
 					label.to_string(),
 					json!(account_keys[account_indexes[offset] as usize].to_string()),
 				);
 				offset += 1;
 			}
+
 			if offset < account_indexes.len() - 1 {
 				let label = if range_proof_instruction_offset == 0 {
 					"rangeProofContextStateAccount"
 				} else {
 					"rangeProofRecordAccount"
 				};
+
 				map.insert(
 					label.to_string(),
 					json!(account_keys[account_indexes[offset] as usize].to_string()),
 				);
 				offset += 1;
 			}
+
 			parse_signers(
 				map,
 				offset,
@@ -615,6 +639,7 @@ mod test {
 
 	fn check_no_panic(mut instruction: Instruction) {
 		let account_meta = AccountMeta::new_readonly(Pubkey::new_unique(), false);
+
 		for i in 0..20 {
 			instruction.accounts = vec![account_meta.clone(); i];
 			let message = Message::new(&[instruction.clone()], None);
