@@ -10,11 +10,11 @@
 //!    `SubscriptionResponse<T>`; this is the per-notification tax a busy
 //!    `programSubscribe` pays.
 //! 2. **Fork replay** — `WebSocketProvider` shares one forked stream. A fork
-//!    cloned from an idle root starts at the root's offset (offset 0 without
-//!    a drain), so a new subscription re-reads and re-parses every buffered
-//!    frame before reaching live traffic: setup cost is O(history). The
-//!    "root advanced" variant models the fix (a task that keeps the root
-//!    fork at the live edge), where a new fork starts at O(1).
+//!    cloned from an idle root starts at the root's offset (offset 0 without a
+//!    drain), so a new subscription re-reads and re-parses every buffered frame
+//!    before reaching live traffic: setup cost is O(history). The "root
+//!    advanced" variant models the fix (a task that keeps the root fork at the
+//!    live edge), where a new fork starts at O(1).
 
 use base64::Engine;
 use criterion::Criterion;
@@ -106,10 +106,9 @@ fn bench_fork_replay(c: &mut Criterion) {
 			|b| {
 				b.iter_batched(
 					|| {
-						let mut root =
-							futures::stream::iter(std::hint::black_box(frames.clone()))
-								.map(Ok::<_, ()>)
-								.fork();
+						let mut root = futures::stream::iter(std::hint::black_box(frames.clone()))
+							.map(Ok::<_, ()>)
+							.fork();
 						while futures::executor::block_on(root.next()).is_some() {}
 						root
 					},

@@ -21,10 +21,8 @@ crate-type = ["cdylib", "lib"]
 
 [dependencies]
 async-trait = { workspace = true, default-features = true }
-async-tungstenite = { features = ["futures-03-sink"], workspace = true, default-features = true }
 base64 = { workspace = true, default-features = true }
 bs58 = { workspace = true, default-features = true }
-bv = { workspace = true, features = ["serde"], default-features = true }
 cfg-if = { workspace = true, default-features = true }
 derive_more = { workspace = true, features = ["debug", "deref", "deref_mut", "into", "into_iterator", "from"], default-features = true }
 fork_stream = { workspace = true, default-features = true }
@@ -32,7 +30,6 @@ futures = { workspace = true, default-features = true }
 futures-timer = { workspace = true, default-features = true }
 getrandom = { workspace = true, default-features = true }
 gloo-net = { workspace = true, features = ["websocket"], default-features = true }
-heck = { workspace = true, default-features = true }
 js-sys = { workspace = true, default-features = true }
 log = { workspace = true, default-features = true }
 pin-project = { workspace = true, default-features = true }
@@ -73,7 +70,6 @@ solana-transaction-status-client-types-wasm = { workspace = true }
 solana-transaction-status-wasm = { workspace = true }
 solana-version = { workspace = true, default-features = true }
 solana-vote-interface = { workspace = true, default-features = true, features = ["bincode", "serde"] }
-solana-zk-token-sdk = { workspace = true, default-features = true }
 spl-associated-token-account-interface = { workspace = true, default-features = true }
 spl-memo-interface = { workspace = true, default-features = true }
 spl-token-2022-interface = { workspace = true, features = ["serde"], default-features = true }

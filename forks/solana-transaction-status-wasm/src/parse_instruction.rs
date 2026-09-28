@@ -2,7 +2,6 @@ use std::collections::HashMap;
 use std::str::Utf8Error;
 use std::str::from_utf8;
 
-use inflector::Inflector;
 use serde::Deserialize;
 use serde::Serialize;
 use serde_json::Value;
@@ -127,11 +126,37 @@ pub fn parse(
 	};
 
 	Ok(ParsedInstruction {
-		program: format!("{program_name:?}").to_kebab_case(),
+		program: enum_name_to_kebab_case(&format!("{program_name:?}")),
 		program_id: program_id.to_string(),
 		parsed: parsed_json,
 		stack_height,
 	})
+}
+
+/// Convert an enum variant's `Debug` name (e.g. `SplToken`) to the
+/// kebab-case program name used on the wire (`spl-token`).
+///
+/// Hand-rolled so the fork does not pull the `Inflector` crate — and with it
+/// the entire `regex` stack — into every wasm build for one call site.
+/// Matches `Inflector`'s output for these variant names.
+fn enum_name_to_kebab_case(name: &str) -> String {
+	let mut out = String::with_capacity(name.len() + 4);
+	let mut previous_was_lowercase_or_digit = false;
+	for character in name.chars() {
+		if character.is_ascii_uppercase() {
+			if previous_was_lowercase_or_digit {
+				out.push('-');
+			}
+			out.push(character.to_ascii_lowercase());
+			previous_was_lowercase_or_digit = false;
+		} else if character.is_ascii_lowercase() || character.is_ascii_digit() {
+			out.push(character);
+			previous_was_lowercase_or_digit = character.is_ascii_lowercase();
+		} else {
+			previous_was_lowercase_or_digit = false;
+		}
+	}
+	out
 }
 
 fn parse_memo(instruction: &CompiledInstruction) -> Result<Value, ParseInstructionError> {

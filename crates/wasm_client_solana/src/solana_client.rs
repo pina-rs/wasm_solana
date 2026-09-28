@@ -1617,7 +1617,7 @@ impl SolanaRpcClient {
 	) -> ClientResult<Subscription<GetAccountInfoResponse>> {
 		let request: GetAccountInfoRequest = request.into();
 		let (id, subscription_id) = self.ws.create_subscription(request).await?;
-		let subscription = Subscription::new(&self.ws, id, subscription_id);
+		let subscription = Subscription::new(&self.ws, id, subscription_id)?;
 
 		Ok(subscription)
 	}
@@ -1640,7 +1640,7 @@ impl SolanaRpcClient {
 		request: BlockSubscribeRequest,
 	) -> ClientResult<Subscription<BlockNotificationResponse>> {
 		let (id, subscription_id) = self.ws.create_subscription(request).await?;
-		let subscription = Subscription::new(&self.ws, id, subscription_id);
+		let subscription = Subscription::new(&self.ws, id, subscription_id)?;
 
 		Ok(subscription)
 	}
@@ -1660,7 +1660,7 @@ impl SolanaRpcClient {
 		request: LogsSubscribeRequest,
 	) -> ClientResult<Subscription<LogsNotificationResponse>> {
 		let (id, subscription_id) = self.ws.create_subscription(request).await?;
-		let subscription = Subscription::new(&self.ws, id, subscription_id);
+		let subscription = Subscription::new(&self.ws, id, subscription_id)?;
 
 		Ok(subscription)
 	}
@@ -1680,7 +1680,7 @@ impl SolanaRpcClient {
 		request: ProgramSubscribeRequest,
 	) -> ClientResult<Subscription<GetProgramAccountsResponse>> {
 		let (id, subscription_id) = self.ws.create_subscription(request).await?;
-		let subscription = Subscription::new(&self.ws, id, subscription_id);
+		let subscription = Subscription::new(&self.ws, id, subscription_id)?;
 
 		Ok(subscription)
 	}

@@ -18,13 +18,13 @@
 use std::sync::Arc;
 
 use async_trait::async_trait;
-use base64::prelude::BASE64_STANDARD;
 use base64::Engine;
+use base64::prelude::BASE64_STANDARD;
 use criterion::BenchmarkId;
 use criterion::Criterion;
+use criterion::Throughput;
 use criterion::criterion_group;
 use criterion::criterion_main;
-use criterion::Throughput;
 use serde::Serialize;
 use serde_json::Value;
 use solana_commitment_config::CommitmentConfig;
@@ -37,13 +37,13 @@ use solana_transaction::Transaction;
 use solana_transaction::versioned::VersionedTransaction;
 use wasm_client_solana::ClientResponse;
 use wasm_client_solana::ClientResult;
+use wasm_client_solana::Context;
 use wasm_client_solana::GetAccountInfoResponse;
 use wasm_client_solana::GetBalanceResponse;
 use wasm_client_solana::GetMultipleAccountsResponse;
 use wasm_client_solana::RpcKeyedAccount;
 use wasm_client_solana::RpcProvider;
 use wasm_client_solana::SolanaRpcClient;
-use wasm_client_solana::Context;
 use wasm_client_solana::rpc_config::serialize_and_encode;
 use wasm_client_solana::solana_account_decoder::UiAccount;
 use wasm_client_solana::solana_account_decoder::UiAccountData;
@@ -126,8 +126,9 @@ fn bench_dispatch(c: &mut Criterion) {
 	}
 
 	for (count, size) in [(10, 1024), (100, 1024)] {
-		let accounts: Vec<Option<UiAccount>> =
-			(0..count).map(|i| Some(ui_account(size, i as u8))).collect();
+		let accounts: Vec<Option<UiAccount>> = (0..count)
+			.map(|i| Some(ui_account(size, i as u8)))
+			.collect();
 		let client = mock_client(envelope(GetMultipleAccountsResponse {
 			context: Context { slot: 1 },
 			value: accounts,
@@ -149,9 +150,11 @@ fn bench_dispatch(c: &mut Criterion) {
 	{
 		let count = 1000;
 		let accounts: Vec<RpcKeyedAccount> = (0..count)
-			.map(|i| RpcKeyedAccount {
-				pubkey: Pubkey::new_unique(),
-				account: ui_account(256, i as u8),
+			.map(|i| {
+				RpcKeyedAccount {
+					pubkey: Pubkey::new_unique(),
+					account: ui_account(256, i as u8),
+				}
 			})
 			.collect();
 		// `GetProgramAccountsResponse` is deserialize-only, so the envelope is
@@ -170,7 +173,8 @@ fn bench_dispatch(c: &mut Criterion) {
 		group.bench_function("get_program_accounts/1000x256b", |b| {
 			b.iter(|| {
 				let program = std::hint::black_box(pubkey);
-				futures::executor::block_on(client.get_program_accounts(&program)).expect("accounts")
+				futures::executor::block_on(client.get_program_accounts(&program))
+					.expect("accounts")
 			})
 		});
 	}

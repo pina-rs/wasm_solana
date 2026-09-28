@@ -26,7 +26,6 @@ repository = "https://github.com/ifiokjr/wasm_solana"
 rust-version = "1.89.0"
 
 [workspace.dependencies]
-Inflector = { default-features = false, version = "^0.11" }
 agave-reserved-account-keys = { default-features = false, features = ["agave-unstable-api"], version = "^4.2" }
 anyhow = { default-features = false, version = "^1" }
 assert2 = { default-features = false, version = "^0.3" }

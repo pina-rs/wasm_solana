@@ -940,22 +940,6 @@ dependencies = [
 
 [[package]]
 name = "async-tungstenite"
-version = "0.28.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1c348fb0b6d132c596eca3dcd941df48fb597aafcb07a738ec41c004b087dc99"
-dependencies = [
- "atomic-waker",
- "futures-core",
- "futures-io",
- "futures-task",
- "futures-util",
- "log",
- "pin-project-lite",
- "tungstenite 0.24.0",
-]
-
-[[package]]
-name = "async-tungstenite"
 version = "0.31.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "ee88b4c88ac8c9ea446ad43498955750a4bbe64c4392f21ccfe5d952865e318f"
@@ -1151,12 +1135,6 @@ name = "base64"
 version = "0.22.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "72b3254f16251a8381aa12e40e3c4d2f0199f8c6508fbecb9d91f575e0fbb8c6"
-
-[[package]]
-name = "base64"
-version = "0.23.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ac07cdecf99051d9a5238b80f35af32cdeba5b336e55d957b318b50137e18da5"
 
 [[package]]
 name = "base64ct"
@@ -2830,11 +2808,11 @@ checksum = "cd417de3d1d015fc3bfd2b1ea46dfc7bab72ef86f1cc7cc9c78e728b34a6d1fd"
 
 [[package]]
 name = "futures-timeout"
-version = "0.2.1"
+version = "0.1.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e58ec6ce8fe4cc0b1f82f58eec8e6d1cd08584cc40aadab74cb925ff1b2750f2"
+checksum = "fc766541fbac66e9c9b53a92623c38e9a22768a4bd6a0c49a0b564b0126474e2"
 dependencies = [
- "futures-core",
+ "futures 0.3.34",
  "futures-timer",
  "pin-project",
 ]
@@ -2962,9 +2940,9 @@ dependencies = [
 
 [[package]]
 name = "gloo-net"
-version = "0.7.0"
+version = "0.6.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a6420f887c48417e9e86c6cf61274eb231830cccc100e49613f7952e269a1fe1"
+checksum = "c06f627b1a58ca3d42b45d6104bf1e1a03799df472df00988b6ba21accc10580"
 dependencies = [
  "futures-channel",
  "futures-core",
@@ -2975,7 +2953,7 @@ dependencies = [
  "pin-project",
  "serde",
  "serde_json",
- "thiserror 2.0.20",
+ "thiserror 1.0.69",
  "wasm-bindgen",
  "wasm-bindgen-futures",
  "web-sys",
@@ -2995,9 +2973,9 @@ dependencies = [
 
 [[package]]
 name = "gloo-utils"
-version = "0.3.0"
+version = "0.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "4202275d95a142fa209a1e35e91c250a710c5600731372cd3464a39ed01573d6"
+checksum = "0b5555354113b18c547c1d3a98fbf7fb32a9ff4f6fa112ce823a21641a0ba3aa"
 dependencies = [
  "js-sys",
  "serde",
@@ -4258,7 +4236,7 @@ dependencies = [
 
 [[package]]
 name = "memory_wallet"
-version = "0.12.1"
+version = "0.11.2"
 dependencies = [
  "anyhow",
  "assert2",
@@ -5697,7 +5675,7 @@ version = "0.5.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "cd5f79b25f7f17a62cc9337108974431a66ae5a723ac0d9fe78ac1cce2027720"
 dependencies = [
- "async-tungstenite 0.31.0",
+ "async-tungstenite",
  "bytes",
  "futures-util",
  "reqwest 0.12.28",
@@ -6538,7 +6516,7 @@ dependencies = [
 name = "solana-account-decoder-client-types-wasm"
 version = "4.0.2"
 dependencies = [
- "base64 0.23.1",
+ "base64 0.22.1",
  "bs58",
  "serde",
  "serde_derive",
@@ -6554,9 +6532,8 @@ dependencies = [
 name = "solana-account-decoder-wasm"
 version = "4.0.2"
 dependencies = [
- "Inflector",
  "assert_matches",
- "base64 0.23.1",
+ "base64 0.22.1",
  "bincode",
  "bs58",
  "bv",
@@ -7425,20 +7402,6 @@ dependencies = [
 
 [[package]]
 name = "solana-curve25519"
-version = "3.1.14"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "5aff7432cdf2ec6a44ac06b4d64d2ee006f6c0066d6456e032a7fe25be40cd5c"
-dependencies = [
- "bytemuck",
- "bytemuck_derive",
- "curve25519-dalek 4.1.3",
- "solana-define-syscall 3.0.0",
- "subtle",
- "thiserror 2.0.20",
-]
-
-[[package]]
-name = "solana-curve25519"
 version = "4.0.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "14b4d2a4bf0d0b0a86c22111917e86e8bd39a7b31420fb2c7d73eb83761fc7af"
@@ -7450,12 +7413,6 @@ dependencies = [
  "subtle",
  "thiserror 2.0.20",
 ]
-
-[[package]]
-name = "solana-define-syscall"
-version = "3.0.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f9697086a4e102d28a156b8d6b521730335d6951bd39a5e766512bbe09007cee"
 
 [[package]]
 name = "solana-define-syscall"
@@ -9613,7 +9570,7 @@ dependencies = [
  "solana-bn254",
  "solana-clock",
  "solana-cpi",
- "solana-curve25519 4.0.1",
+ "solana-curve25519",
  "solana-hash 4.5.0",
  "solana-hash-512",
  "solana-instruction",
@@ -10019,7 +9976,7 @@ dependencies = [
 name = "solana-transaction-status-client-types-wasm"
 version = "4.0.2"
 dependencies = [
- "base64 0.23.1",
+ "base64 0.22.1",
  "bincode",
  "bs58",
  "serde",
@@ -10047,9 +10004,8 @@ dependencies = [
 name = "solana-transaction-status-wasm"
 version = "4.0.2"
 dependencies = [
- "Inflector",
  "agave-reserved-account-keys",
- "base64 0.23.1",
+ "base64 0.22.1",
  "bincode",
  "borsh",
  "bs58",
@@ -10446,40 +10402,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "solana-zk-token-sdk"
-version = "3.1.14"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "6e5fe47f0389206960e272a6f1af3b06c2b32551be77f9e4254564b6d1177b83"
-dependencies = [
- "aes-gcm-siv",
- "base64 0.22.1",
- "bincode",
- "bytemuck",
- "bytemuck_derive",
- "curve25519-dalek 4.1.3",
- "itertools 0.12.1",
- "merlin",
- "num-derive",
- "num-traits",
- "rand 0.8.8",
- "serde",
- "serde_json",
- "sha3",
- "solana-curve25519 3.1.14",
- "solana-derivation-path",
- "solana-instruction",
- "solana-pubkey 3.0.0",
- "solana-sdk-ids",
- "solana-seed-derivable",
- "solana-seed-phrase",
- "solana-signature",
- "solana-signer",
- "subtle",
- "thiserror 2.0.20",
- "zeroize",
-]
-
-[[package]]
 name = "spin"
 version = "0.9.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -10622,7 +10544,7 @@ dependencies = [
  "bytemuck",
  "solana-account-info",
  "solana-address 2.6.1",
- "solana-curve25519 4.0.1",
+ "solana-curve25519",
  "solana-instruction",
  "solana-instructions-sysvar 3.0.1",
  "solana-msg",
@@ -10940,7 +10862,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "32497e9a4c7b38532efcdebeef879707aa9f794296a4f0244f6f69e9bc8574bd"
 dependencies = [
  "fastrand",
- "getrandom 0.4.3",
+ "getrandom 0.3.4",
  "once_cell",
  "rustix",
  "windows-sys 0.61.2",
@@ -11019,7 +10941,7 @@ dependencies = [
 
 [[package]]
 name = "test_utils_insta"
-version = "0.12.1"
+version = "0.11.2"
 dependencies = [
  "anyhow",
  "assert2",
@@ -11028,14 +10950,14 @@ dependencies = [
 
 [[package]]
 name = "test_utils_keypairs"
-version = "0.12.1"
+version = "0.11.2"
 dependencies = [
  "solana-keypair",
 ]
 
 [[package]]
 name = "test_utils_solana"
-version = "0.12.1"
+version = "0.11.2"
 dependencies = [
  "anyhow",
  "assert2",
@@ -11633,24 +11555,6 @@ checksum = "e421abadd41a4225275504ea4d6566923418b7f05506fbc9c0fe86ba7396114b"
 
 [[package]]
 name = "tungstenite"
-version = "0.24.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "18e5b8366ee7a95b16d32197d0b2604b43a0be89dc5fac9f8e96ccafbaedda8a"
-dependencies = [
- "byteorder",
- "bytes",
- "data-encoding",
- "http 1.5.0",
- "httparse",
- "log",
- "rand 0.8.8",
- "sha1",
- "thiserror 1.0.69",
- "utf-8",
-]
-
-[[package]]
-name = "tungstenite"
 version = "0.27.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "eadc29d668c91fcc564941132e17b28a7ceb2f3ebf0b9dae3e03fd7a6748eb0d"
@@ -12049,15 +11953,13 @@ checksum = "f37b4f992cebe528ef34964ae69681ac0fe7080071e7298e46008f9d380302af"
 
 [[package]]
 name = "wasm_client_solana"
-version = "0.12.1"
+version = "0.11.2"
 dependencies = [
  "anyhow",
  "assert2",
  "async-trait",
- "async-tungstenite 0.28.2",
- "base64 0.23.1",
+ "base64 0.22.1",
  "bs58",
- "bv",
  "cfg-if 1.0.4",
  "criterion",
  "derive_more 2.1.1",
@@ -12068,7 +11970,6 @@ dependencies = [
  "getrandom 0.3.4",
  "getrandom 0.4.3",
  "gloo-net",
- "heck",
  "insta",
  "js-sys",
  "log",
@@ -12111,7 +12012,6 @@ dependencies = [
  "solana-transaction-status-wasm",
  "solana-version",
  "solana-vote-interface",
- "solana-zk-token-sdk",
  "spl-associated-token-account-interface",
  "spl-memo-interface",
  "spl-pod",
