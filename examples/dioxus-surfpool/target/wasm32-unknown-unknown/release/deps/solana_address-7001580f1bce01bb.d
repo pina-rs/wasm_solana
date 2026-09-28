@@ -1,0 +1,10 @@
+/Users/ifiokjr/Developer/projects/wasm_solana/wasm_solana/examples/dioxus-surfpool/target/wasm32-unknown-unknown/release/deps/solana_address-7001580f1bce01bb.d: /Users/ifiokjr/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/solana-address-2.6.1/src/lib.rs /Users/ifiokjr/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/solana-address-2.6.1/src/derive.rs /Users/ifiokjr/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/solana-address-2.6.1/src/error.rs /Users/ifiokjr/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/solana-address-2.6.1/src/syscalls.rs
+
+/Users/ifiokjr/Developer/projects/wasm_solana/wasm_solana/examples/dioxus-surfpool/target/wasm32-unknown-unknown/release/deps/libsolana_address-7001580f1bce01bb.rlib: /Users/ifiokjr/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/solana-address-2.6.1/src/lib.rs /Users/ifiokjr/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/solana-address-2.6.1/src/derive.rs /Users/ifiokjr/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/solana-address-2.6.1/src/error.rs /Users/ifiokjr/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/solana-address-2.6.1/src/syscalls.rs
+
+/Users/ifiokjr/Developer/projects/wasm_solana/wasm_solana/examples/dioxus-surfpool/target/wasm32-unknown-unknown/release/deps/libsolana_address-7001580f1bce01bb.rmeta: /Users/ifiokjr/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/solana-address-2.6.1/src/lib.rs /Users/ifiokjr/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/solana-address-2.6.1/src/derive.rs /Users/ifiokjr/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/solana-address-2.6.1/src/error.rs /Users/ifiokjr/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/solana-address-2.6.1/src/syscalls.rs
+
+/Users/ifiokjr/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/solana-address-2.6.1/src/lib.rs:
+/Users/ifiokjr/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/solana-address-2.6.1/src/derive.rs:
+/Users/ifiokjr/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/solana-address-2.6.1/src/error.rs:
+/Users/ifiokjr/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/solana-address-2.6.1/src/syscalls.rs:
