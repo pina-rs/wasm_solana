@@ -17,6 +17,7 @@ pub fn parse_vote(
 ) -> Result<ParsedInstructionEnum, ParseInstructionError> {
 	let vote_instruction: VoteInstruction = deserialize(&instruction.data)
 		.map_err(|_| ParseInstructionError::InstructionNotParsable(ParsableProgram::Vote))?;
+
 	match instruction.accounts.iter().max() {
 		Some(index) if (*index as usize) < account_keys.len() => {}
 		_ => {
@@ -26,6 +27,7 @@ pub fn parse_vote(
 			));
 		}
 	}
+
 	match vote_instruction {
 		VoteInstruction::InitializeAccount(vote_init) => {
 			check_num_vote_accounts(&instruction.accounts, 4)?;

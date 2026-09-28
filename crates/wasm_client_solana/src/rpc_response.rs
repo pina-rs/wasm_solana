@@ -526,9 +526,11 @@ mod pubkey_string_map {
 		S: Serializer,
 	{
 		let mut ser_map = serializer.serialize_map(Some(map.len()))?;
+
 		for (k, v) in map {
 			ser_map.serialize_entry(&k.to_string(), v)?;
 		}
+
 		ser_map.end()
 	}
 

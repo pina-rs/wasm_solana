@@ -105,6 +105,7 @@ pub fn parse(
 	let program_name = PARSABLE_PROGRAM_IDS
 		.get(program_id)
 		.ok_or(ParseInstructionError::ProgramNotParsable)?;
+
 	let parsed_json = match program_name {
 		ParsableProgram::AddressLookupTable => {
 			serde_json::to_value(parse_address_lookup_table(instruction, account_keys)?)?
@@ -124,6 +125,7 @@ pub fn parse(
 		ParsableProgram::System => serde_json::to_value(parse_system(instruction, account_keys)?)?,
 		ParsableProgram::Vote => serde_json::to_value(parse_vote(instruction, account_keys)?)?,
 	};
+
 	Ok(ParsedInstruction {
 		program: format!("{program_name:?}").to_kebab_case(),
 		program_id: program_id.to_string(),

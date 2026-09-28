@@ -28,6 +28,7 @@ pub(in crate::parse_token) fn parse_confidential_transfer_instruction(
 			if let Some(authority) = Option::<Pubkey>::from(initialize_mint_data.authority) {
 				map.insert("authority".to_string(), json!(authority.to_string()));
 			}
+
 			Ok(ParsedInstructionEnum {
 				instruction_type: "initializeConfidentialTransferMint".to_string(),
 				info: value,
@@ -92,6 +93,7 @@ pub(in crate::parse_token) fn parse_confidential_transfer_instruction(
 					3
 				}
 			};
+
 			parse_signers(
 				map,
 				offset,
@@ -140,6 +142,7 @@ pub(in crate::parse_token) fn parse_confidential_transfer_instruction(
 					"instructionsSysvar".to_string(),
 					json!(account_keys[account_indexes[1] as usize].to_string()),
 				);
+
 				if account_indexes.len() > 3 {
 					// Assume that the extra account is a proof account and not
 					// a multisig signer. This might be wrong, but it's the
@@ -153,6 +156,7 @@ pub(in crate::parse_token) fn parse_confidential_transfer_instruction(
 					2
 				}
 			};
+
 			parse_signers(
 				map,
 				offset,
@@ -232,6 +236,7 @@ pub(in crate::parse_token) fn parse_confidential_transfer_instruction(
 				} else {
 					"equalityProofRecordAccount"
 				};
+
 				map.insert(
 					label.to_string(),
 					json!(account_keys[account_indexes[offset] as usize].to_string()),
@@ -245,12 +250,14 @@ pub(in crate::parse_token) fn parse_confidential_transfer_instruction(
 				} else {
 					"rangeProofRecordAccount"
 				};
+
 				map.insert(
 					label.to_string(),
 					json!(account_keys[account_indexes[offset] as usize].to_string()),
 				);
 				offset += 1;
 			}
+
 			parse_signers(
 				map,
 				offset,
@@ -302,6 +309,7 @@ pub(in crate::parse_token) fn parse_confidential_transfer_instruction(
 				} else {
 					"equalityProofRecordAccount"
 				};
+
 				map.insert(
 					label.to_string(),
 					json!(account_keys[account_indexes[offset] as usize].to_string()),
@@ -315,6 +323,7 @@ pub(in crate::parse_token) fn parse_confidential_transfer_instruction(
 				} else {
 					"ciphertextValidityProofRecordAccount"
 				};
+
 				map.insert(
 					label.to_string(),
 					json!(account_keys[account_indexes[offset] as usize].to_string()),
@@ -328,6 +337,7 @@ pub(in crate::parse_token) fn parse_confidential_transfer_instruction(
 				} else {
 					"rangeProofRecordAccount"
 				};
+
 				map.insert(
 					label.to_string(),
 					json!(account_keys[account_indexes[offset] as usize].to_string()),
@@ -399,6 +409,7 @@ pub(in crate::parse_token) fn parse_confidential_transfer_instruction(
 				} else {
 					"equalityProofRecordAccount"
 				};
+
 				map.insert(
 					label.to_string(),
 					json!(account_keys[account_indexes[offset] as usize].to_string()),
@@ -411,6 +422,7 @@ pub(in crate::parse_token) fn parse_confidential_transfer_instruction(
 				} else {
 					"transferAmountCiphertextValidityProofRecordAccount"
 				};
+
 				map.insert(
 					label.to_string(),
 					json!(account_keys[account_indexes[offset] as usize].to_string()),
@@ -423,6 +435,7 @@ pub(in crate::parse_token) fn parse_confidential_transfer_instruction(
 				} else {
 					"feeCiphertextValidityProofRecordAccount"
 				};
+
 				map.insert(
 					label.to_string(),
 					json!(account_keys[account_indexes[offset] as usize].to_string()),
@@ -435,6 +448,7 @@ pub(in crate::parse_token) fn parse_confidential_transfer_instruction(
 				} else {
 					"feeSigmaProofRecordAccount"
 				};
+
 				map.insert(
 					label.to_string(),
 					json!(account_keys[account_indexes[offset] as usize].to_string()),
@@ -447,12 +461,14 @@ pub(in crate::parse_token) fn parse_confidential_transfer_instruction(
 				} else {
 					"rangeProofRecordAccount"
 				};
+
 				map.insert(
 					label.to_string(),
 					json!(account_keys[account_indexes[offset] as usize].to_string()),
 				);
 				offset += 1;
 			}
+
 			parse_signers(
 				map,
 				offset,
@@ -615,6 +631,7 @@ mod test {
 
 	fn check_no_panic(mut instruction: Instruction) {
 		let account_meta = AccountMeta::new_readonly(Pubkey::new_unique(), false);
+
 		for i in 0..20 {
 			instruction.accounts = vec![account_meta.clone(); i];
 			let message = Message::new(&[instruction.clone()], None);

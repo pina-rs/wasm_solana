@@ -46,6 +46,7 @@ pub fn parse_token_v3(
 			.iter()
 			.map(|extension_type| parse_extension::<Account>(extension_type, &account))
 			.collect();
+
 		return Ok(TokenAccountType::Account(UiTokenAccount {
 			mint: account.base.mint.to_string(),
 			owner: account.base.owner.to_string(),
@@ -54,6 +55,7 @@ pub fn parse_token_v3(
 				COption::Some(pubkey) => Some(pubkey.to_string()),
 				COption::None => None,
 			},
+
 			state: convert_account_state(account.base.state),
 			is_native: account.base.is_native(),
 			rent_exempt_reserve: match account.base.is_native {
@@ -74,20 +76,24 @@ pub fn parse_token_v3(
 				COption::Some(pubkey) => Some(pubkey.to_string()),
 				COption::None => None,
 			},
+
 			extensions: ui_extensions,
 		}));
 	}
+
 	if let Ok(mint) = StateWithExtensions::<Mint>::unpack(data) {
 		let extension_types = mint.get_extension_types().unwrap_or_default();
 		let ui_extensions = extension_types
 			.iter()
 			.map(|extension_type| parse_extension::<Mint>(extension_type, &mint))
 			.collect();
+
 		return Ok(TokenAccountType::Mint(UiMint {
 			mint_authority: match mint.base.mint_authority {
 				COption::Some(pubkey) => Some(pubkey.to_string()),
 				COption::None => None,
 			},
+
 			supply: mint.base.supply.to_string(),
 			decimals: mint.base.decimals,
 			is_initialized: mint.base.is_initialized,
@@ -95,9 +101,11 @@ pub fn parse_token_v3(
 				COption::Some(pubkey) => Some(pubkey.to_string()),
 				COption::None => None,
 			},
+
 			extensions: ui_extensions,
 		}));
 	}
+
 	if data.len() == Multisig::get_packed_len() {
 		let multisig = Multisig::unpack(data)
 			.map_err(|_| ParseAccountError::AccountNotParsable(ParsableAccount::SplToken))?;

@@ -15,6 +15,7 @@ pub fn parse_system(
 ) -> Result<ParsedInstructionEnum, ParseInstructionError> {
 	let system_instruction: SystemInstruction = deserialize(&instruction.data)
 		.map_err(|_| ParseInstructionError::InstructionNotParsable(ParsableProgram::System))?;
+
 	match instruction.accounts.iter().max() {
 		Some(index) if (*index as usize) < account_keys.len() => {}
 		_ => {
@@ -24,6 +25,7 @@ pub fn parse_system(
 			));
 		}
 	}
+
 	match system_instruction {
 		SystemInstruction::CreateAccount {
 			lamports,

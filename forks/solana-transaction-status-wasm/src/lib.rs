@@ -137,6 +137,7 @@ pub fn parse_ui_instruction(
 	stack_height: Option<u32>,
 ) -> UiInstruction {
 	let program_id = &account_keys[instruction.program_id_index as usize];
+
 	if let Ok(parsed_instruction) = parse(program_id, instruction, account_keys, stack_height) {
 		UiInstruction::Parsed(UiParsedInstruction::Parsed(parsed_instruction))
 	} else {
@@ -210,11 +211,13 @@ fn build_simple_ui_transaction_status_meta(
 			.post_token_balances
 			.map(|balance| balance.into_iter().map(Into::into).collect())
 			.into(),
+
 		rewards: if show_rewards {
 			meta.rewards.into()
 		} else {
 			OptionSerializer::Skip
 		},
+
 		loaded_addresses: OptionSerializer::Skip,
 		return_data: OptionSerializer::Skip,
 		compute_units_consumed: OptionSerializer::Skip,
@@ -408,6 +411,7 @@ impl ConfirmedBlock {
 				)
 			}
 		};
+
 		Ok(UiConfirmedBlock {
 			previous_blockhash: self.previous_blockhash,
 			blockhash: self.blockhash,
@@ -419,6 +423,7 @@ impl ConfirmedBlock {
 			} else {
 				None
 			},
+
 			num_reward_partitions: self.num_partitions,
 			block_time: self.block_time,
 			block_height: self.block_height,
@@ -578,9 +583,11 @@ impl VersionedTransactionWithStatusMeta {
 					if !show_rewards {
 						meta.rewards = OptionSerializer::None;
 					}
+
 					meta
 				}
 			}),
+
 			version,
 		})
 	}

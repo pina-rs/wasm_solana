@@ -94,6 +94,7 @@ pub(in crate::parse_token) fn parse_token_metadata_instruction(
 			if let Some(end) = *end {
 				map.insert("end".to_string(), json!(end));
 			}
+
 			Ok(ParsedInstructionEnum {
 				instruction_type: "emitTokenMetadata".to_string(),
 				info: value,

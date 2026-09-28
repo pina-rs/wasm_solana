@@ -348,11 +348,13 @@ impl<'de> DeserializeTrait<'de> for UiTransactionError {
 				from_value(instruction_error.clone())
 			}
 			.map_err(|e| DeserializeError::custom(e.to_string()))?;
+
 			return Ok(UiTransactionError(TransactionError::InstructionError(
 				outer_instruction_index,
 				err,
 			)));
 		}
+
 		let err = TransactionError::deserialize(value).map_err(de::Error::custom)?;
 		Ok(UiTransactionError(err))
 	}
@@ -538,11 +540,13 @@ impl From<TransactionTokenBalance> for UiTransactionTokenBalance {
 			account_index: token_balance.account_index,
 			mint: token_balance.mint,
 			ui_token_amount: token_balance.ui_token_amount,
+
 			owner: if !token_balance.owner.is_empty() {
 				OptionSerializer::Some(token_balance.owner)
 			} else {
 				OptionSerializer::Skip
 			},
+
 			program_id: if !token_balance.program_id.is_empty() {
 				OptionSerializer::Some(token_balance.program_id)
 			} else {

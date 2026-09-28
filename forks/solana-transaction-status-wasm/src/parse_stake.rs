@@ -17,6 +17,7 @@ pub fn parse_stake(
 ) -> Result<ParsedInstructionEnum, ParseInstructionError> {
 	let stake_instruction: StakeInstruction = deserialize(&instruction.data)
 		.map_err(|_| ParseInstructionError::InstructionNotParsable(ParsableProgram::Stake))?;
+
 	match instruction.accounts.iter().max() {
 		Some(index) if (*index as usize) < account_keys.len() => {}
 		_ => {
@@ -26,6 +27,7 @@ pub fn parse_stake(
 			));
 		}
 	}
+
 	match stake_instruction {
 		StakeInstruction::Initialize(authorized, lockup) => {
 			check_num_stake_accounts(&instruction.accounts, 2)?;
@@ -64,6 +66,7 @@ pub fn parse_stake(
 					json!(account_keys[instruction.accounts[3] as usize].to_string()),
 				);
 			}
+
 			Ok(ParsedInstructionEnum {
 				instruction_type: "authorize".to_string(),
 				info: value,
@@ -112,6 +115,7 @@ pub fn parse_stake(
 					json!(account_keys[instruction.accounts[5] as usize].to_string()),
 				);
 			}
+
 			Ok(ParsedInstructionEnum {
 				instruction_type: "withdraw".to_string(),
 				info: value,
@@ -140,6 +144,7 @@ pub fn parse_stake(
 			if let Some(custodian) = lockup_args.custodian {
 				lockup_map.insert("custodian".to_string(), json!(custodian.to_string()));
 			}
+
 			Ok(ParsedInstructionEnum {
 				instruction_type: "setLockup".to_string(),
 				info: json!({
@@ -185,6 +190,7 @@ pub fn parse_stake(
 					json!(account_keys[instruction.accounts[3] as usize].to_string()),
 				);
 			}
+
 			Ok(ParsedInstructionEnum {
 				instruction_type: "authorizeWithSeed".to_string(),
 				info: value,
@@ -218,6 +224,7 @@ pub fn parse_stake(
 					json!(account_keys[instruction.accounts[4] as usize].to_string()),
 				);
 			}
+
 			Ok(ParsedInstructionEnum {
 				instruction_type: "authorizeChecked".to_string(),
 				info: value,
@@ -241,6 +248,7 @@ pub fn parse_stake(
 					json!(account_keys[instruction.accounts[4] as usize].to_string()),
 				);
 			}
+
 			Ok(ParsedInstructionEnum {
 				instruction_type: "authorizeCheckedWithSeed".to_string(),
 				info: value,
@@ -261,6 +269,7 @@ pub fn parse_stake(
 					json!(account_keys[instruction.accounts[2] as usize].to_string()),
 				);
 			}
+
 			Ok(ParsedInstructionEnum {
 				instruction_type: "setLockupChecked".to_string(),
 				info: json!({
