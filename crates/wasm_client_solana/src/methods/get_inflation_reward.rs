@@ -9,18 +9,25 @@ use crate::impl_http_method;
 use crate::rpc_config::RpcEpochConfig;
 use crate::rpc_response::RpcInflationReward;
 
+/// Request for the `getInflationReward` RPC method, which returns the inflation
+/// reward paid to each address for an epoch.
 #[serde_as]
 #[skip_serializing_none]
 #[derive(Debug, Serialize_tuple)]
 pub struct GetInflationRewardRequest {
+	/// Base58 pubkeys of the accounts to query rewards for.
 	#[serde_as(as = "Vec<DisplayFromStr>")]
 	pub addresses: Vec<Pubkey>,
+	/// Config selecting the epoch, commitment, and minimum context slot of the
+	/// query. Defaults to the previous epoch.
 	pub config: Option<RpcEpochConfig>,
 }
 
 impl_http_method!(GetInflationRewardRequest, "getInflationReward");
 
 impl GetInflationRewardRequest {
+	/// Creates a request for the given addresses using the default epoch
+	/// config.
 	pub fn new(addresses: Vec<Pubkey>) -> Self {
 		Self {
 			addresses,
@@ -28,6 +35,7 @@ impl GetInflationRewardRequest {
 		}
 	}
 
+	/// Creates a request for the given addresses with an explicit epoch config.
 	pub fn new_with_config(addresses: Vec<Pubkey>, config: RpcEpochConfig) -> Self {
 		Self {
 			addresses,
@@ -36,6 +44,7 @@ impl GetInflationRewardRequest {
 	}
 }
 
+/// Response for the `getInflationReward` RPC method.
 #[derive(Debug, Deserialize, PartialEq, Eq)]
 pub struct GetInflationRewardResponse(Vec<Option<RpcInflationReward>>);
 

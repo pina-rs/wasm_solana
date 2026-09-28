@@ -5,11 +5,14 @@ use serde::Serialize;
 use crate::impl_http_method;
 use crate::rpc_response::RpcInflationRate;
 
+/// Request for the `getInflationRate` RPC method, which returns the inflation
+/// rate for the current epoch.
 #[derive(Debug, Serialize)]
 pub struct GetInflationRateRequest;
 
 impl_http_method!(GetInflationRateRequest, "getInflationRate");
 
+/// Response for the `getInflationRate` RPC method.
 #[derive(Debug, Deserialize, Into)]
 pub struct GetInflationRateResponse(RpcInflationRate);
 

@@ -1,3 +1,8 @@
+//! Constant keypairs with well known addresses for use in tests.
+//!
+//! Each constant holds the 64 byte secret key of a deterministic account so
+//! that tests across crates can rely on the same addresses.
+
 use solana_keypair::Keypair;
 
 /// `tBuug63EhqE836n1dirg3sZ5KwZuG6P6i5nDHYrryyX`
@@ -35,18 +40,24 @@ pub const SECRET_KEY_WALLET: &[u8] = &[
 	174, 75, 215,
 ];
 
+/// The admin [`Keypair`] for `4z5X2suocz9szaQnSshj2AW8tuLgUVmYUxiW9hhPaRHs`.
 pub fn get_admin_keypair() -> Keypair {
 	Keypair::try_from(SECRET_KEY_ADMIN).unwrap()
 }
 
+/// The authority [`Keypair`] for
+/// `EjxoynXa5jTq4MyZzWtTz6Uq8UHQDxebkWhvEkDXoZxH`.
 pub fn get_authority_keypair() -> Keypair {
 	Keypair::try_from(SECRET_KEY_AUTHORITY).unwrap()
 }
 
+/// The treasury [`Keypair`] for `tBuug63EhqE836n1dirg3sZ5KwZuG6P6i5nDHYrryyX`.
 pub fn get_treasury_keypair() -> Keypair {
 	Keypair::try_from(SECRET_KEY_TREASURY).unwrap()
 }
 
+/// The user wallet [`Keypair`] for
+/// `B6FAryxc6pfLuK4to1BuvhqVJQm2V1cthguAmSPvqPug`.
 pub fn get_wallet_keypair() -> Keypair {
 	Keypair::try_from(SECRET_KEY_WALLET).unwrap()
 }

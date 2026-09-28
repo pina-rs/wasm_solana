@@ -11,20 +11,31 @@ use crate::impl_http_method;
 use crate::rpc_config::RpcBlockConfig;
 use crate::solana_transaction_status::UiConfirmedBlock;
 
+/// Request for the `getBlock` RPC method, which returns a confirmed block with
+/// all of its transactions at the given slot.
 #[skip_serializing_none]
 #[derive(Debug, Serialize_tuple, Deserialize_tuple)]
 pub struct GetBlockRequest {
+	/// Slot of the block to return.
 	pub slot: Slot,
+	/// Config controlling the transaction encoding, rewards, transaction
+	/// detail level, and the highest transaction version that may be returned.
 	pub config: Option<RpcBlockConfig>,
 }
 
 impl_http_method!(GetBlockRequest, "getBlock");
 
 impl GetBlockRequest {
+	/// Creates a request using the node's default block config. The `txv1`
+	/// feature gate is active on mainnet, so omitting
+	/// `maxSupportedTransactionVersion` makes the node reject the whole block.
 	pub fn new(slot: Slot) -> Self {
 		Self { slot, config: None }
 	}
 
+	/// Creates a request with an explicit block config. Set
+	/// `maxSupportedTransactionVersion` to read blocks that contain v1
+	/// transactions.
 	pub fn new_with_config(slot: Slot, config: RpcBlockConfig) -> Self {
 		Self {
 			slot,
@@ -33,6 +44,7 @@ impl GetBlockRequest {
 	}
 }
 
+/// Response for the `getBlock` RPC method.
 #[derive(Debug, Serialize, Deserialize, PartialEq)]
 pub struct GetBlockResponse(UiConfirmedBlock);
 

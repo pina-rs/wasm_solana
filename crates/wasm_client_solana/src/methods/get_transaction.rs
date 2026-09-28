@@ -13,12 +13,17 @@ use crate::impl_http_method;
 use crate::rpc_config::RpcTransactionConfig;
 use crate::solana_transaction_status::EncodedConfirmedTransactionWithStatusMeta;
 
+/// Request for the `getTransaction` RPC method, which returns a confirmed
+/// transaction by signature.
 #[serde_as]
 #[skip_serializing_none]
 #[derive(Debug, Serialize_tuple, Deserialize_tuple)]
 pub struct GetTransactionRequest {
+	/// Base58 signature of the transaction to look up.
 	#[serde_as(as = "DisplayFromStr")]
 	pub signature: Signature,
+	/// Config controlling the transaction encoding, commitment, and the highest
+	/// transaction version that may be returned.
 	pub config: Option<RpcTransactionConfig>,
 }
 
@@ -46,6 +51,7 @@ impl GetTransactionRequest {
 		}
 	}
 
+	/// Creates a request with an explicit transaction config.
 	pub fn new_with_config(signature: Signature, config: RpcTransactionConfig) -> Self {
 		Self {
 			signature,
@@ -54,6 +60,7 @@ impl GetTransactionRequest {
 	}
 }
 
+/// Response for the `getTransaction` RPC method.
 #[derive(Debug, Serialize, Deserialize, PartialEq, Eq)]
 pub struct GetTransactionResponse(Option<EncodedConfirmedTransactionWithStatusMeta>);
 

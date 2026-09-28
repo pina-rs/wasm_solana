@@ -6,10 +6,15 @@ use solana_commitment_config::CommitmentConfig;
 
 use crate::impl_http_method;
 
+/// Request for the `getMinimumBalanceForRentExemption` RPC method, which
+/// returns the lamport balance an account must hold to be rent exempt.
 #[skip_serializing_none]
 #[derive(Debug, Serialize_tuple)]
 pub struct GetMinimumBalanceForRentExemptionRequest {
+	/// Account data length in bytes that the exempt balance is computed for.
 	pub data_length: usize,
+	/// Commitment level for the request. Defaults to the client's commitment
+	/// when omitted.
 	pub config: Option<CommitmentConfig>,
 }
 
@@ -19,6 +24,8 @@ impl_http_method!(
 );
 
 impl GetMinimumBalanceForRentExemptionRequest {
+	/// Creates a request that evaluates the exemption using the node's default
+	/// commitment.
 	pub fn new(data_length: usize) -> Self {
 		Self {
 			data_length,
@@ -26,6 +33,8 @@ impl GetMinimumBalanceForRentExemptionRequest {
 		}
 	}
 
+	/// Creates a request that evaluates the exemption at the given commitment
+	/// level.
 	pub fn new_with_config(data_length: usize, config: CommitmentConfig) -> Self {
 		Self {
 			data_length,
@@ -34,6 +43,7 @@ impl GetMinimumBalanceForRentExemptionRequest {
 	}
 }
 
+/// Response for the `getMinimumBalanceForRentExemption` RPC method.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct GetMinimumBalanceForRentExemptionResponse(u64);
 

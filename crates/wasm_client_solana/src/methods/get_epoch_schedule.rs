@@ -4,11 +4,14 @@ use solana_epoch_schedule::EpochSchedule;
 
 use crate::impl_http_method;
 
+/// Request for the `getEpochSchedule` RPC method, which returns the epoch
+/// schedule of the cluster.
 #[derive(Debug, Serialize, Deserialize)]
 pub struct GetEpochScheduleRequest;
 
 impl_http_method!(GetEpochScheduleRequest, "getEpochSchedule");
 
+/// Response for the `getEpochSchedule` RPC method.
 #[derive(Debug, Serialize, Deserialize, PartialEq, Eq)]
 pub struct GetEpochScheduleResponse(EpochSchedule);
 

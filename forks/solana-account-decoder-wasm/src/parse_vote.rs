@@ -11,6 +11,10 @@ use solana_vote_interface::state::VoteStateV4;
 use crate::StringAmount;
 use crate::parse_account_data::ParseAccountError;
 
+/// Deserialize a vote account into its JSON form.
+///
+/// `vote_pubkey` is required to verify the account address embedded in the
+/// serialized [`VoteStateV4`].
 pub fn parse_vote(data: &[u8], vote_pubkey: &Pubkey) -> Result<VoteAccountType, ParseAccountError> {
 	let vote_state =
 		VoteStateV4::deserialize(data, vote_pubkey).map_err(ParseAccountError::from)?;
@@ -64,6 +68,7 @@ pub fn parse_vote(data: &[u8], vote_pubkey: &Pubkey) -> Result<VoteAccountType, 
 #[derive(Debug, Serialize, Deserialize, PartialEq, Eq)]
 #[serde(rename_all = "camelCase", tag = "type", content = "info")]
 pub enum VoteAccountType {
+	/// An initialized vote account.
 	Vote(UiVoteState),
 }
 

@@ -5,11 +5,14 @@ use serde::Serialize;
 
 use crate::impl_http_method;
 
+/// Request for the `getMaxRetransmitSlot` RPC method, which returns the highest
+/// slot the node has received a shred for.
 #[derive(Debug, Serialize)]
 pub struct GetMaxRetransmitSlotRequest;
 
 impl_http_method!(GetMaxRetransmitSlotRequest, "getMaxRetransmitSlot");
 
+/// Response for the `getMaxRetransmitSlot` RPC method.
 #[derive(Debug, Deserialize, From, Into)]
 pub struct GetMaxRetransmitSlotResponse(u64);
 

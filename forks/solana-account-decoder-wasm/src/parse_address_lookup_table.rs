@@ -6,6 +6,10 @@ use solana_instruction::error::InstructionError;
 use crate::parse_account_data::ParsableAccount;
 use crate::parse_account_data::ParseAccountError;
 
+/// Deserialize an address lookup table account into its JSON form.
+///
+/// Returns the uninitialized variant for accounts whose meta is all zeroes,
+/// and [`ParseAccountError::AccountNotParsable`] for any other failure.
 pub fn parse_address_lookup_table(
 	data: &[u8],
 ) -> Result<LookupTableAccountType, ParseAccountError> {
@@ -25,21 +29,32 @@ pub fn parse_address_lookup_table(
 		})
 }
 
+/// The parsed contents of an address lookup table account, tagged by state in
+/// JSON.
 #[derive(Debug, Serialize, Deserialize, PartialEq, Eq)]
 #[serde(rename_all = "camelCase", tag = "type", content = "info")]
 pub enum LookupTableAccountType {
+	/// The account has not been initialized.
 	Uninitialized,
+	/// The account is an initialized lookup table.
 	LookupTable(UiLookupTable),
 }
 
+/// Parsed address lookup table contents.
 #[derive(Debug, Serialize, Deserialize, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
 pub struct UiLookupTable {
+	/// The slot at which the table was deactivated, as a string. `u64::MAX`
+	/// when active.
 	pub deactivation_slot: String,
+	/// The slot at which the table was last extended, as a string.
 	pub last_extended_slot: String,
+	/// Index within `last_extended_slot` at which the last extension began.
 	pub last_extended_slot_start_index: u8,
+	/// The authority allowed to extend or deactivate the table, if set.
 	#[serde(skip_serializing_if = "Option::is_none")]
 	pub authority: Option<String>,
+	/// The addresses stored in the table, as base58 strings.
 	pub addresses: Vec<String>,
 }
 

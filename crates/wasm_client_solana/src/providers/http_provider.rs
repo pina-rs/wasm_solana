@@ -8,6 +8,11 @@ pub use wasm_http_provider::HttpProvider;
 use crate::ClientRequest;
 use crate::ClientResult;
 
+/// Transport used by [`crate::SolanaRpcClient`] to reach a Solana node.
+///
+/// Implemented for HTTP in `http_provider` and for websocket pubsub in
+/// `websocket_provider`, each with a wasm (`gloo-net`) and a native
+/// (`reqwest`) backend.
 #[async_trait]
 pub trait RpcProvider {
 	/// Send the request.
@@ -28,6 +33,8 @@ mod ssr_http_provider {
 	use crate::RpcError;
 	use crate::RpcErrorDetails;
 
+	/// An HTTP provider backed by `reqwest`, used when the `ssr` feature is
+	/// enabled.
 	#[derive(Debug, Clone)]
 	pub struct HttpProvider {
 		client: Client,
@@ -78,6 +85,8 @@ mod ssr_http_provider {
 	}
 
 	impl HttpProvider {
+		/// Create a provider that posts JSON-RPC requests to `url` with a JSON
+		/// content type header.
 		pub fn new(url: impl Into<String>) -> Self {
 			let client = Client::new();
 			let url = url.into();
@@ -178,6 +187,8 @@ mod wasm_http_provider {
 		}
 	}
 
+	/// An HTTP provider backed by `gloo-net`, used when the `ssr` feature is
+	/// disabled and the target is wasm.
 	#[derive(Debug, Clone)]
 	pub struct HttpProvider(String);
 
@@ -213,6 +224,7 @@ mod wasm_http_provider {
 	}
 
 	impl HttpProvider {
+		/// Create a provider that posts JSON-RPC requests to `url`.
 		pub fn new(url: impl Into<String>) -> Self {
 			Self(url.into())
 		}
@@ -240,8 +252,13 @@ mod wasm_http_provider {
 	}
 }
 
+/// Solana devnet RPC endpoint.
 pub const DEVNET: &str = "https://api.devnet.solana.com";
+/// Solana testnet RPC endpoint.
 pub const TESTNET: &str = "https://api.testnet.solana.com";
+/// Solana mainnet-beta RPC endpoint.
 pub const MAINNET: &str = "https://api.mainnet-beta.solana.com";
+/// Default endpoint of a locally running `solana-test-validator`.
 pub const LOCALNET: &str = "http://127.0.0.1:8899";
+/// Endpoint of the public debugging node maintained by the project.
 pub const DEBUG: &str = "http://34.90.18.145:8899";

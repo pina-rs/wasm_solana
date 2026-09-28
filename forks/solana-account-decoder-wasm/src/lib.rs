@@ -1,16 +1,32 @@
 #![allow(clippy::arithmetic_side_effects)]
+//! Wasm-compatible fork of Agave's `solana-account-decoder`.
+//!
+//! Decodes on-chain account data into the JSON shapes returned by the Solana
+//! JSON RPC API. The `parse_*` modules cover the accounts of the standard
+//! native programs and sysvars.
 
+/// Dispatches account data to the parser for its owning program.
 pub mod parse_account_data;
+/// Parses address lookup table accounts.
 pub mod parse_address_lookup_table;
+/// Parses upgradeable and non-upgradeable BPF loader accounts.
 pub mod parse_bpf_loader;
+/// Parses accounts owned by the deprecated config program.
 #[allow(deprecated)]
 pub mod parse_config;
+/// Parses nonce accounts.
 pub mod parse_nonce;
+/// Parses stake accounts.
 pub mod parse_stake;
+/// Parses sysvar accounts such as clock, rent, and stake history.
 pub mod parse_sysvar;
+/// Parses SPL Token and Token-2022 accounts.
 pub mod parse_token;
+/// Parses SPL Token-2022 extensions.
 pub mod parse_token_extension;
+/// Parses vote accounts.
 pub mod parse_vote;
+/// Parses the validator info account.
 pub mod validator_info;
 
 use base64::Engine;
@@ -28,8 +44,13 @@ use solana_pubkey::Pubkey;
 use crate::parse_account_data::AccountAdditionalDataV3;
 use crate::parse_account_data::parse_account_data_v3;
 
+/// A numeric amount serialized as a string.
 pub type StringAmount = String;
+/// The number of decimals for an amount, serialized as a string.
 pub type StringDecimals = String;
+/// Maximum account data length, in bytes, that will be base58 encoded.
+///
+/// Larger data falls back to base64.
 pub const MAX_BASE58_BYTES: usize = 128;
 
 fn encode_bs58<T: ReadableAccount>(
@@ -44,6 +65,10 @@ fn encode_bs58<T: ReadableAccount>(
 	}
 }
 
+/// Encode account data as a base58 string, applying an optional data slice.
+///
+/// Returns the error string `"error: data too large for bs58 encoding"` when
+/// the resulting slice exceeds [`MAX_BASE58_BYTES`].
 pub fn encode_ui_account<T: ReadableAccount>(
 	pubkey: &Pubkey,
 	account: &T,
@@ -117,9 +142,12 @@ pub fn encode_ui_account<T: ReadableAccount>(
 	}
 }
 
+/// Account fee schedule as returned by RPC methods that report the current fee
+/// calculator.
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
 pub struct UiFeeCalculator {
+	/// Lamports charged per transaction signature, as a string.
 	pub lamports_per_signature: StringAmount,
 }
 

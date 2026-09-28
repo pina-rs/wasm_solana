@@ -1,3 +1,12 @@
+//! Request and response types for the Solana JSON-RPC API.
+//!
+//! Each submodule models exactly one RPC method: a request type that serializes
+//! to the JSON-RPC `params` array and a response type that deserializes the
+//! `result` field. Requests implement [`HttpMethod`] to carry the method name,
+//! and the websocket-backed ones additionally implement
+//! [`WebSocketMethod`]/[`WebSocketNotification`] to carry the subscription
+//! method names.
+
 use serde::Deserialize;
 use serde::Serialize;
 use serde::de::DeserializeOwned;
@@ -109,20 +118,32 @@ mod request_airdrop;
 mod send_transaction;
 mod simulate_transaction;
 
+/// Slot at which a response was evaluated, returned by every context-aware RPC
+/// response.
 #[derive(Serialize, Deserialize, Debug, PartialEq, Eq, Clone)]
 pub struct Context {
+	/// The slot that the RPC node used to evaluate the request.
 	pub slot: Slot,
 }
 
+/// Inclusive range of slots used to scope block production queries, where
+/// `first_slot` is the starting slot and `last_slot` bounds the range at the
+/// tip of the ledger when omitted.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct BlockProductionRange {
+	/// The first slot in the range. Only blocks at or after this slot are
+	/// returned.
 	pub first_slot: u64,
+	/// The last slot to consider. Defaults to the current tip of the ledger
+	/// when omitted.
 	#[serde(skip_serializing_if = "Option::is_none")]
 	pub last_slot: Option<u64>,
 }
 
+/// A request that maps to a JSON-RPC method on the HTTP endpoint.
 pub trait HttpMethod: Serialize {
+	/// Name of the JSON-RPC method, such as `getBalance`.
 	const NAME: &'static str;
 }
 
@@ -134,12 +155,19 @@ macro_rules! impl_http_method {
 	};
 }
 
+/// A websocket notification payload that deserializes from a subscription
+/// notification.
 pub trait WebSocketNotification: DeserializeOwned {
+	/// Name of the notification, such as `accountNotification`.
 	const NOTIFICATION: &'static str;
+	/// Name of the method that cancels the subscription, such as
+	/// `accountUnsubscribe`.
 	const UNSUBSCRIBE: &'static str;
 }
 
+/// A request that maps to a subscription method on the websocket endpoint.
 pub trait WebSocketMethod: Serialize {
+	/// Name of the subscribe method, such as `accountSubscribe`.
 	const SUBSCRIBE: &'static str;
 }
 

@@ -17,20 +17,39 @@ use crate::ClientResult;
 use crate::SolanaRpcClient;
 use crate::rpc_config::RpcAccountInfoConfig;
 
+/// Failure while reading or validating a durable nonce account.
 #[derive(Clone, Debug, Serialize, Deserialize, thiserror::Error, PartialEq, Eq)]
 pub enum NonceError {
+	/// The account is not owned by the system program.
 	#[error("invalid account owner")]
 	InvalidAccountOwner,
+	/// The account data could not be deserialized into a nonce state.
 	#[error("invalid account data")]
 	InvalidAccountData,
+	/// The account holds no data, so it cannot be a nonce account.
 	#[error("unexpected account data size")]
 	UnexpectedDataSize,
+	/// The stored nonce hash differs from the one the caller expected.
 	#[error("provided hash ({provided}) does not match nonce hash ({expected})")]
-	InvalidHash { provided: Hash, expected: Hash },
+	InvalidHash {
+		/// Hash the caller expected the account to hold.
+		provided: Hash,
+		/// Hash actually stored in the nonce account.
+		expected: Hash,
+	},
+	/// The stored authority differs from the one the caller expected.
 	#[error("provided authority ({provided}) does not match nonce authority ({expected})")]
-	InvalidAuthority { provided: Pubkey, expected: Pubkey },
+	InvalidAuthority {
+		/// Authority the caller expected the account to be controlled by.
+		provided: Pubkey,
+		/// Authority actually stored in the nonce account.
+		expected: Pubkey,
+	},
+	/// The nonce state does not permit the requested operation, such as
+	/// advancing the nonce of an uninitialized account.
 	#[error("invalid state for requested operation")]
 	InvalidStateForOperation,
+	/// The underlying RPC call failed.
 	#[error("client error: {0}")]
 	Client(String),
 }

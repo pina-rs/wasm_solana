@@ -1,3 +1,5 @@
+//! Browser tests for the RPC client against a local validator, exercising
+//! airdrops and pubsub subscriptions.
 #![cfg(feature = "js")]
 
 use anyhow::Result;
@@ -14,6 +16,7 @@ use wasm_client_solana::rpc_config::RpcTransactionLogsFilter;
 
 wasm_bindgen_test_configure!(run_in_browser);
 
+/// Request an airdrop, wait for it to confirm, and check the credited balance.
 #[wasm_bindgen_test]
 pub async fn request_airdrop() -> Result<()> {
 	let rpc = SolanaRpcClient::new(LOCALNET);
@@ -29,6 +32,7 @@ pub async fn request_airdrop() -> Result<()> {
 	Ok(())
 }
 
+/// Subscribe to transaction logs and assert the notification shape.
 #[wasm_bindgen_test]
 pub async fn log_subscription() -> Result<()> {
 	let rpc = SolanaRpcClient::new(LOCALNET);
@@ -52,11 +56,13 @@ pub async fn log_subscription() -> Result<()> {
 	Ok(())
 }
 
-// TODO this test doesn't actually work. Spent too long trying to get it to
-// fail for the correct reason. It seems like there is a lock somewhere that is
-// only released on drop. So when the subscription is dropped all the stream
-// updates are processed, but nothing happens in the subscription since it has
-// already been dropped.
+/// Subscribe to an account and drive a create-account transaction through it.
+///
+/// TODO this test doesn't actually work. Spent too long trying to get it to
+/// fail for the correct reason. It seems like there is a lock somewhere that is
+/// only released on drop. So when the subscription is dropped all the stream
+/// updates are processed, but nothing happens in the subscription since it has
+/// already been dropped.
 #[wasm_bindgen_test]
 pub async fn account_subscription() -> Result<()> {
 	let date = js_sys::Date::new_0();

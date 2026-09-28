@@ -1,0 +1,37 @@
+# mdt keeps shared documentation in one place so the crate docs, the docs site
+# and the readmes cannot drift apart. Provider blocks live in `.templates/` and
+# consumers reference them with `<!-- {=name} -->` tags.
+#
+# `mdt update` syncs consumers, `mdt check` fails when one is stale.
+
+# Respect `.gitignore` so build output and nix stores are never scanned.
+disable_gitignore = false
+
+# Source-file consumers need content on the line after the tag so that rustfmt
+# and dprint cannot merge the doc comment with the injected text.
+[padding]
+before = 0
+after = 0
+
+# dprint is the repo formatter, so let mdt converge with it instead of bouncing
+# between `mdt update` and the formatter.
+[[formatters]]
+command = "dprint fmt --stdin \"{{ filePath }}\""
+patterns = ["**/*.md", "**/*.rs"]
+ignore = ["**/*.t.md", "**/*.snap", "**/target/**"]
+
+[templates]
+paths = [".templates"]
+
+# The scans cover every crate this repo ships, including the vendored Agave
+# forks, plus the docs site and the readmes.
+[include]
+patterns = [
+	"crates/**/*.rs",
+	"crates/**/*.md",
+	"forks/**/*.rs",
+	"forks/**/*.md",
+	"docs/**/*.md",
+	"readme.md",
+	"changelog.md",
+]

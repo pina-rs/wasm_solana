@@ -12,6 +12,11 @@ use crate::UiAccountEncoding;
 use crate::parse_account_data::ParsableAccount;
 use crate::parse_account_data::ParseAccountError;
 
+/// Deserialize an upgradeable loader account into its JSON form, base64
+/// encoding the program bytes of buffer and program data accounts.
+///
+/// Returns [`ParseAccountError::AccountNotParsable`] if the data is not a valid
+/// bincode serialized [`UpgradeableLoaderState`].
 pub fn parse_bpf_upgradeable_loader(
 	data: &[u8],
 ) -> Result<BpfUpgradeableLoaderAccountType, ParseAccountError> {
@@ -68,33 +73,48 @@ pub fn parse_bpf_upgradeable_loader(
 	Ok(parsed_account)
 }
 
+/// The parsed contents of an upgradeable loader account, tagged by state in
+/// JSON.
 #[derive(Debug, Serialize, Deserialize, PartialEq, Eq)]
 #[serde(rename_all = "camelCase", tag = "type", content = "info")]
 pub enum BpfUpgradeableLoaderAccountType {
+	/// The account has not been initialized.
 	Uninitialized,
+	/// The account is a program buffer holding a pending deployment.
 	Buffer(UiBuffer),
+	/// The account is an executable program.
 	Program(UiProgram),
+	/// The account holds the deployed program data and upgrade authority.
 	ProgramData(UiProgramData),
 }
 
+/// Parsed buffer account holding program bytes that are not yet deployed.
 #[derive(Debug, Serialize, Deserialize, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
 pub struct UiBuffer {
+	/// The authority allowed to write to the buffer, if set.
 	pub authority: Option<String>,
+	/// The buffered program data, base64 encoded.
 	pub data: UiAccountData,
 }
 
+/// Parsed executable program account.
 #[derive(Debug, Serialize, Deserialize, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
 pub struct UiProgram {
+	/// The address of the program data account holding the deployed bytes.
 	pub program_data: String,
 }
 
+/// Parsed program data account holding the deployed program bytes.
 #[derive(Debug, Serialize, Deserialize, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
 pub struct UiProgramData {
+	/// The slot at which the program was last deployed or upgraded.
 	pub slot: u64,
+	/// The upgrade authority, if set. Absent means the program is immutable.
 	pub authority: Option<String>,
+	/// The deployed program data, base64 encoded.
 	pub data: UiAccountData,
 }
 

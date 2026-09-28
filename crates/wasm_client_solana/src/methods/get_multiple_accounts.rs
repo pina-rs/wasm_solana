@@ -12,19 +12,26 @@ use crate::impl_http_method;
 use crate::rpc_config::RpcAccountInfoConfig;
 use crate::solana_account_decoder::UiAccount;
 
+/// Request for the `getMultipleAccounts` RPC method, which returns account
+/// information for a list of pubkeys in a single call.
 #[serde_as]
 #[skip_serializing_none]
 #[derive(Debug, Serialize_tuple, Deserialize_tuple)]
 #[serde(rename_all = "camelCase")]
 pub struct GetMultipleAccountsRequest {
+	/// Base58 pubkeys of the accounts to query.
 	#[serde_as(as = "Vec<DisplayFromStr>")]
 	pub addresses: Vec<Pubkey>,
+	/// Config controlling the encoding, data slice, commitment, and minimum
+	/// context slot of the query.
 	pub config: Option<RpcAccountInfoConfig>,
 }
 
 impl_http_method!(GetMultipleAccountsRequest, "getMultipleAccounts");
 
 impl GetMultipleAccountsRequest {
+	/// Creates a request for the given addresses using the default account info
+	/// config.
 	pub fn new(addresses: Vec<Pubkey>) -> Self {
 		Self {
 			addresses,
@@ -32,6 +39,8 @@ impl GetMultipleAccountsRequest {
 		}
 	}
 
+	/// Creates a request for the given addresses with an explicit account info
+	/// config.
 	pub fn new_with_config(addresses: Vec<Pubkey>, config: RpcAccountInfoConfig) -> Self {
 		Self {
 			addresses,
@@ -40,9 +49,13 @@ impl GetMultipleAccountsRequest {
 	}
 }
 
+/// Response for the `getMultipleAccounts` RPC method.
 #[derive(Debug, Serialize, Deserialize, PartialEq, Eq)]
 pub struct GetMultipleAccountsResponse {
+	/// The slot that the RPC node used to evaluate the request.
 	pub context: Context,
+	/// Account data for each requested pubkey, in the same order as the
+	/// request, with `None` for accounts that do not exist.
 	pub value: Vec<Option<UiAccount>>,
 }
 

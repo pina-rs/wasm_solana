@@ -10,18 +10,26 @@ use crate::impl_http_method;
 use crate::rpc_config::RpcKeyedAccount;
 use crate::rpc_config::RpcProgramAccountsConfig;
 
+/// Request for the `getProgramAccounts` RPC method, which returns every account
+/// owned by a program, optionally filtered by data size or memcmp filters.
 #[serde_as]
 #[skip_serializing_none]
 #[derive(Debug, Serialize_tuple)]
 pub struct GetProgramAccountsRequest {
+	/// Base58 pubkey of the program whose accounts are returned.
 	#[serde_as(as = "DisplayFromStr")]
 	pub pubkey: Pubkey,
+	/// Config controlling the encoding, data slice, filters, and commitment of
+	/// the query. Filters are required by most public RPC providers for this
+	/// method.
 	pub config: Option<RpcProgramAccountsConfig>,
 }
 
 impl_http_method!(GetProgramAccountsRequest, "getProgramAccounts");
 
 impl GetProgramAccountsRequest {
+	/// Creates a request without filters using the default program accounts
+	/// config.
 	pub fn new(pubkey: Pubkey) -> Self {
 		Self {
 			pubkey,
@@ -29,6 +37,7 @@ impl GetProgramAccountsRequest {
 		}
 	}
 
+	/// Creates a request with an explicit program accounts config.
 	pub fn new_with_config(pubkey: Pubkey, config: RpcProgramAccountsConfig) -> Self {
 		Self {
 			pubkey,
@@ -37,12 +46,15 @@ impl GetProgramAccountsRequest {
 	}
 }
 
+/// Response for the `getProgramAccounts` RPC method.
 #[derive(Debug, Deserialize, PartialEq, Eq)]
 pub struct GetProgramAccountsResponse(Option<Vec<RpcKeyedAccount>>);
 
 impl_websocket_notification!(GetProgramAccountsResponse, "program");
 
 impl GetProgramAccountsResponse {
+	/// Returns the matching accounts, each paired with its pubkey, or `None`
+	/// when the response contained no accounts.
 	pub fn keyed_accounts(&self) -> Option<&Vec<RpcKeyedAccount>> {
 		self.0.as_ref()
 	}

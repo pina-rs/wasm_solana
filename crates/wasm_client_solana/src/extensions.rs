@@ -59,12 +59,16 @@ pub trait VersionedTransactionExtension {
 	/// lookup tables, so every account is listed inline and the account limit
 	/// is 64.
 	///
-	/// Unlike the message default, `config` limits are given non-zero defaults.
-	/// A v1 message defaults `compute_unit_limit` and
-	/// `loaded_accounts_data_size_limit` to zero, and a transaction carrying
-	/// zeros fails with `MaxLoadedAccountsDataSizeExceeded`. Prefer
+	/// <!-- {=txv1ComputeBudget|trim|linePrefix:"/// ":true} -->
+	/// A v1 message carries its compute budget instead of using `ComputeBudget`
+	/// instructions, and defaults both `compute_unit_limit` and
+	/// `loaded_accounts_data_size_limit` to zero. A transaction carrying zeros
+	/// fails with `MaxLoadedAccountsDataSizeExceeded`, so set the limits
+	/// explicitly. <!-- {/txv1ComputeBudget} -->
+	///
+	/// This method supplies non-zero defaults for both limits. Prefer
 	/// [`VersionedTransactionExtension::new_unsigned_v1_with_config`] to set
-	/// both precisely.
+	/// them precisely.
 	fn new_unsigned_v1(
 		payer: &Pubkey,
 		instructions: &[Instruction],
@@ -82,6 +86,8 @@ pub trait VersionedTransactionExtension {
 		recent_blockhash: Hash,
 		config: v1::TransactionConfig,
 	) -> Result<VersionedTransaction, CompileError>;
+	/// Create an unsigned transaction from a [`VersionedMessage`], filling the
+	/// required signature slots with default values.
 	fn new_unsigned(message: VersionedMessage) -> VersionedTransaction;
 	/// Attempt to sign this transaction with provided signers.
 	fn try_sign<T: Signers + ?Sized>(
@@ -89,6 +95,7 @@ pub trait VersionedTransactionExtension {
 		signers: &T,
 		recent_blockhash: Option<Hash>,
 	) -> Result<&mut Self, SignerError>;
+	/// Attempt to sign this transaction with a solana wallet.
 	fn try_sign_async<W: WalletSolanaSignMessage + WalletSolanaPubkey>(
 		&mut self,
 		wallet: &W,
@@ -113,12 +120,16 @@ pub trait VersionedTransactionExtension {
 		positions: Vec<usize>,
 		recent_blockhash: Option<Hash>,
 	) -> Result<(), SignerError>;
+	/// Place a single wallet signature at `position` without verifying that the
+	/// position is correct.
 	fn try_sign_unchecked_async<W: WalletSolanaSignMessage + WalletSolanaPubkey>(
 		&mut self,
 		wallet: &W,
 		position: usize,
 		recent_blockhash: Option<Hash>,
 	) -> impl Future<Output = WalletResult<()>>;
+	/// Find where each of `pubkeys` appears in the transaction's signed
+	/// accounts, returning `None` for keys that are not required signers.
 	fn get_signing_keypair_positions(
 		&self,
 		pubkeys: &[Pubkey],
@@ -140,6 +151,11 @@ pub trait VersionedTransactionExtension {
 		wallet: &W,
 		recent_blockhash: Option<Hash>,
 	) -> impl Future<Output = WalletResult<&mut Self>>;
+	/// Ask a wallet to sign the transaction, letting the wallet decide which
+	/// signatures to produce.
+	///
+	/// Unlike [`VersionedTransactionExtension::try_sign`], the transaction is
+	/// consumed and the fully signed version is returned.
 	fn sign_with_wallet<W: WalletSolanaSignTransaction>(
 		self,
 		wallet: &W,
@@ -367,7 +383,10 @@ impl VersionedTransactionExtension for VersionedTransaction {
 	}
 }
 
+/// Add extensions for converting a [`VersionedMessage`] into a transaction.
 pub trait VersionedMessageExtension {
+	/// Wrap the message in an unsigned [`VersionedTransaction`], leaving every
+	/// signature slot at its default value.
 	fn into_versioned_transaction(self) -> VersionedTransaction;
 }
 

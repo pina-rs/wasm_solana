@@ -10,6 +10,11 @@ use crate::parse_account_data::ParsableAccount;
 use crate::parse_account_data::ParseAccountError;
 use crate::validator_info;
 
+/// Parse a config program account, currently only supporting the validator
+/// info config.
+///
+/// Returns [`ParseAccountError::AccountNotParsable`] when the first config key
+/// is not the validator info pubkey or the data cannot be deserialized.
 pub fn parse_config(data: &[u8], _pubkey: &Pubkey) -> Result<ConfigAccountType, ParseAccountError> {
 	let parsed_account = deserialize::<ConfigKeys>(data).ok().and_then(|key_list| {
 		if !key_list.keys.is_empty() && key_list.keys[0].0 == validator_info::id() {
@@ -45,23 +50,32 @@ where
 	Some(UiConfig { keys, config_data })
 }
 
+/// The parsed contents of a config program account, tagged by config type in
+/// JSON.
 #[derive(Debug, Serialize, Deserialize, PartialEq)]
 #[serde(rename_all = "camelCase", tag = "type", content = "info")]
 pub enum ConfigAccountType {
+	/// A config account holding validator metadata.
 	ValidatorInfo(UiConfig<Value>),
 }
 
+/// A single key of a config account.
 #[derive(Debug, Serialize, Deserialize, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
 pub struct UiConfigKey {
+	/// The key's pubkey, as a string.
 	pub pubkey: String,
+	/// Whether the key must sign transactions updating the config.
 	pub signer: bool,
 }
 
+/// Parsed config account, pairing its keys with its deserialized data.
 #[derive(Debug, Serialize, Deserialize, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
 pub struct UiConfig<T> {
+	/// The keys that control the config account.
 	pub keys: Vec<UiConfigKey>,
+	/// The config data.
 	pub config_data: T,
 }
 

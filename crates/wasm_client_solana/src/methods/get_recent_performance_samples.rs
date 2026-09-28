@@ -5,9 +5,13 @@ use serde_with::skip_serializing_none;
 use crate::impl_http_method;
 use crate::rpc_response::RpcPerfSample;
 
+/// Request for the `getRecentPerformanceSamples` RPC method, which returns
+/// recent performance samples in slots-per-second terms.
 #[skip_serializing_none]
 #[derive(Debug, Default, Serialize_tuple)]
 pub struct GetRecentPerformanceSamplesRequest {
+	/// Maximum number of samples to return. Defaults to the node's maximum when
+	/// omitted.
 	pub limit: Option<usize>,
 }
 
@@ -17,15 +21,18 @@ impl_http_method!(
 );
 
 impl GetRecentPerformanceSamplesRequest {
+	/// Creates a request for the node's default number of samples.
 	pub fn new() -> Self {
 		Self::default()
 	}
 
+	/// Creates a request for at most `limit` samples.
 	pub fn new_with_limit(limit: usize) -> Self {
 		Self { limit: Some(limit) }
 	}
 }
 
+/// Response for the `getRecentPerformanceSamples` RPC method.
 #[derive(Debug, Deserialize, PartialEq, Eq)]
 pub struct GetRecentPerformanceSamplesResponse(Vec<RpcPerfSample>);
 

@@ -7,6 +7,11 @@ use solana_nonce::versions::Versions;
 use crate::UiFeeCalculator;
 use crate::parse_account_data::ParseAccountError;
 
+/// Deserialize a nonce account into its JSON form.
+///
+/// Returns [`InstructionError::InvalidAccountData`] for uninitialized or
+/// otherwise malformed accounts, so that empty system accounts are never
+/// reported as uninitialized nonces.
 pub fn parse_nonce(data: &[u8]) -> Result<UiNonceState, ParseAccountError> {
 	let nonce_versions: Versions = bincode::deserialize(data)
 		.map_err(|_| ParseAccountError::from(InstructionError::InvalidAccountData))?;
@@ -34,15 +39,21 @@ pub fn parse_nonce(data: &[u8]) -> Result<UiNonceState, ParseAccountError> {
 #[derive(Debug, Serialize, Deserialize, PartialEq, Eq)]
 #[serde(rename_all = "camelCase", tag = "type", content = "info")]
 pub enum UiNonceState {
+	/// The account is not an initialized nonce.
 	Uninitialized,
+	/// The account holds an initialized nonce.
 	Initialized(UiNonceData),
 }
 
+/// Parsed nonce account data.
 #[derive(Debug, Serialize, Deserialize, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
 pub struct UiNonceData {
+	/// The authority allowed to advance the nonce, as a string.
 	pub authority: String,
+	/// The stored durable nonce, as a string.
 	pub blockhash: String,
+	/// The fee schedule in effect when the nonce was created.
 	pub fee_calculator: UiFeeCalculator,
 }
 

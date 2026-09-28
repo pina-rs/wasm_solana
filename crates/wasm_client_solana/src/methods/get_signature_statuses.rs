@@ -12,9 +12,14 @@ use crate::impl_http_method;
 use crate::rpc_config::RpcSignatureStatusConfig;
 use crate::solana_transaction_status::TransactionStatus;
 
+/// Request for the `getSignatureStatuses` RPC method, which returns the
+/// confirmation status of a batch of transaction signatures.
 #[derive(Clone, Debug)]
 pub struct GetSignatureStatusesRequest {
+	/// Base58 signatures to look up.
 	pub signatures: Vec<Signature>,
+	/// Config controlling whether the node searches past ledger history for
+	/// statuses it no longer caches.
 	pub config: Option<RpcSignatureStatusConfig>,
 }
 
@@ -62,6 +67,7 @@ impl<'de> Deserialize<'de> for GetSignatureStatusesRequest {
 impl_http_method!(GetSignatureStatusesRequest, "getSignatureStatuses");
 
 impl GetSignatureStatusesRequest {
+	/// Creates a request that only consults the node's recent status cache.
 	pub fn new(signatures: Vec<Signature>) -> Self {
 		Self {
 			signatures,
@@ -69,6 +75,7 @@ impl GetSignatureStatusesRequest {
 		}
 	}
 
+	/// Creates a request with an explicit signature status config.
 	pub fn new_with_config(signatures: Vec<Signature>, config: RpcSignatureStatusConfig) -> Self {
 		Self {
 			signatures,
@@ -77,9 +84,13 @@ impl GetSignatureStatusesRequest {
 	}
 }
 
+/// Response for the `getSignatureStatuses` RPC method.
 #[derive(Debug, Serialize, Deserialize, PartialEq, Eq)]
 pub struct GetSignatureStatusesResponse {
+	/// The slot that the RPC node used to evaluate the request.
 	pub context: Context,
+	/// Status for each requested signature, in the same order as the request,
+	/// with `None` for signatures the node has not seen.
 	pub value: Vec<Option<TransactionStatus>>,
 }
 

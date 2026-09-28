@@ -7,26 +7,37 @@ use solana_pubkey::Pubkey;
 
 use crate::impl_http_method;
 
+/// Request for the `getClusterNodes` RPC method, which returns the contact
+/// information of every node known to the queried node.
 #[derive(Debug, Serialize, Deserialize)]
 pub struct GetClusterNodesRequest;
 
 impl_http_method!(GetClusterNodesRequest, "getClusterNodes");
 
+/// Contact information for a single cluster node.
 #[serde_as]
 #[skip_serializing_none]
 #[derive(Debug, Serialize, Deserialize, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
 pub struct RpcContactInfoWasm {
+	/// Base58 identity pubkey of the node.
 	#[serde_as(as = "DisplayFromStr")]
 	pub pubkey: Pubkey,
+	/// Gossip address in `host:port` form.
 	pub gossip: Option<String>,
+	/// TPU address in `host:port` form.
 	pub tpu: Option<String>,
+	/// JSON-RPC address in `host:port` form.
 	pub rpc: Option<String>,
+	/// Software version reported by the node.
 	pub version: Option<String>,
+	/// Feature set identifier activated on the node.
 	pub feature_set: Option<u32>,
+	/// Shred version the node uses for the block-shred wire format.
 	pub shred_version: Option<u16>,
 }
 
+/// Response for the `getClusterNodes` RPC method.
 #[derive(Debug, Serialize, Deserialize, PartialEq, Eq)]
 pub struct GetClusterNodesResponse(Vec<RpcContactInfoWasm>);
 

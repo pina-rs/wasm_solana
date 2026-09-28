@@ -4,11 +4,14 @@ use solana_clock::Slot;
 
 use crate::impl_http_method;
 
+/// Request for the `getFirstAvailableBlock` RPC method, which returns the
+/// lowest slot for which the node has a block.
 #[derive(Debug, Serialize)]
 pub struct GetFirstAvailableBlockRequest;
 
 impl_http_method!(GetFirstAvailableBlockRequest, "getFirstAvailableBlock");
 
+/// Response for the `getFirstAvailableBlock` RPC method.
 #[derive(Debug, Deserialize, PartialEq, Eq)]
 pub struct GetFirstAvailableBlockResponse(Slot);
 

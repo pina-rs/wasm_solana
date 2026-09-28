@@ -27,6 +27,8 @@ use crate::parse_sysvar::parse_sysvar;
 use crate::parse_token::parse_token_v3;
 use crate::parse_vote::parse_vote;
 
+/// Map of program ids that [`parse_account_data_v3`] knows how to parse to the
+/// [`ParsableAccount`] variant describing them.
 pub static PARSABLE_PROGRAM_IDS: std::sync::LazyLock<HashMap<Pubkey, ParsableAccount>> =
 	std::sync::LazyLock::new(|| {
 		let mut m = HashMap::new();
@@ -51,50 +53,74 @@ pub static PARSABLE_PROGRAM_IDS: std::sync::LazyLock<HashMap<Pubkey, ParsableAcc
 		m
 	});
 
+/// Errors returned while parsing account data.
 #[derive(Error, Debug)]
 pub enum ParseAccountError {
+	/// The account's program id is known but the data could not be decoded.
 	#[error("{0:?} account not parsable")]
 	AccountNotParsable(ParsableAccount),
 
+	/// The account's program id is not one of the known parsable programs.
 	#[error("Program not parsable")]
 	ProgramNotParsable,
 
+	/// The parser requires additional data (such as mint decimals) that was not
+	/// supplied.
 	#[error("Additional data required to parse: {0}")]
 	AdditionalDataMissing(String),
 
+	/// An instruction error was encountered while parsing.
 	#[error("Instruction error")]
 	InstructionError(#[from] InstructionError),
 
+	/// Serializing the parsed account to JSON failed.
 	#[error("Serde json error")]
 	SerdeJsonError(#[from] serde_json::error::Error),
 }
 
+/// Programs whose account data can be decoded into a parsed JSON form.
 #[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub enum ParsableAccount {
+	/// The address lookup table program.
 	AddressLookupTable,
+	/// The upgradeable BPF loader program.
 	BpfUpgradeableLoader,
+	/// The deprecated config program.
 	Config,
+	/// The system program (nonce accounts).
 	Nonce,
+	/// The SPL Token program.
 	SplToken,
+	/// The SPL Token-2022 program.
 	SplToken2022,
+	/// The stake program.
 	Stake,
+	/// Any sysvar account, dispatched by its specific address.
 	Sysvar,
+	/// The vote program.
 	Vote,
 }
 
+/// Optional extra data needed to fully parse token accounts.
 #[derive(Clone, Copy, Default)]
 pub struct AccountAdditionalDataV3 {
+	/// Additional data for SPL Token accounts, if the mint metadata is known.
 	pub spl_token_additional_data: Option<SplTokenAdditionalDataV2>,
 }
 
+/// Extra token mint data needed to parse token accounts.
 #[derive(Clone, Copy, Default)]
 pub struct SplTokenAdditionalData {
+	/// Number of decimals of the token mint.
 	pub decimals: u8,
+	/// The mint's interest bearing config and the unix timestamp used to
+	/// calculate the current interest.
 	pub interest_bearing_config: Option<(InterestBearingConfig, UnixTimestamp)>,
 }
 
 impl SplTokenAdditionalData {
+	/// Create additional data with the given number of decimals.
 	pub fn with_decimals(decimals: u8) -> Self {
 		Self {
 			decimals,
@@ -103,10 +129,17 @@ impl SplTokenAdditionalData {
 	}
 }
 
+/// Extra token mint data needed to parse token accounts, including Token-2022
+/// extensions.
 #[derive(Clone, Copy, Default)]
 pub struct SplTokenAdditionalDataV2 {
+	/// Number of decimals of the token mint.
 	pub decimals: u8,
+	/// The mint's interest bearing config and the unix timestamp used to
+	/// calculate the current interest.
 	pub interest_bearing_config: Option<(InterestBearingConfig, UnixTimestamp)>,
+	/// The mint's scaled UI amount config and the unix timestamp used to
+	/// calculate the current multiplier.
 	pub scaled_ui_amount_config: Option<(ScaledUiAmountConfig, UnixTimestamp)>,
 }
 
@@ -121,6 +154,7 @@ impl From<SplTokenAdditionalData> for SplTokenAdditionalDataV2 {
 }
 
 impl SplTokenAdditionalDataV2 {
+	/// Create additional data with the given number of decimals.
 	pub fn with_decimals(decimals: u8) -> Self {
 		Self {
 			decimals,
@@ -129,6 +163,13 @@ impl SplTokenAdditionalDataV2 {
 	}
 }
 
+/// Parse an account's data into the JSON form served by
+/// `getAccountInfo` with `jsonParsed` encoding.
+///
+/// `program_id` selects the parser through [`PARSABLE_PROGRAM_IDS`], and
+/// `additional_data` supplies mint metadata for token accounts. Returns a
+/// [`ParsedAccount`] whose `program` field is the kebab-cased
+/// [`ParsableAccount`] name.
 pub fn parse_account_data_v3(
 	pubkey: &Pubkey,
 	program_id: &Pubkey,

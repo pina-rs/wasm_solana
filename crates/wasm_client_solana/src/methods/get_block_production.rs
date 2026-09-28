@@ -9,19 +9,25 @@ use crate::impl_http_method;
 use crate::rpc_config::RpcBlockProductionConfig;
 use crate::rpc_response::RpcBlockProduction;
 
+/// Request for the `getBlockProduction` RPC method, which returns recent block
+/// production statistics, optionally scoped to an identity or slot range.
 #[skip_serializing_none]
 #[derive(Debug, Serialize_tuple, Deserialize_tuple, Default)]
 pub struct GetBlockProductionRequest {
+	/// Config selecting the identity and slot range to report on. Defaults to
+	/// the current epoch for all identities.
 	pub config: Option<RpcBlockProductionConfig>,
 }
 
 impl_http_method!(GetBlockProductionRequest, "getBlockProduction");
 
 impl GetBlockProductionRequest {
+	/// Creates a request for the full current-epoch block production stats.
 	pub fn new() -> Self {
 		Self::default()
 	}
 
+	/// Creates a request scoped by the given block production config.
 	pub fn new_with_config(config: RpcBlockProductionConfig) -> Self {
 		Self {
 			config: Some(config),
@@ -29,9 +35,12 @@ impl GetBlockProductionRequest {
 	}
 }
 
+/// Response for the `getBlockProduction` RPC method.
 #[derive(Debug, Serialize, Deserialize, PartialEq, Eq)]
 pub struct GetBlockProductionResponse {
+	/// The slot that the RPC node used to evaluate the request.
 	pub context: Context,
+	/// Per-identity leader slot counts and the slot range they cover.
 	pub value: RpcBlockProduction,
 }
 

@@ -39,6 +39,10 @@ use spl_token_metadata_interface::state::TokenMetadata;
 
 use crate::parse_token::convert_account_state;
 
+/// Convert a single Token-2022 extension into its JSON representation.
+///
+/// Reads the extension from `account` and returns
+/// [`UiExtension::UnparseableExtension`] when the bytes cannot be decoded.
 pub fn parse_extension<S: BaseState + Pack>(
 	extension_type: &ExtensionType,
 	account: &StateWithExtensions<S>,
@@ -321,6 +325,8 @@ fn convert_permanent_delegate(
 	}
 }
 
+/// Convert a mint's confidential transfer configuration into its JSON
+/// representation.
 pub fn convert_confidential_transfer_mint(
 	confidential_transfer_mint: extension::confidential_transfer::ConfidentialTransferMint,
 ) -> UiConfidentialTransferMint {
@@ -334,6 +340,8 @@ pub fn convert_confidential_transfer_mint(
 	}
 }
 
+/// Convert a mint's confidential transfer fee configuration into its JSON
+/// representation.
 pub fn convert_confidential_transfer_fee_config(
 	confidential_transfer_fee_config: extension::confidential_transfer_fee::ConfidentialTransferFeeConfig,
 ) -> UiConfidentialTransferFeeConfig {

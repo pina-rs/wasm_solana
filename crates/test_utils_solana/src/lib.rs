@@ -1,3 +1,11 @@
+//! Testing utilities for Solana programs and clients.
+//!
+//! Provides a `TestValidatorRunner` (behind the `test_validator` feature) that
+//! boots a local validator, a [`ProgramTest`]/[`ProgramTestContext`] wrapper
+//! with helpers for funding accounts and adding programs, and a
+//! [`TestRpcProvider`] that serves a [`ProgramTestContext`] over the
+//! [`RpcProvider`](wasm_client_solana::RpcProvider) trait.
+
 pub use solana_banks_client::BanksClientExt;
 pub use solana_banks_interface::BanksTransactionResultWithSimulation;
 pub use solana_program_binaries as programs;
@@ -20,6 +28,8 @@ mod test_rpc_provider;
 mod test_validator_runner;
 mod utils;
 
+/// Commonly used traits and types for writing tests against a banks client
+/// or [`ProgramTest`].
 pub mod prelude {
 	pub use wallet_standard::prelude::*;
 	pub use wasm_client_solana::prelude::*;

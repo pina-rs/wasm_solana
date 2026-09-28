@@ -6,19 +6,26 @@ use solana_commitment_config::CommitmentConfig;
 
 use crate::impl_http_method;
 
+/// Request for the `getSlot` RPC method, which returns the slot that the node
+/// is currently at.
 #[skip_serializing_none]
 #[derive(Debug, Default, Serialize_tuple)]
 pub struct GetSlotRequest {
+	/// Commitment level for the request. Defaults to the client's commitment
+	/// when omitted.
 	config: Option<CommitmentConfig>,
 }
 
 impl_http_method!(GetSlotRequest, "getSlot");
 
 impl GetSlotRequest {
+	/// Creates a request that evaluates the slot using the node's default
+	/// commitment.
 	pub fn new() -> Self {
 		Self::default()
 	}
 
+	/// Creates a request that evaluates the slot at the given commitment level.
 	pub fn new_with_config(config: CommitmentConfig) -> Self {
 		Self {
 			config: Some(config),
@@ -26,6 +33,7 @@ impl GetSlotRequest {
 	}
 }
 
+/// Response for the `getSlot` RPC method.
 #[derive(Debug, Deserialize, PartialEq, Eq)]
 pub struct GetSlotResponse(Slot);
 

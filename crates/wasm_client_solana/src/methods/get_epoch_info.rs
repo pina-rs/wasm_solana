@@ -8,19 +8,27 @@ use solana_epoch_info::EpochInfo;
 
 use crate::impl_http_method;
 
+/// Request for the `getEpochInfo` RPC method, which returns the current epoch
+/// number together with the slot index and block height within it.
 #[skip_serializing_none]
 #[derive(Debug, Serialize_tuple, Deserialize_tuple, Default)]
 pub struct GetEpochInfoRequest {
+	/// Commitment level for the request. Defaults to the client's commitment
+	/// when omitted.
 	pub config: Option<CommitmentConfig>,
 }
 
 impl_http_method!(GetEpochInfoRequest, "getEpochInfo");
 
 impl GetEpochInfoRequest {
+	/// Creates a request that evaluates the epoch info using the node's default
+	/// commitment.
 	pub fn new() -> Self {
 		Self::default()
 	}
 
+	/// Creates a request that evaluates the epoch info at the given commitment
+	/// level.
 	pub fn new_with_config(config: CommitmentConfig) -> Self {
 		Self {
 			config: Some(config),
@@ -28,6 +36,7 @@ impl GetEpochInfoRequest {
 	}
 }
 
+/// Response for the `getEpochInfo` RPC method.
 #[derive(Debug, Serialize, Deserialize, PartialEq, Eq)]
 pub struct GetEpochInfoResponse(EpochInfo);
 

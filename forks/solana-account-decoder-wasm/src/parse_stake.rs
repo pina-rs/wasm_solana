@@ -14,6 +14,10 @@ use crate::StringAmount;
 use crate::parse_account_data::ParsableAccount;
 use crate::parse_account_data::ParseAccountError;
 
+/// Deserialize a stake account into its JSON form.
+///
+/// Returns [`ParseAccountError::AccountNotParsable`] if the data is not a
+/// valid bincode serialized [`StakeStateV2`].
 pub fn parse_stake(data: &[u8]) -> Result<StakeAccountType, ParseAccountError> {
 	let stake_state: StakeStateV2 = deserialize(data)
 		.map_err(|_| ParseAccountError::AccountNotParsable(ParsableAccount::Stake))?;
@@ -36,32 +40,44 @@ pub fn parse_stake(data: &[u8]) -> Result<StakeAccountType, ParseAccountError> {
 	Ok(parsed_account)
 }
 
+/// The parsed contents of a stake account, tagged by state in JSON.
 #[derive(Debug, Serialize, Deserialize, PartialEq)]
 #[serde(rename_all = "camelCase", tag = "type", content = "info")]
 pub enum StakeAccountType {
+	/// The account has not been initialized.
 	Uninitialized,
+	/// The account is initialized but not delegated.
 	Initialized(UiStakeAccount),
+	/// The account is delegated to a vote account.
 	Delegated(UiStakeAccount),
+	/// The account is a rewards pool account.
 	RewardsPool,
 }
 
+/// Parsed stake account state and optional delegation.
 #[derive(Debug, Serialize, Deserialize, PartialEq)]
 #[serde(rename_all = "camelCase")]
 pub struct UiStakeAccount {
+	/// The account's metadata.
 	pub meta: UiMeta,
+	/// The delegation details, absent unless the account is delegated.
 	pub stake: Option<UiStake>,
 }
 
+/// Parsed stake account metadata.
 #[derive(Debug, Serialize, Deserialize, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
 pub struct UiMeta {
+	/// Rent exempt reserve held by the stake account, as a string.
 	#[deprecated(
 		since = "4.1.0",
 		note = "Stake account rent must be calculated via the `Rent` sysvar. This value will \
 		        cease to be correct once lamports-per-byte is adjusted."
 	)]
 	pub rent_exempt_reserve: StringAmount,
+	/// The staker and withdrawer authorities.
 	pub authorized: UiAuthorized,
+	/// The lockup that restricts withdrawals.
 	pub lockup: UiLockup,
 }
 
@@ -76,11 +92,15 @@ impl From<Meta> for UiMeta {
 	}
 }
 
+/// Parsed stake lockup.
 #[derive(Debug, Serialize, Deserialize, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
 pub struct UiLockup {
+	/// Unix timestamp at which the lockup expires.
 	pub unix_timestamp: UnixTimestamp,
+	/// Epoch at which the lockup expires.
 	pub epoch: Epoch,
+	/// The pubkey that may override the lockup, as a string.
 	pub custodian: String,
 }
 
@@ -94,10 +114,13 @@ impl From<Lockup> for UiLockup {
 	}
 }
 
+/// Parsed stake authorities.
 #[derive(Debug, Serialize, Deserialize, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
 pub struct UiAuthorized {
+	/// The staker authority, as a string.
 	pub staker: String,
+	/// The withdrawer authority, as a string.
 	pub withdrawer: String,
 }
 
@@ -110,10 +133,13 @@ impl From<Authorized> for UiAuthorized {
 	}
 }
 
+/// Parsed stake of a delegated account.
 #[derive(Debug, Serialize, Deserialize, PartialEq)]
 #[serde(rename_all = "camelCase")]
 pub struct UiStake {
+	/// The delegation to a vote account.
 	pub delegation: UiDelegation,
+	/// Number of stake credits observed when the delegation was last updated.
 	pub credits_observed: u64,
 }
 
@@ -126,12 +152,17 @@ impl From<Stake> for UiStake {
 	}
 }
 
+/// Parsed delegation details.
 #[derive(Debug, Serialize, Deserialize, PartialEq)]
 #[serde(rename_all = "camelCase")]
 pub struct UiDelegation {
+	/// The vote account the stake is delegated to, as a string.
 	pub voter: String,
+	/// The amount of stake delegated, in lamports as a string.
 	pub stake: StringAmount,
+	/// The epoch in which the stake became active, as a string.
 	pub activation_epoch: StringAmount,
+	/// The epoch in which the stake was deactivated, as a string.
 	pub deactivation_epoch: StringAmount,
 }
 

@@ -4,11 +4,14 @@ use solana_clock::Slot;
 
 use crate::impl_http_method;
 
+/// Request for the `minimumLedgerSlot` RPC method, which returns the lowest
+/// slot the node retains in its ledger.
 #[derive(Debug, Serialize)]
 pub struct MinimumLedgerSlotRequest;
 
 impl_http_method!(MinimumLedgerSlotRequest, "minimumLedgerSlot");
 
+/// Response for the `minimumLedgerSlot` RPC method.
 #[derive(Debug, Deserialize, PartialEq, Eq)]
 pub struct MinimumLedgerSlotResponse(Slot);
 
