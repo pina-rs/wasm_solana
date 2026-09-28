@@ -17,6 +17,7 @@ rules:
   # intentional local action reference.
   self-repository:
     ignore:
+      - changeset-policy.yml
       - ci.yml
       - docs-pages.yml
       - publish.yml
