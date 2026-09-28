@@ -1,0 +1,9 @@
+/Users/ifiokjr/Developer/projects/wasm_solana/wasm_solana/examples/leptos-surfpool/target/wasm32-unknown-unknown/release/deps/solana_config_interface-5c7b3ba28e580419.d: /Users/ifiokjr/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/solana-config-interface-2.0.0/src/lib.rs /Users/ifiokjr/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/solana-config-interface-2.0.0/src/instruction.rs /Users/ifiokjr/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/solana-config-interface-2.0.0/src/state.rs
+
+/Users/ifiokjr/Developer/projects/wasm_solana/wasm_solana/examples/leptos-surfpool/target/wasm32-unknown-unknown/release/deps/libsolana_config_interface-5c7b3ba28e580419.rlib: /Users/ifiokjr/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/solana-config-interface-2.0.0/src/lib.rs /Users/ifiokjr/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/solana-config-interface-2.0.0/src/instruction.rs /Users/ifiokjr/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/solana-config-interface-2.0.0/src/state.rs
+
+/Users/ifiokjr/Developer/projects/wasm_solana/wasm_solana/examples/leptos-surfpool/target/wasm32-unknown-unknown/release/deps/libsolana_config_interface-5c7b3ba28e580419.rmeta: /Users/ifiokjr/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/solana-config-interface-2.0.0/src/lib.rs /Users/ifiokjr/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/solana-config-interface-2.0.0/src/instruction.rs /Users/ifiokjr/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/solana-config-interface-2.0.0/src/state.rs
+
+/Users/ifiokjr/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/solana-config-interface-2.0.0/src/lib.rs:
+/Users/ifiokjr/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/solana-config-interface-2.0.0/src/instruction.rs:
+/Users/ifiokjr/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/solana-config-interface-2.0.0/src/state.rs:

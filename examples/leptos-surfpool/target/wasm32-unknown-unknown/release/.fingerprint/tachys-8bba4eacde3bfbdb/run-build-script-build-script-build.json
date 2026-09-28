@@ -1,0 +1,1 @@
+{"rustc":17329007180185699724,"features":"","declared_features":"","target":0,"profile":0,"path":0,"deps":[[1087164682658667635,"build_script_build",false,17142401251584904410]],"local":[{"Precalculated":"0.2.19"}],"rustflags":["--cfg","getrandom_backend=\"wasm_js\""],"config":0,"compile_kind":0}
