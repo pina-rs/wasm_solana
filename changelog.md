@@ -4,6 +4,19 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.12.1](https://github.com/pina-rs/wasm_solana/releases/tag/v0.12.1) (2026-09-28)
+
+Grouped release for `core`.
+
+### Fixes
+
+- **test_utils_solana**: **Fix a port-picker overflow near u16::MAX.** `TestValidatorPorts::random_ports` drew its base port up to `u16::MAX - 25`, but the gossip range end is `port + 103`; a draw in the top ~80 values overflowed and panicked under debug overflow checks, failing test runs at random. _Owner:_ Ifiok Jr. · _Introduced in:_ [2b61d2f](https://github.com/pina-rs/wasm_solana/commit/2b61d2f154d956e54490996ac9b7e61d059f1c75)
+
+### Notes
+
+- _Packages:_ _memory_wallet_, _test_utils_insta_, _test_utils_keypairs_, _test_utils_solana_, _wasm_client_solana_ **Ignore three new advisories for the validator stack.** `proc-macro-error2 is unmaintained` (RUSTSEC-2026-0173) reaches the lockfile only through `aquamarine ← solana-runtime` — the host-side validator/test harness — and is never part of any published client surface, so it joins the existing validator-stack ignore list. RUSTSEC-2026-0097 (rand unsoundness) hits rand 0.7.3, reachable only through ed25519-dalek 1.x inside agave-precompiles; the client's own rand pins (0.8.8, 0.9.x) are in the patched ranges, so nothing published is affected. RUSTSEC-2026-0292 (imbl-sized-chunks use-after-free) enters through imbl in solana-runtime, again validator-only. _Owner:_ Ifiok Jr. · _Introduced in:_ [9e7f3f7](https://github.com/pina-rs/wasm_solana/commit/9e7f3f739a4a833014d7940247feaf4a22bbb1fe) · _Last updated in:_ [d1e87f6](https://github.com/pina-rs/wasm_solana/commit/d1e87f6f0e144f79b1282ab90a729f0f65e30e73)
+- **memory_wallet**: **Poll getTransaction in the v1 sign-and-send test.** Test-only: the single-shot `getTransaction` read raced the completed-block store on slow CI runners (statuses reported the transaction confirmed before the block store could serve it), so the test has failed every CI run since the v1 support landed. It now polls for the same window the confirmation loop uses. _Owner:_ Ifiok Jr. · _Introduced in:_ [6c095e1](https://github.com/pina-rs/wasm_solana/commit/6c095e1b1a57323024c9d2107cc8464644a353fa)
+
 ## [0.12.0](https://github.com/pina-rs/wasm_solana/releases/tag/v0.12.0) (2026-09-28)
 
 Grouped release for `core`.
