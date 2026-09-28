@@ -1138,6 +1138,12 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "72b3254f16251a8381aa12e40e3c4d2f0199f8c6508fbecb9d91f575e0fbb8c6"
 
 [[package]]
+name = "base64"
+version = "0.23.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "ac07cdecf99051d9a5238b80f35af32cdeba5b336e55d957b318b50137e18da5"
+
+[[package]]
 name = "base64ct"
 version = "1.8.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2724,11 +2730,11 @@ checksum = "cd417de3d1d015fc3bfd2b1ea46dfc7bab72ef86f1cc7cc9c78e728b34a6d1fd"
 
 [[package]]
 name = "futures-timeout"
-version = "0.1.3"
+version = "0.2.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "fc766541fbac66e9c9b53a92623c38e9a22768a4bd6a0c49a0b564b0126474e2"
+checksum = "e58ec6ce8fe4cc0b1f82f58eec8e6d1cd08584cc40aadab74cb925ff1b2750f2"
 dependencies = [
- "futures 0.3.34",
+ "futures-core",
  "futures-timer",
  "pin-project",
 ]
@@ -2856,9 +2862,9 @@ dependencies = [
 
 [[package]]
 name = "gloo-net"
-version = "0.6.0"
+version = "0.7.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c06f627b1a58ca3d42b45d6104bf1e1a03799df472df00988b6ba21accc10580"
+checksum = "a6420f887c48417e9e86c6cf61274eb231830cccc100e49613f7952e269a1fe1"
 dependencies = [
  "futures-channel",
  "futures-core",
@@ -2869,7 +2875,7 @@ dependencies = [
  "pin-project",
  "serde",
  "serde_json",
- "thiserror 1.0.69",
+ "thiserror 2.0.20",
  "wasm-bindgen",
  "wasm-bindgen-futures",
  "web-sys",
@@ -2889,9 +2895,9 @@ dependencies = [
 
 [[package]]
 name = "gloo-utils"
-version = "0.2.0"
+version = "0.3.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0b5555354113b18c547c1d3a98fbf7fb32a9ff4f6fa112ce823a21641a0ba3aa"
+checksum = "4202275d95a142fa209a1e35e91c250a710c5600731372cd3464a39ed01573d6"
 dependencies = [
  "js-sys",
  "serde",
@@ -6411,7 +6417,7 @@ dependencies = [
 name = "solana-account-decoder-client-types-wasm"
 version = "4.0.2"
 dependencies = [
- "base64 0.22.1",
+ "base64 0.23.1",
  "bs58",
  "serde",
  "serde_derive",
@@ -6429,7 +6435,7 @@ version = "4.0.2"
 dependencies = [
  "Inflector",
  "assert_matches",
- "base64 0.22.1",
+ "base64 0.23.1",
  "bincode",
  "bs58",
  "bv",
@@ -9892,7 +9898,7 @@ dependencies = [
 name = "solana-transaction-status-client-types-wasm"
 version = "4.0.2"
 dependencies = [
- "base64 0.22.1",
+ "base64 0.23.1",
  "bincode",
  "bs58",
  "serde",
@@ -9922,7 +9928,7 @@ version = "4.0.2"
 dependencies = [
  "Inflector",
  "agave-reserved-account-keys",
- "base64 0.22.1",
+ "base64 0.23.1",
  "bincode",
  "borsh",
  "bs58",
@@ -10813,7 +10819,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "32497e9a4c7b38532efcdebeef879707aa9f794296a4f0244f6f69e9bc8574bd"
 dependencies = [
  "fastrand",
- "getrandom 0.3.4",
+ "getrandom 0.4.3",
  "once_cell",
  "rustix",
  "windows-sys 0.61.2",
@@ -11918,8 +11924,7 @@ dependencies = [
  "assert2",
  "async-trait",
  "async-tungstenite 0.28.2",
- "base64 0.22.1",
- "bincode",
+ "base64 0.23.1",
  "bs58",
  "bv",
  "cfg-if 1.0.4",
@@ -11993,6 +11998,7 @@ dependencies = [
  "wasm-bindgen-futures",
  "wasm-bindgen-test",
  "web-sys",
+ "wincode",
  "zstd",
 ]
 
