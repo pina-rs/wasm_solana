@@ -304,6 +304,7 @@ in
           --ignore RUSTSEC-2024-0421 \
           --ignore RUSTSEC-2026-0173 \
           --ignore RUSTSEC-2026-0097 \
+          --ignore RUSTSEC-2026-0292 \
           --file "$DEVENV_ROOT/Cargo.lock"
       '';
       description = "Run RustSec advisory audit for Cargo.lock (ignores validator-stack advisories).";
