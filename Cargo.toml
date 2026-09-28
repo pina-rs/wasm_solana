@@ -41,7 +41,7 @@ crossbeam-channel = { default-features = false, version = "^0.5" }
 derive_more = { default-features = false, version = "^2" }
 fork_stream = { default-features = false, version = "^0.1" }
 futures = { default-features = false, version = "^0.3" }
-futures-timeout = { default-features = false, version = "^0.1" }
+futures-timeout = { default-features = false, version = "^0.2" }
 futures-timer = { default-features = false, version = "^3" }
 getrandom = { default-features = false, version = "^0.3" }
 gloo-net = { default-features = false, version = "^0.6" }
