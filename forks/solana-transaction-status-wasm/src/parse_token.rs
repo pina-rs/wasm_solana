@@ -1226,7 +1226,8 @@ mod test {
 		// Test Transfer, incl multisig
 		let recipient = Pubkey::new_unique();
 		#[allow(deprecated)]
-		let transfer_ix = transfer(program_id, &account_pubkey, &recipient, &owner, &[], 42).unwrap();
+		let transfer_ix =
+			transfer(program_id, &account_pubkey, &recipient, &owner, &[], 42).unwrap();
 		let message = Message::new(&[transfer_ix], None);
 		let compiled_instruction = &message.instructions[0];
 		assert_eq!(

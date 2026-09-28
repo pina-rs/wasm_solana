@@ -86,9 +86,10 @@ impl Source {
 			}
 			Self::NonceAccount(pubkey) => {
 				#[allow(clippy::redundant_closure)]
-				let data = nonce_utils::get_account_with_commitment(rpc_client, pubkey, commitment_config)
-					.await
-					.and_then(|ref a| nonce_utils::data_from_account(a))?;
+				let data =
+					nonce_utils::get_account_with_commitment(rpc_client, pubkey, commitment_config)
+						.await
+						.and_then(|ref a| nonce_utils::data_from_account(a))?;
 				Ok(data.blockhash())
 			}
 		}
@@ -123,9 +124,10 @@ impl Source {
 			}
 			Self::NonceAccount(pubkey) => {
 				#[allow(clippy::redundant_closure)]
-				let _ = nonce_utils::get_account_with_commitment(rpc_client, pubkey, commitment_config)
-					.await
-					.and_then(|ref a| nonce_utils::data_from_account(a))?;
+				let _ =
+					nonce_utils::get_account_with_commitment(rpc_client, pubkey, commitment_config)
+						.await
+						.and_then(|ref a| nonce_utils::data_from_account(a))?;
 				true
 			}
 		})
