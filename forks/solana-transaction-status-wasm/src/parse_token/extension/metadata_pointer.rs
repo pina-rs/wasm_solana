@@ -33,6 +33,7 @@ pub(in crate::parse_token) fn parse_metadata_pointer_instruction(
 					json!(metadata_address.to_string()),
 				);
 			}
+
 			Ok(ParsedInstructionEnum {
 				instruction_type: "initializeMetadataPointer".to_string(),
 				info: value,
@@ -54,6 +55,7 @@ pub(in crate::parse_token) fn parse_metadata_pointer_instruction(
 					json!(metadata_address.to_string()),
 				);
 			}
+
 			parse_signers(
 				map,
 				1,

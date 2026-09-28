@@ -10,6 +10,7 @@ use crate::parse_account_data::ParseAccountError;
 pub fn parse_nonce(data: &[u8]) -> Result<UiNonceState, ParseAccountError> {
 	let nonce_versions: Versions = bincode::deserialize(data)
 		.map_err(|_| ParseAccountError::from(InstructionError::InvalidAccountData))?;
+
 	match nonce_versions.state() {
 		// This prevents parsing an allocated System-owned account with empty data of any non-zero
 		// length as `uninitialized` nonce. An empty account of the wrong length can never be

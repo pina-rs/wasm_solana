@@ -18,6 +18,7 @@ pub fn parse_bpf_upgradeable_loader(
 	let account_state: UpgradeableLoaderState = deserialize(data).map_err(|_| {
 		ParseAccountError::AccountNotParsable(ParsableAccount::BpfUpgradeableLoader)
 	})?;
+
 	let parsed_account = match account_state {
 		UpgradeableLoaderState::Uninitialized => BpfUpgradeableLoaderAccountType::Uninitialized,
 		UpgradeableLoaderState::Buffer { authority_address } => {
@@ -30,6 +31,7 @@ pub fn parse_bpf_upgradeable_loader(
 				UpgradeableLoaderState::size_of_buffer_metadata()
 					- serialized_size(&Pubkey::default()).unwrap() as usize
 			};
+
 			BpfUpgradeableLoaderAccountType::Buffer(UiBuffer {
 				authority: authority_address.map(|pubkey| pubkey.to_string()),
 				data: UiAccountData::Binary(
@@ -55,6 +57,7 @@ pub fn parse_bpf_upgradeable_loader(
 				UpgradeableLoaderState::size_of_programdata_metadata()
 					- serialized_size(&Pubkey::default()).unwrap() as usize
 			};
+
 			BpfUpgradeableLoaderAccountType::ProgramData(UiProgramData {
 				slot,
 				authority: upgrade_authority_address.map(|pubkey| pubkey.to_string()),
@@ -65,6 +68,7 @@ pub fn parse_bpf_upgradeable_loader(
 			})
 		}
 	};
+
 	Ok(parsed_account)
 }
 

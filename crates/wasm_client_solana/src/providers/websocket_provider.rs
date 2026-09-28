@@ -453,6 +453,7 @@ mod websocket_provider_reqwest {
 			if let Ok(mut websocket) = result {
 				let poll_result = websocket.poll_ready_unpin(cx).map_err(Into::into);
 				this.websocket.set(Some(websocket));
+
 				return poll_result;
 			}
 

@@ -226,6 +226,7 @@ impl ProgramTestExtension for ProgramTest {
 			self.add_account_with_lamports(keypair.pubkey(), keypair.pubkey(), initial_lamports);
 			accounts.push(keypair);
 		}
+
 		accounts
 	}
 

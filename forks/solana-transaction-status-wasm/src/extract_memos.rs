@@ -9,6 +9,7 @@ use crate::parse_instruction::parse_memo_data;
 
 pub fn extract_and_fmt_memos<T: ExtractMemos>(message: &T) -> Option<String> {
 	let memos = message.extract_memos();
+
 	if memos.is_empty() {
 		None
 	} else {
@@ -82,6 +83,7 @@ fn extract_memos_inner(
 					}
 				}
 			}?;
+
 			Some(extract_and_fmt_memo_data(memo_data))
 		})
 		.collect()

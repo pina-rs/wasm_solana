@@ -14,6 +14,7 @@ pub(in crate::parse_token) fn parse_default_account_state_instruction(
 		ParseInstructionError::InstructionNotParsable(ParsableProgram::SplToken)
 	})?;
 	let instruction_type = "DefaultAccountState";
+
 	match default_account_state_instruction {
 		DefaultAccountStateInstruction::Initialize => {
 			check_num_token_accounts(account_indexes, 1)?;

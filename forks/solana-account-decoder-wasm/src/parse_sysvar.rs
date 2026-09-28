@@ -235,6 +235,7 @@ impl std::fmt::Debug for SlotHistoryBits {
 				write!(f, "0")?;
 			}
 		}
+
 		Ok(())
 	}
 }

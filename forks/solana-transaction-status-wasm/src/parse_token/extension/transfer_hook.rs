@@ -30,6 +30,7 @@ pub(in crate::parse_token) fn parse_transfer_hook_instruction(
 			if let Some(program_id) = Option::<Pubkey>::from(program_id) {
 				map.insert("programId".to_string(), json!(program_id.to_string()));
 			}
+
 			Ok(ParsedInstructionEnum {
 				instruction_type: "initializeTransferHook".to_string(),
 				info: value,
@@ -48,6 +49,7 @@ pub(in crate::parse_token) fn parse_transfer_hook_instruction(
 			if let Some(program_id) = Option::<Pubkey>::from(program_id) {
 				map.insert("programId".to_string(), json!(program_id.to_string()));
 			}
+
 			parse_signers(
 				map,
 				1,

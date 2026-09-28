@@ -37,6 +37,7 @@ fn encode_bs58<T: ReadableAccount>(
 	data_slice_config: Option<UiDataSliceConfig>,
 ) -> String {
 	let slice = slice_data(account.data(), data_slice_config);
+
 	if slice.len() <= MAX_BASE58_BYTES {
 		bs58::encode(slice).into_string()
 	} else {
@@ -52,6 +53,7 @@ pub fn encode_ui_account<T: ReadableAccount>(
 	data_slice_config: Option<UiDataSliceConfig>,
 ) -> UiAccount {
 	let space = account.data().len();
+
 	let data = match encoding {
 		UiAccountEncoding::Binary => {
 			let data = encode_bs58(account, data_slice_config);
@@ -107,6 +109,7 @@ pub fn encode_ui_account<T: ReadableAccount>(
 			}
 		}
 	};
+
 	UiAccount {
 		lamports: account.lamports(),
 		data,

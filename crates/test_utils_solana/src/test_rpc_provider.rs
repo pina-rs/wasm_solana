@@ -248,13 +248,11 @@ impl RpcProvider for TestRpcProvider {
 				// 	else {
 				// 		return Err(RpcError::default().into());
 				// 	};
-
 				// 	let response = ClientResponse {
 				// 		jsonrpc: "2.0".into(),
 				// 		id: 0,
 				// 		result,
 				// 	};
-
 				// 	serde_json::to_value(response).map_err(to_error)?
 				// }
 				RequestAirdropRequest::NAME => {
@@ -342,6 +340,7 @@ impl RpcProvider for TestRpcProvider {
 								.and_then(|v| v.return_data.map(Into::into)),
 						},
 					};
+
 					let response = ClientResponse {
 						jsonrpc: "2.0".into(),
 						id: 0,

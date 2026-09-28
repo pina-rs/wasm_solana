@@ -104,6 +104,7 @@ pub enum BlockhashQuery {
 impl BlockhashQuery {
 	pub fn new(blockhash: Option<Hash>, sign_only: bool, nonce_account: Option<Pubkey>) -> Self {
 		let source = nonce_account.map_or(Source::Cluster, Source::NonceAccount);
+
 		match blockhash {
 			Some(hash) if sign_only => Self::None(hash),
 			Some(hash) if !sign_only => Self::FeeCalculator(source, hash),
@@ -155,6 +156,7 @@ where
 {
 	let serialized = wincode::serialize(input)
 		.map_err(|e| RpcError::new(format!("Serialization failed: {e}")))?;
+
 	let encoded = match encoding {
 		UiTransactionEncoding::Base58 => bs58::encode(serialized).into_string(),
 		UiTransactionEncoding::Base64 => BASE64_STANDARD.encode(serialized),
@@ -165,6 +167,7 @@ where
 			.into());
 		}
 	};
+
 	Ok(encoded)
 }
 

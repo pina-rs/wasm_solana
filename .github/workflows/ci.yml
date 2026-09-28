@@ -22,6 +22,18 @@ jobs:
     steps:
       - name: checkout repository
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: monostyle inline annotations
+        if: always()
+        run: |
+          set -euo pipefail
+          case "$(uname -m)" in
+            x86_64) triple="x86_64-unknown-linux-musl" ;;
+            aarch64 | arm64) triple="aarch64-unknown-linux-musl" ;;
+          esac
+          curl -fsSL --retry 3 -o "$RUNNER_TEMP/monostyle" \
+            "https://github.com/ifiokjr/monostyle/releases/download/v0.3.16/monostyle-${triple}"
+          chmod +x "$RUNNER_TEMP/monostyle"
+          "$RUNNER_TEMP/monostyle" check . --format github
         with:
           persist-credentials: false
 

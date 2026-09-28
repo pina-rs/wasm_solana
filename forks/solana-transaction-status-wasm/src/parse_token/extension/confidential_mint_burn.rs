@@ -77,6 +77,7 @@ pub(in crate::parse_token) fn parse_confidential_mint_burn_instruction(
 					json!(account_keys[account_indexes[1] as usize].to_string()),
 				);
 			}
+
 			parse_signers(
 				map,
 				2,
@@ -127,6 +128,7 @@ pub(in crate::parse_token) fn parse_confidential_mint_burn_instruction(
 				} else {
 					"equalityProofRecordAccount"
 				};
+
 				map.insert(
 					label.to_string(),
 					json!(account_keys[account_indexes[offset] as usize].to_string()),
@@ -139,6 +141,7 @@ pub(in crate::parse_token) fn parse_confidential_mint_burn_instruction(
 				} else {
 					"ciphertextValidityProofRecordAccount"
 				};
+
 				map.insert(
 					label.to_string(),
 					json!(account_keys[account_indexes[offset] as usize].to_string()),
@@ -151,6 +154,7 @@ pub(in crate::parse_token) fn parse_confidential_mint_burn_instruction(
 				} else {
 					"rangeProofRecordAccount"
 				};
+
 				map.insert(
 					label.to_string(),
 					json!(account_keys[account_indexes[offset] as usize].to_string()),
@@ -208,6 +212,7 @@ pub(in crate::parse_token) fn parse_confidential_mint_burn_instruction(
 				} else {
 					"equalityProofRecordAccount"
 				};
+
 				map.insert(
 					label.to_string(),
 					json!(account_keys[account_indexes[offset] as usize].to_string()),
@@ -220,6 +225,7 @@ pub(in crate::parse_token) fn parse_confidential_mint_burn_instruction(
 				} else {
 					"ciphertextValidityProofRecordAccount"
 				};
+
 				map.insert(
 					label.to_string(),
 					json!(account_keys[account_indexes[offset] as usize].to_string()),
@@ -232,6 +238,7 @@ pub(in crate::parse_token) fn parse_confidential_mint_burn_instruction(
 				} else {
 					"rangeProofRecordAccount"
 				};
+
 				map.insert(
 					label.to_string(),
 					json!(account_keys[account_indexes[offset] as usize].to_string()),
@@ -299,6 +306,7 @@ mod test {
 
 	fn check_no_panic(mut instruction: Instruction) {
 		let account_meta = AccountMeta::new_readonly(Pubkey::new_unique(), false);
+
 		for i in 0..20 {
 			instruction.accounts = vec![account_meta.clone(); i];
 			let message = Message::new(&[instruction.clone()], None);

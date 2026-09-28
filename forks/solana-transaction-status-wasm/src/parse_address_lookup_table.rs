@@ -17,6 +17,7 @@ pub fn parse_address_lookup_table(
 		.map_err(|_| {
 			ParseInstructionError::InstructionNotParsable(ParsableProgram::AddressLookupTable)
 		})?;
+
 	match instruction.accounts.iter().max() {
 		Some(index) if (*index as usize) < account_keys.len() => {}
 		_ => {
@@ -26,6 +27,7 @@ pub fn parse_address_lookup_table(
 			));
 		}
 	}
+
 	match address_lookup_table_instruction {
 		ProgramInstruction::CreateLookupTable {
 			recent_slot,
@@ -76,6 +78,7 @@ pub fn parse_address_lookup_table(
 					json!(account_keys[instruction.accounts[3] as usize].to_string()),
 				);
 			}
+
 			Ok(ParsedInstructionEnum {
 				instruction_type: "extendLookupTable".to_string(),
 				info: value,
