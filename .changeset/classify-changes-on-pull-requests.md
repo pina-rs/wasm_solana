@@ -2,12 +2,12 @@
 memory_wallet: none
 test_utils_insta: none
 test_utils_keypairs: none
-test_utils_solana: patch
-wasm_client_solana: patch
-solana-account-decoder-client-types-wasm: patch
-solana-account-decoder-wasm: patch
-solana-transaction-status-client-types-wasm: patch
-solana-transaction-status-wasm: patch
+test_utils_solana: fix
+wasm_client_solana: fix
+solana-account-decoder-client-types-wasm: fix
+solana-account-decoder-wasm: fix
+solana-transaction-status-client-types-wasm: fix
+solana-transaction-status-wasm: fix
 ---
 
 # Classify pull request changes before they reach a release
