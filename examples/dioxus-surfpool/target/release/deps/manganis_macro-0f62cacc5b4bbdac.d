@@ -1,0 +1,10 @@
+/Users/ifiokjr/Developer/projects/wasm_solana/wasm_solana/examples/dioxus-surfpool/target/release/deps/manganis_macro-0f62cacc5b4bbdac.d: /Users/ifiokjr/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/manganis-macro-0.7.10/src/lib.rs /Users/ifiokjr/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/manganis-macro-0.7.10/src/asset.rs /Users/ifiokjr/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/manganis-macro-0.7.10/src/css_module.rs /Users/ifiokjr/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/manganis-macro-0.7.10/src/ffi.rs /Users/ifiokjr/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/manganis-macro-0.7.10/src/linker.rs /Users/ifiokjr/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/manganis-macro-0.7.10/src/../README.md
+
+/Users/ifiokjr/Developer/projects/wasm_solana/wasm_solana/examples/dioxus-surfpool/target/release/deps/libmanganis_macro-0f62cacc5b4bbdac.dylib: /Users/ifiokjr/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/manganis-macro-0.7.10/src/lib.rs /Users/ifiokjr/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/manganis-macro-0.7.10/src/asset.rs /Users/ifiokjr/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/manganis-macro-0.7.10/src/css_module.rs /Users/ifiokjr/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/manganis-macro-0.7.10/src/ffi.rs /Users/ifiokjr/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/manganis-macro-0.7.10/src/linker.rs /Users/ifiokjr/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/manganis-macro-0.7.10/src/../README.md
+
+/Users/ifiokjr/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/manganis-macro-0.7.10/src/lib.rs:
+/Users/ifiokjr/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/manganis-macro-0.7.10/src/asset.rs:
+/Users/ifiokjr/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/manganis-macro-0.7.10/src/css_module.rs:
+/Users/ifiokjr/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/manganis-macro-0.7.10/src/ffi.rs:
+/Users/ifiokjr/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/manganis-macro-0.7.10/src/linker.rs:
+/Users/ifiokjr/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/manganis-macro-0.7.10/src/../README.md:

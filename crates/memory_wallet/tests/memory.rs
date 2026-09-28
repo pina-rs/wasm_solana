@@ -127,16 +127,27 @@ async fn sign_and_send_v1_transaction() -> Result<()> {
 
 	// The read path must be able to fetch it back. Request v1 explicitly, since
 	// a v1 transaction is what `getTransaction` will not decode by default.
-	let fetched = rpc
-		.get_transaction_with_config(
-			&signature,
-			RpcTransactionConfig {
-				encoding: Some(UiTransactionEncoding::Base64),
-				commitment: Some(CommitmentConfig::confirmed()),
-				..Default::default()
-			},
-		)
-		.await?;
+	//
+	// `getTransaction` serves confirmed transactions from the completed block
+	// store, which lags `getSignatureStatuses` under load: on slow runners the
+	// status reports confirmed seconds before the block store can serve the
+	// transaction, so a single read races. Poll for the same window the
+	// confirmation loop uses.
+	let config = RpcTransactionConfig {
+		encoding: Some(UiTransactionEncoding::Base64),
+		commitment: Some(CommitmentConfig::confirmed()),
+		..Default::default()
+	};
+	let mut fetched = None;
+	for _ in 0..25 {
+		if let Ok(transaction) = rpc.get_transaction_with_config(&signature, config).await {
+			fetched = Some(transaction);
+			break;
+		}
+		tokio::time::sleep(std::time::Duration::from_millis(400)).await;
+	}
+	let fetched =
+		fetched.expect("a confirmed transaction is served by getTransaction within 10 seconds");
 	let fetched_version = fetched
 		.transaction
 		.transaction

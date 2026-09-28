@@ -293,7 +293,9 @@ in
         rm -rf "$DEVENV_ROOT/target/advisory-db-audit"
         # Ignore validator-stack advisories: these crates only run inside the
         # host-side solana-test-validator harness and are never part of any
-        # published client API surface.
+        # published client API surface. RUSTSEC-2026-0097 hits rand 0.7.3,
+        # which enters only through ed25519-dalek 1.x in agave-precompiles
+        # (the client's own rand 0.8.8/0.9.x pins are patched ranges).
         cargo-audit audit \
           --db "$DEVENV_ROOT/target/advisory-db-audit" \
           --url "https://github.com/RustSec/advisory-db.git" \
@@ -301,6 +303,9 @@ in
           --ignore RUSTSEC-2022-0093 \
           --ignore RUSTSEC-2024-0344 \
           --ignore RUSTSEC-2024-0421 \
+          --ignore RUSTSEC-2026-0173 \
+          --ignore RUSTSEC-2026-0097 \
+          --ignore RUSTSEC-2026-0292 \
           --file "$DEVENV_ROOT/Cargo.lock"
       '';
       description = "Run RustSec advisory audit for Cargo.lock (ignores validator-stack advisories).";

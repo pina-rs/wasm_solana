@@ -1,0 +1,10 @@
+/Users/ifiokjr/Developer/projects/wasm_solana/wasm_solana/examples/leptos-surfpool/target/release/deps/proc_macro_utils-58ecdc82670cd043.d: /Users/ifiokjr/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/proc-macro-utils-0.10.0/src/lib.rs /Users/ifiokjr/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/proc-macro-utils-0.10.0/src/parser.rs /Users/ifiokjr/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/proc-macro-utils-0.10.0/src/assert.rs /Users/ifiokjr/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/proc-macro-utils-0.10.0/src/__private.rs
+
+/Users/ifiokjr/Developer/projects/wasm_solana/wasm_solana/examples/leptos-surfpool/target/release/deps/libproc_macro_utils-58ecdc82670cd043.rlib: /Users/ifiokjr/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/proc-macro-utils-0.10.0/src/lib.rs /Users/ifiokjr/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/proc-macro-utils-0.10.0/src/parser.rs /Users/ifiokjr/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/proc-macro-utils-0.10.0/src/assert.rs /Users/ifiokjr/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/proc-macro-utils-0.10.0/src/__private.rs
+
+/Users/ifiokjr/Developer/projects/wasm_solana/wasm_solana/examples/leptos-surfpool/target/release/deps/libproc_macro_utils-58ecdc82670cd043.rmeta: /Users/ifiokjr/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/proc-macro-utils-0.10.0/src/lib.rs /Users/ifiokjr/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/proc-macro-utils-0.10.0/src/parser.rs /Users/ifiokjr/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/proc-macro-utils-0.10.0/src/assert.rs /Users/ifiokjr/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/proc-macro-utils-0.10.0/src/__private.rs
+
+/Users/ifiokjr/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/proc-macro-utils-0.10.0/src/lib.rs:
+/Users/ifiokjr/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/proc-macro-utils-0.10.0/src/parser.rs:
+/Users/ifiokjr/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/proc-macro-utils-0.10.0/src/assert.rs:
+/Users/ifiokjr/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/proc-macro-utils-0.10.0/src/__private.rs:

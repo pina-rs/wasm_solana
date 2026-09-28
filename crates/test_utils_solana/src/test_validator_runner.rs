@@ -393,7 +393,11 @@ fn free_port(port: u16) {
 
 fn find_ports() -> Option<(u16, u16, u16, (u16, u16))> {
 	let mut rng = rand::rng();
-	let max = u16::MAX - 25;
+	// Leave room for the full port tuple: rpc, pubsub, faucet, and a
+	// 100-port gossip range above the base. Drawing the base near u16::MAX
+	// used to overflow the gossip range end and panic under debug
+	// overflow checks.
+	let max = u16::MAX - 103;
 	let mut attempts = 100;
 
 	loop {

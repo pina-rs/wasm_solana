@@ -1,0 +1,10 @@
+/Users/ifiokjr/Developer/projects/wasm_solana/wasm_solana/examples/dioxus-surfpool/target/wasm32-unknown-unknown/release/deps/getrandom-34c5204b2c3b7db9.d: /Users/ifiokjr/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/getrandom-0.2.17/src/lib.rs /Users/ifiokjr/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/getrandom-0.2.17/src/error.rs /Users/ifiokjr/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/getrandom-0.2.17/src/util.rs /Users/ifiokjr/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/getrandom-0.2.17/src/js.rs
+
+/Users/ifiokjr/Developer/projects/wasm_solana/wasm_solana/examples/dioxus-surfpool/target/wasm32-unknown-unknown/release/deps/libgetrandom-34c5204b2c3b7db9.rlib: /Users/ifiokjr/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/getrandom-0.2.17/src/lib.rs /Users/ifiokjr/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/getrandom-0.2.17/src/error.rs /Users/ifiokjr/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/getrandom-0.2.17/src/util.rs /Users/ifiokjr/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/getrandom-0.2.17/src/js.rs
+
+/Users/ifiokjr/Developer/projects/wasm_solana/wasm_solana/examples/dioxus-surfpool/target/wasm32-unknown-unknown/release/deps/libgetrandom-34c5204b2c3b7db9.rmeta: /Users/ifiokjr/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/getrandom-0.2.17/src/lib.rs /Users/ifiokjr/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/getrandom-0.2.17/src/error.rs /Users/ifiokjr/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/getrandom-0.2.17/src/util.rs /Users/ifiokjr/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/getrandom-0.2.17/src/js.rs
+
+/Users/ifiokjr/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/getrandom-0.2.17/src/lib.rs:
+/Users/ifiokjr/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/getrandom-0.2.17/src/error.rs:
+/Users/ifiokjr/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/getrandom-0.2.17/src/util.rs:
+/Users/ifiokjr/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/getrandom-0.2.17/src/js.rs:
