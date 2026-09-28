@@ -129,9 +129,7 @@ impl WebSocketProvider {
 	///
 	/// Fails only when the shared buffer is gone, which cannot happen while
 	/// this provider (and its root fork) is alive.
-	fn live_fork(
-		&self,
-	) -> Result<Forked<SplitStream<WebSocketStream>>, ClientWebSocketError> {
+	fn live_fork(&self) -> Result<Forked<SplitStream<WebSocketStream>>, ClientWebSocketError> {
 		self.live_edge
 			.upgrade()
 			.ok_or(ClientWebSocketError::ConnectionError)
