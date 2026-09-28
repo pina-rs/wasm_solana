@@ -1,0 +1,31 @@
+[package]
+name = "dioxus-surfpool-example"
+version = "0.1.0"
+edition = "2021"
+publish = false
+description = "Browser demo driving wasm_client_solana against a local surfpool node"
+
+# Standalone crate: excluded from the repository workspace so the example
+# keeps its own lockfile and the published dependency graph stays clean.
+[workspace]
+
+[dependencies]
+# Dioxus 0.7 with the web renderer selected explicitly so a plain
+# `cargo build --target wasm32-unknown-unknown` produces a browser binary
+# (no `dx` CLI required for this demo).
+dioxus = { version = "0.7", features = ["web"] }
+futures = { default-features = false, version = "0.3" }
+solana-keypair = { version = "^3.1" }
+# Pin to the version the repository lockfile is tested with: newer
+# solana-message 4.4.x releases pull wincode 0.6 alongside the 0.5 required
+# by solana-instruction, which does not compile.
+solana-message = "=4.4.1"
+solana-native-token = { version = "^3" }
+solana-pubkey = { version = ">=4.2.0, <4.3.0" }
+solana-signer = { version = "^3" }
+solana-system-interface = { version = ">=3.2.0, <3.3.0", features = ["bincode"] }
+solana-transaction = { version = ">=4.1.4, <4.2.0" }
+# Pinned to the wasm-bindgen CLI version the repository ships
+# (workspace.metadata.bin -> wasm-bindgen-cli 0.2.128).
+wasm-bindgen = "=0.2.128"
+wasm_client_solana = { features = ["js"], path = "../../crates/wasm_client_solana" }

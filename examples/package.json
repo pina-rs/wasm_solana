@@ -1,0 +1,16 @@
+{
+	"name": "wasm-solana-examples",
+	"private": true,
+	"description": "Browser examples and Playwright e2e tests for wasm_client_solana against a local surfpool node",
+	"scripts": {
+		"build": "npm run build:leptos && npm run build:dioxus",
+		"build:leptos": "cd leptos-surfpool && cargo build --release --target wasm32-unknown-unknown && cd .. && \"${WASM_BINDGEN:-../.bin/.shims/wasm-bindgen}\" --target web --out-dir leptos-surfpool/dist leptos-surfpool/target/wasm32-unknown-unknown/release/leptos-surfpool-example.wasm && cp leptos-surfpool/index.html leptos-surfpool/dist/",
+		"build:dioxus": "cd dioxus-surfpool && cargo build --release --target wasm32-unknown-unknown && cd .. && \"${WASM_BINDGEN:-../.bin/.shims/wasm-bindgen}\" --target web --out-dir dioxus-surfpool/dist dioxus-surfpool/target/wasm32-unknown-unknown/release/dioxus-surfpool-example.wasm && cp dioxus-surfpool/index.html dioxus-surfpool/dist/",
+		"serve": "python3 -m http.server 4173 --directory leptos-surfpool/dist & python3 -m http.server 4174 --directory dioxus-surfpool/dist & wait",
+		"test": "playwright test",
+		"test:headed": "playwright test --headed"
+	},
+	"devDependencies": {
+		"@playwright/test": "1.63.0"
+	}
+}

@@ -11,7 +11,6 @@ use fork_stream::StreamExt as _;
 use futures::SinkExt;
 use futures::Stream;
 use futures::StreamExt;
-use futures::future;
 use futures::lock::Mutex;
 use futures::stream::SplitSink;
 use futures::stream::SplitStream;

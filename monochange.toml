@@ -180,6 +180,8 @@ ignored_paths = [
 	"readme.md",
 	"codecov.json",
 	"test-ledger/**",
+	# Browser examples are standalone demos, not released packages.
+	"examples/**",
 ]
 
 [lints]

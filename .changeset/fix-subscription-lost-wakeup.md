@@ -1,5 +1,5 @@
 ---
-wasm_client_solana: fix
+wasm_client_solana: breaking
 ---
 
 # Keep websocket subscriptions alive after non-matching frames

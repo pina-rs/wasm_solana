@@ -1,0 +1,18 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<title>wasm_client_solana × Dioxus × surfpool</title>
+	</head>
+	<body>
+		<!-- dioxus mounts into `#main` by default -->
+		<div id="main"></div>
+		<!-- Loading the wasm-bindgen output directly keeps the example free of
+		     bundler tooling; `dx serve --platform web` also works. -->
+		<script type="module">
+			import init from "./dioxus-surfpool-example.js";
+			init();
+		</script>
+	</body>
+</html>
