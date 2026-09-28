@@ -1,0 +1,417 @@
+{
+	"schema_version": "0.6",
+	"kind": "monochange.releaseRecord",
+	"created_at": "2026-09-28T23:57:08Z",
+	"command": "release",
+	"version": "0.12.1",
+	"versions": {
+		"core": "0.12.1"
+	},
+	"release_targets": [
+		{
+			"id": "core",
+			"kind": "group",
+			"version": "0.12.1",
+			"version_format": "primary",
+			"tag": true,
+			"release": true,
+			"tag_name": "v0.12.1",
+			"members": [
+				"memory_wallet",
+				"test_utils_insta",
+				"test_utils_keypairs",
+				"test_utils_solana",
+				"wasm_client_solana"
+			]
+		}
+	],
+	"released_packages": [
+		"memory_wallet",
+		"test_utils_insta",
+		"test_utils_keypairs",
+		"test_utils_solana",
+		"wasm_client_solana"
+	],
+	"changed_files": [
+		"Cargo.lock",
+		"Cargo.toml",
+		"changelog.md",
+		"crates/memory_wallet/Cargo.toml",
+		"crates/test_utils_insta/Cargo.toml",
+		"crates/test_utils_keypairs/Cargo.toml",
+		"crates/test_utils_solana/Cargo.toml",
+		"crates/wasm_client_solana/Cargo.toml"
+	],
+	"package_publications": [
+		{
+			"package": "memory_wallet",
+			"ecosystem": "cargo",
+			"registry": "crates_io",
+			"version": "0.12.1",
+			"mode": "builtin",
+			"trusted_publishing": {
+				"enabled": true,
+				"repository": "pina-rs/wasm_solana",
+				"workflow": "publish.yml",
+				"environment": "publisher"
+			}
+		},
+		{
+			"package": "test_utils_insta",
+			"ecosystem": "cargo",
+			"registry": "crates_io",
+			"version": "0.12.1",
+			"mode": "builtin",
+			"trusted_publishing": {
+				"enabled": true,
+				"repository": "pina-rs/wasm_solana",
+				"workflow": "publish.yml",
+				"environment": "publisher"
+			}
+		},
+		{
+			"package": "test_utils_keypairs",
+			"ecosystem": "cargo",
+			"registry": "crates_io",
+			"version": "0.12.1",
+			"mode": "builtin",
+			"trusted_publishing": {
+				"enabled": true,
+				"repository": "pina-rs/wasm_solana",
+				"workflow": "publish.yml",
+				"environment": "publisher"
+			}
+		},
+		{
+			"package": "test_utils_solana",
+			"ecosystem": "cargo",
+			"registry": "crates_io",
+			"version": "0.12.1",
+			"mode": "builtin",
+			"trusted_publishing": {
+				"enabled": true,
+				"repository": "pina-rs/wasm_solana",
+				"workflow": "publish.yml",
+				"environment": "publisher"
+			},
+			"timeout": {
+				"timeout_seconds": 900,
+				"retries": 2
+			}
+		},
+		{
+			"package": "wasm_client_solana",
+			"ecosystem": "cargo",
+			"registry": "crates_io",
+			"version": "0.12.1",
+			"mode": "builtin",
+			"trusted_publishing": {
+				"enabled": true,
+				"repository": "pina-rs/wasm_solana",
+				"workflow": "publish.yml",
+				"environment": "publisher"
+			}
+		}
+	],
+	"updated_changelogs": [
+		"changelog.md"
+	],
+	"deleted_changesets": [
+		".changeset/fix-random-port-overflow.md",
+		".changeset/ignore-proc-macro-error2-advisory.md",
+		".changeset/poll-v1-gettransaction-test.md"
+	],
+	"changesets": [
+		{
+			"path": ".changeset/fix-random-port-overflow.md",
+			"summary": "Fix a port-picker overflow near u16::MAX",
+			"details": "`TestValidatorPorts::random_ports` drew its base port up to `u16::MAX - 25`, but the gossip range end is `port + 103`; a draw in the top ~80 values overflowed and panicked under debug overflow checks, failing test runs at random.",
+			"targets": [
+				{
+					"id": "test_utils_solana",
+					"kind": "package",
+					"bump": "patch",
+					"origin": "direct-change",
+					"evidence_refs": [],
+					"change_type": "fix"
+				}
+			],
+			"context": {
+				"provider": "github",
+				"host": "github.com",
+				"capabilities": {
+					"commit_web_urls": true,
+					"actor_profiles": true,
+					"review_request_lookup": true,
+					"related_issues": true,
+					"issue_comments": true
+				},
+				"introduced": {
+					"actor": {
+						"provider": "github",
+						"host": "github.com",
+						"id": null,
+						"login": null,
+						"display_name": "Ifiok Jr.",
+						"url": null,
+						"source": "commit_author"
+					},
+					"commit": {
+						"provider": "github",
+						"host": "github.com",
+						"sha": "2b61d2f154d956e54490996ac9b7e61d059f1c75",
+						"short_sha": "2b61d2f",
+						"url": "https://github.com/pina-rs/wasm_solana/commit/2b61d2f154d956e54490996ac9b7e61d059f1c75",
+						"authored_at": "2026-09-28T22:48:12+01:00",
+						"committed_at": "2026-09-28T22:48:12+01:00",
+						"author_name": "Ifiok Jr.",
+						"author_email": "1160934+ifiokjr@users.noreply.github.com"
+					},
+					"review_request": null
+				},
+				"last_updated": {
+					"actor": {
+						"provider": "github",
+						"host": "github.com",
+						"id": null,
+						"login": null,
+						"display_name": "Ifiok Jr.",
+						"url": null,
+						"source": "commit_author"
+					},
+					"commit": {
+						"provider": "github",
+						"host": "github.com",
+						"sha": "2b61d2f154d956e54490996ac9b7e61d059f1c75",
+						"short_sha": "2b61d2f",
+						"url": "https://github.com/pina-rs/wasm_solana/commit/2b61d2f154d956e54490996ac9b7e61d059f1c75",
+						"authored_at": "2026-09-28T22:48:12+01:00",
+						"committed_at": "2026-09-28T22:48:12+01:00",
+						"author_name": "Ifiok Jr.",
+						"author_email": "1160934+ifiokjr@users.noreply.github.com"
+					},
+					"review_request": null
+				},
+				"related_issues": []
+			}
+		},
+		{
+			"path": ".changeset/ignore-proc-macro-error2-advisory.md",
+			"summary": "Ignore three new advisories for the validator stack",
+			"details": "`proc-macro-error2 is unmaintained` (RUSTSEC-2026-0173) reaches the lockfile only through `aquamarine ← solana-runtime` — the host-side validator/test harness — and is never part of any published client surface, so it joins the existing validator-stack ignore list. RUSTSEC-2026-0097 (rand unsoundness) hits rand 0.7.3, reachable only through ed25519-dalek 1.x inside agave-precompiles; the client's own rand pins (0.8.8, 0.9.x) are in the patched ranges, so nothing published is affected. RUSTSEC-2026-0292 (imbl-sized-chunks use-after-free) enters through imbl in solana-runtime, again validator-only.",
+			"targets": [
+				{
+					"id": "memory_wallet",
+					"kind": "package",
+					"bump": "none",
+					"origin": "direct-change",
+					"evidence_refs": [],
+					"change_type": "none"
+				},
+				{
+					"id": "test_utils_insta",
+					"kind": "package",
+					"bump": "none",
+					"origin": "direct-change",
+					"evidence_refs": [],
+					"change_type": "none"
+				},
+				{
+					"id": "test_utils_keypairs",
+					"kind": "package",
+					"bump": "none",
+					"origin": "direct-change",
+					"evidence_refs": [],
+					"change_type": "none"
+				},
+				{
+					"id": "test_utils_solana",
+					"kind": "package",
+					"bump": "none",
+					"origin": "direct-change",
+					"evidence_refs": [],
+					"change_type": "none"
+				},
+				{
+					"id": "wasm_client_solana",
+					"kind": "package",
+					"bump": "none",
+					"origin": "direct-change",
+					"evidence_refs": [],
+					"change_type": "none"
+				}
+			],
+			"context": {
+				"provider": "github",
+				"host": "github.com",
+				"capabilities": {
+					"commit_web_urls": true,
+					"actor_profiles": true,
+					"review_request_lookup": true,
+					"related_issues": true,
+					"issue_comments": true
+				},
+				"introduced": {
+					"actor": {
+						"provider": "github",
+						"host": "github.com",
+						"id": null,
+						"login": null,
+						"display_name": "Ifiok Jr.",
+						"url": null,
+						"source": "commit_author"
+					},
+					"commit": {
+						"provider": "github",
+						"host": "github.com",
+						"sha": "9e7f3f739a4a833014d7940247feaf4a22bbb1fe",
+						"short_sha": "9e7f3f7",
+						"url": "https://github.com/pina-rs/wasm_solana/commit/9e7f3f739a4a833014d7940247feaf4a22bbb1fe",
+						"authored_at": "2026-09-28T22:48:16+01:00",
+						"committed_at": "2026-09-28T22:48:16+01:00",
+						"author_name": "Ifiok Jr.",
+						"author_email": "1160934+ifiokjr@users.noreply.github.com"
+					},
+					"review_request": null
+				},
+				"last_updated": {
+					"actor": {
+						"provider": "github",
+						"host": "github.com",
+						"id": null,
+						"login": null,
+						"display_name": "Ifiok Jr.",
+						"url": null,
+						"source": "commit_author"
+					},
+					"commit": {
+						"provider": "github",
+						"host": "github.com",
+						"sha": "d1e87f6f0e144f79b1282ab90a729f0f65e30e73",
+						"short_sha": "d1e87f6",
+						"url": "https://github.com/pina-rs/wasm_solana/commit/d1e87f6f0e144f79b1282ab90a729f0f65e30e73",
+						"authored_at": "2026-09-28T22:54:38+01:00",
+						"committed_at": "2026-09-28T22:54:38+01:00",
+						"author_name": "Ifiok Jr.",
+						"author_email": "ifiokotung@gmail.com"
+					},
+					"review_request": null
+				},
+				"related_issues": []
+			}
+		},
+		{
+			"path": ".changeset/poll-v1-gettransaction-test.md",
+			"summary": "Poll getTransaction in the v1 sign-and-send test",
+			"details": "Test-only: the single-shot `getTransaction` read raced the completed-block store on slow CI runners (statuses reported the transaction confirmed before the block store could serve it), so the test has failed every CI run since the v1 support landed. It now polls for the same window the confirmation loop uses.",
+			"targets": [
+				{
+					"id": "memory_wallet",
+					"kind": "package",
+					"bump": "none",
+					"origin": "direct-change",
+					"evidence_refs": [],
+					"change_type": "none"
+				}
+			],
+			"context": {
+				"provider": "github",
+				"host": "github.com",
+				"capabilities": {
+					"commit_web_urls": true,
+					"actor_profiles": true,
+					"review_request_lookup": true,
+					"related_issues": true,
+					"issue_comments": true
+				},
+				"introduced": {
+					"actor": {
+						"provider": "github",
+						"host": "github.com",
+						"id": null,
+						"login": null,
+						"display_name": "Ifiok Jr.",
+						"url": null,
+						"source": "commit_author"
+					},
+					"commit": {
+						"provider": "github",
+						"host": "github.com",
+						"sha": "6c095e1b1a57323024c9d2107cc8464644a353fa",
+						"short_sha": "6c095e1",
+						"url": "https://github.com/pina-rs/wasm_solana/commit/6c095e1b1a57323024c9d2107cc8464644a353fa",
+						"authored_at": "2026-09-28T22:48:07+01:00",
+						"committed_at": "2026-09-28T22:48:07+01:00",
+						"author_name": "Ifiok Jr.",
+						"author_email": "1160934+ifiokjr@users.noreply.github.com"
+					},
+					"review_request": null
+				},
+				"last_updated": {
+					"actor": {
+						"provider": "github",
+						"host": "github.com",
+						"id": null,
+						"login": null,
+						"display_name": "Ifiok Jr.",
+						"url": null,
+						"source": "commit_author"
+					},
+					"commit": {
+						"provider": "github",
+						"host": "github.com",
+						"sha": "6c095e1b1a57323024c9d2107cc8464644a353fa",
+						"short_sha": "6c095e1",
+						"url": "https://github.com/pina-rs/wasm_solana/commit/6c095e1b1a57323024c9d2107cc8464644a353fa",
+						"authored_at": "2026-09-28T22:48:07+01:00",
+						"committed_at": "2026-09-28T22:48:07+01:00",
+						"author_name": "Ifiok Jr.",
+						"author_email": "1160934+ifiokjr@users.noreply.github.com"
+					},
+					"review_request": null
+				},
+				"related_issues": []
+			}
+		}
+	],
+	"changelogs": [
+		{
+			"owner_id": "core",
+			"owner_kind": "group",
+			"output": "default",
+			"stream": "default",
+			"path": "changelog.md",
+			"format": "keep_a_changelog",
+			"notes": {
+				"title": "[0.12.1](https://github.com/pina-rs/wasm_solana/releases/tag/v0.12.1) (2026-09-28)",
+				"summary": [
+					"Grouped release for `core`."
+				],
+				"sections": [
+					{
+						"title": "Fixes",
+						"collapsed": false,
+						"entries": [
+							"- **test_utils_solana**: **Fix a port-picker overflow near u16::MAX.** `TestValidatorPorts::random_ports` drew its base port up to `u16::MAX - 25`, but the gossip range end is `port + 103`; a draw in the top ~80 values overflowed and panicked under debug overflow checks, failing test runs at random.\n  _Owner:_ Ifiok Jr. · _Introduced in:_ [2b61d2f](https://github.com/pina-rs/wasm_solana/commit/2b61d2f154d956e54490996ac9b7e61d059f1c75)"
+						]
+					},
+					{
+						"title": "Notes",
+						"collapsed": false,
+						"entries": [
+							"- _Packages:_ _memory_wallet_, _test_utils_insta_, _test_utils_keypairs_, _test_utils_solana_, _wasm_client_solana_**Ignore three new advisories for the validator stack.** `proc-macro-error2 is unmaintained` (RUSTSEC-2026-0173) reaches the lockfile only through `aquamarine ← solana-runtime` — the host-side validator/test harness — and is never part of any published client surface, so it joins the existing validator-stack ignore list. RUSTSEC-2026-0097 (rand unsoundness) hits rand 0.7.3, reachable only through ed25519-dalek 1.x inside agave-precompiles; the client's own rand pins (0.8.8, 0.9.x) are in the patched ranges, so nothing published is affected. RUSTSEC-2026-0292 (imbl-sized-chunks use-after-free) enters through imbl in solana-runtime, again validator-only.\n  _Owner:_ Ifiok Jr. · _Introduced in:_ [9e7f3f7](https://github.com/pina-rs/wasm_solana/commit/9e7f3f739a4a833014d7940247feaf4a22bbb1fe) · _Last updated in:_ [d1e87f6](https://github.com/pina-rs/wasm_solana/commit/d1e87f6f0e144f79b1282ab90a729f0f65e30e73)",
+							"- **memory_wallet**: **Poll getTransaction in the v1 sign-and-send test.** Test-only: the single-shot `getTransaction` read raced the completed-block store on slow CI runners (statuses reported the transaction confirmed before the block store could serve it), so the test has failed every CI run since the v1 support landed. It now polls for the same window the confirmation loop uses.\n  _Owner:_ Ifiok Jr. · _Introduced in:_ [6c095e1](https://github.com/pina-rs/wasm_solana/commit/6c095e1b1a57323024c9d2107cc8464644a353fa)"
+						]
+					}
+				]
+			},
+			"rendered": "## [0.12.1](https://github.com/pina-rs/wasm_solana/releases/tag/v0.12.1) (2026-09-28)\n\nGrouped release for `core`.\n\n### Fixes\n\n- **test_utils_solana**: **Fix a port-picker overflow near u16::MAX.** `TestValidatorPorts::random_ports` drew its base port up to `u16::MAX - 25`, but the gossip range end is `port + 103`; a draw in the top ~80 values overflowed and panicked under debug overflow checks, failing test runs at random.\n  _Owner:_ Ifiok Jr. · _Introduced in:_ [2b61d2f](https://github.com/pina-rs/wasm_solana/commit/2b61d2f154d956e54490996ac9b7e61d059f1c75)\n\n### Notes\n\n- _Packages:_ _memory_wallet_, _test_utils_insta_, _test_utils_keypairs_, _test_utils_solana_, _wasm_client_solana_**Ignore three new advisories for the validator stack.** `proc-macro-error2 is unmaintained` (RUSTSEC-2026-0173) reaches the lockfile only through `aquamarine ← solana-runtime` — the host-side validator/test harness — and is never part of any published client surface, so it joins the existing validator-stack ignore list. RUSTSEC-2026-0097 (rand unsoundness) hits rand 0.7.3, reachable only through ed25519-dalek 1.x inside agave-precompiles; the client's own rand pins (0.8.8, 0.9.x) are in the patched ranges, so nothing published is affected. RUSTSEC-2026-0292 (imbl-sized-chunks use-after-free) enters through imbl in solana-runtime, again validator-only.\n  _Owner:_ Ifiok Jr. · _Introduced in:_ [9e7f3f7](https://github.com/pina-rs/wasm_solana/commit/9e7f3f739a4a833014d7940247feaf4a22bbb1fe) · _Last updated in:_ [d1e87f6](https://github.com/pina-rs/wasm_solana/commit/d1e87f6f0e144f79b1282ab90a729f0f65e30e73)\n- **memory_wallet**: **Poll getTransaction in the v1 sign-and-send test.** Test-only: the single-shot `getTransaction` read raced the completed-block store on slow CI runners (statuses reported the transaction confirmed before the block store could serve it), so the test has failed every CI run since the v1 support landed. It now polls for the same window the confirmation loop uses.\n  _Owner:_ Ifiok Jr. · _Introduced in:_ [6c095e1](https://github.com/pina-rs/wasm_solana/commit/6c095e1b1a57323024c9d2107cc8464644a353fa)"
+		}
+	],
+	"provider": {
+		"kind": "github",
+		"owner": "pina-rs",
+		"repo": "wasm_solana",
+		"host": null
+	}
+}
