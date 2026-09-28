@@ -6,7 +6,7 @@ solana-transaction-status-client-types-wasm: fix
 solana-transaction-status-wasm: fix
 test_utils_insta: docs
 test_utils_keypairs: docs
-test_utils_solana: docs
+test_utils_solana: fix
 wasm_client_solana: fix
 ---
 
