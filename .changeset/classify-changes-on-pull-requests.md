@@ -3,10 +3,10 @@ memory_wallet: none
 test_utils_insta: none
 test_utils_keypairs: none
 test_utils_solana: patch
-wasm_client_solana: none
+wasm_client_solana: patch
 solana-account-decoder-client-types-wasm: patch
 solana-account-decoder-wasm: patch
-solana-transaction-status-client-types-wasm: none
+solana-transaction-status-client-types-wasm: patch
 solana-transaction-status-wasm: patch
 ---
 
