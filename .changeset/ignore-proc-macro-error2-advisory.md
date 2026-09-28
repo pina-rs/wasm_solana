@@ -6,6 +6,9 @@ test_utils_solana: none
 wasm_client_solana: none
 ---
 
-# Ignore RUSTSEC-2026-0173 for the validator stack
+# Ignore two new advisories for the validator stack
 
-`proc-macro-error2 is unmaintained` (RUSTSEC-2026-0173) reaches the lockfile only through `aquamarine ← solana-runtime` — the host-side validator/test harness — and is never part of any published client surface, so it joins the existing validator-stack ignore list.
+`proc-macro-error2 is unmaintained` (RUSTSEC-2026-0173) reaches the lockfile only through `aquamarine ← solana-runtime` — the host-side validator/test harness — and is never part of any published client surface, so it joins the existing validator-stack ignore list. RUSTSEC-2026-0097
+(rand unsoundness) hits rand 0.7.3, reachable only through ed25519-dalek
+1.x inside agave-precompiles; the client's own rand pins (0.8.8, 0.9.x)
+are in the patched ranges, so nothing published is affected.
