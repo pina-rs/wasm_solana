@@ -1,13 +1,13 @@
 ---
 memory_wallet: docs
-solana-account-decoder-client-types-wasm: docs
-solana-account-decoder-wasm: docs
-solana-transaction-status-client-types-wasm: docs
-solana-transaction-status-wasm: docs
+solana-account-decoder-client-types-wasm: fix
+solana-account-decoder-wasm: fix
+solana-transaction-status-client-types-wasm: fix
+solana-transaction-status-wasm: fix
 test_utils_insta: docs
 test_utils_keypairs: docs
 test_utils_solana: docs
-wasm_client_solana: docs
+wasm_client_solana: fix
 ---
 
 # Add monostyle inline annotations
