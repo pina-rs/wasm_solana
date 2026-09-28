@@ -67,3 +67,14 @@ devenv.local.nix
 # pre-commit
 .pre-commit-config.yaml
 /docs/book
+
+# browser examples (each example is its own cargo workspace)
+examples/*/target/
+examples/*/dist/
+examples/node_modules/
+examples/package-lock.json
+examples/test-results/
+examples/playwright-report/
+
+# agent tooling artifacts
+/.video_agent/

@@ -58,11 +58,12 @@ pub async fn log_subscription() -> Result<()> {
 
 /// Subscribe to an account and drive a create-account transaction through it.
 ///
-/// TODO this test doesn't actually work. Spent too long trying to get it to
-/// fail for the correct reason. It seems like there is a lock somewhere that is
-/// only released on drop. So when the subscription is dropped all the stream
-/// updates are processed, but nothing happens in the subscription since it has
-/// already been dropped.
+/// This test spent a long time "not working for the correct reason": the
+// websocket subscription stalled after its ack because `poll_next` dropped
+// the task wakeup whenever it consumed a non-matching frame (see
+// `Subscription::poll_next` for the details). The spawned consumer below now
+// receives notifications live; verified against `solana-test-validator` and
+// against a local surfpool node (`surfpool start --offline`).
 #[wasm_bindgen_test]
 pub async fn account_subscription() -> Result<()> {
 	let date = js_sys::Date::new_0();
