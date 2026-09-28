@@ -29,7 +29,7 @@ assert2 = { default-features = false, version = "^0.3" }
 assert_matches = { default-features = false, version = "^1" }
 async-trait = { default-features = false, version = "^0.1" }
 async-tungstenite = { default-features = false, version = "^0.28.1" }
-base64 = { default-features = false, version = "^0.22" }
+base64 = { default-features = false, version = "^0.23" }
 bincode = { default-features = false, version = "^1" }
 borsh = { default-features = false, version = "^1" }
 bs58 = { default-features = false, version = "^0.5" }
@@ -41,10 +41,10 @@ crossbeam-channel = { default-features = false, version = "^0.5" }
 derive_more = { default-features = false, version = "^2" }
 fork_stream = { default-features = false, version = "^0.1" }
 futures = { default-features = false, version = "^0.3" }
-futures-timeout = { default-features = false, version = "^0.1" }
+futures-timeout = { default-features = false, version = "^0.2" }
 futures-timer = { default-features = false, version = "^3" }
 getrandom = { default-features = false, version = "^0.3" }
-gloo-net = { default-features = false, version = "^0.6" }
+gloo-net = { default-features = false, version = "^0.7" }
 heck = { default-features = false, version = "^0.5" }
 indexmap = { default-features = false, version = "^2" }
 insta = { default-features = false, version = "^1" }
