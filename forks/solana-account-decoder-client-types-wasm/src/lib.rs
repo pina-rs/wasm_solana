@@ -57,7 +57,13 @@ impl UiAccountData {
 					UiAccountEncoding::Base64Zstd => {
 						BASE64_STANDARD.decode(blob).ok().and_then(|zstd_data| {
 							let mut data = vec![];
+							// Cap the decompressed size: a tiny compressed
+							// blob from a hostile RPC must not be able to
+							// expand into gigabytes and OOM the process.
+							// Solana itself caps account data at 10 MiB.
+							const MAX_ACCOUNT_DATA_LEN: usize = 10 * 1024 * 1024;
 							zstd::stream::read::Decoder::new(zstd_data.as_slice())
+								.map(|reader| reader.take(MAX_ACCOUNT_DATA_LEN as u64))
 								.and_then(|mut reader| reader.read_to_end(&mut data))
 								.map(|_| data)
 								.ok()

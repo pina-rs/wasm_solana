@@ -175,8 +175,6 @@ impl SolanaRpcClient {
 	/// The client has a default timeout of 30 seconds, and a user-specified
 	/// [`CommitmentLevel`] via [`CommitmentConfig`].
 	pub fn new_with_commitment(endpoint: &str, commitment_config: CommitmentConfig) -> Self {
-		println!("endpoint: {endpoint}");
-
 		Self {
 			provider: Arc::new(HttpProvider::new(endpoint)),
 			commitment_config,
@@ -237,14 +235,21 @@ impl SolanaRpcClient {
 			)
 			.await?;
 
-		match serde_json::from_value::<R>(result.clone()) {
+		// A JSON-RPC error envelope carries an `error` member instead of a
+		// `result`. Probing for it first means the error shape is only
+		// deserialized when the response is an error, and successful
+		// responses — which can carry megabytes of account data — are never
+		// deep-cloned just to try the error shape.
+		if result.get("error").is_some() {
+			return match serde_json::from_value::<RpcError>(result) {
+				Ok(error) => Err(error.into()),
+				Err(error) => Err(ClientError::Other(error.to_string())),
+			};
+		}
+
+		match serde_json::from_value::<R>(result) {
 			Ok(response) => Ok(response),
-			_ => {
-				match serde_json::from_value::<RpcError>(result) {
-					Ok(error) => Err(error.into()),
-					Err(error) => Err(ClientError::Other(error.to_string())),
-				}
-			}
+			Err(error) => Err(ClientError::Other(error.to_string())),
 		}
 	}
 
@@ -959,9 +964,12 @@ impl SolanaRpcClient {
 		Ok(response
 			.result
 			.value
-			.iter()
-			.filter(|maybe_acc| maybe_acc.is_some())
-			.map(|acc| acc.clone().unwrap().to_account())
+			.into_iter()
+			// Preserve positional alignment with `pubkeys`: a `None` at
+			// index `i` means that account does not exist. Filtering the
+			// `None`s out would let callers attribute one account's data
+			// to another pubkey.
+			.map(|maybe_acc| maybe_acc.and_then(|acc| acc.to_account()))
 			.collect())
 	}
 
@@ -975,6 +983,10 @@ impl SolanaRpcClient {
 			pubkeys,
 			RpcAccountInfoConfig {
 				commitment: Some(commitment_config),
+				// The binary encoding is required for `to_account` to decode
+				// account data: the server default (jsonParsed) cannot be
+				// decoded by `UiAccountData::decode`.
+				encoding: Some(UiAccountEncoding::Base64),
 				..RpcAccountInfoConfig::default()
 			},
 		)

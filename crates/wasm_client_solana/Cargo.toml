@@ -106,7 +106,15 @@ wasm-bindgen-test = { workspace = true, default-features = true }
 [features]
 js = ["futures-timer/wasm-bindgen", "getrandom/wasm_js"]
 ssr = ["dep:reqwest", "dep:reqwest-websocket", "dep:tokio"]
-zstd = ["ssr", "dep:zstd"]
+# `zstd` account data only exists on SSR-style responses; enabling it must
+# also arm the decoder forks, otherwise `UiAccountData::decode` silently
+# returns `None` for `base64+zstd` accounts.
+zstd = [
+	"ssr",
+	"dep:zstd",
+	"solana-account-decoder-client-types-wasm/zstd",
+	"solana-account-decoder-wasm/zstd",
+]
 
 [target.'cfg(all(target_arch = "wasm32", target_os = "unknown"))'.dependencies]
 getrandom-04 = { default-features = false, features = ["wasm_js"], package = "getrandom", version = "^0.4" }

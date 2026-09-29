@@ -11,7 +11,6 @@ use fork_stream::StreamExt as _;
 use futures::SinkExt;
 use futures::Stream;
 use futures::StreamExt;
-use futures::future;
 use futures::lock::Mutex;
 use futures::stream::SplitSink;
 use futures::stream::SplitStream;
@@ -117,23 +116,30 @@ impl WebSocketProvider {
 				.map_err(|_| ClientWebSocketError::MessageSendError)?;
 		}
 
-		let mut stream = self.receiver.clone().filter_map(|value| {
-			let Ok(value) = value else {
-				return future::ready(None);
+		// Wait for the ack with a manual re-poll loop rather than
+		// `filter_map`: the combinator returns `Pending` after consuming a
+		// buffered frame that does not match, and `Forked` only registers the
+		// caller's waker with the websocket once its buffer runs dry — so a
+		// `Pending` returned while replayed frames remain would park this
+		// future forever. Re-polling drains the buffer and re-arms the socket
+		// waker in the same poll.
+		let mut stream = self.receiver.clone();
+
+		loop {
+			let Some(result) = stream.next().await else {
+				return Err(ClientWebSocketError::Subscription);
 			};
 
-			future::ready(
-				serde_json::from_value::<SubscriptionResult>(value)
-					.ok()
-					.filter(|value| value.id == id),
-			)
-		});
+			let Ok(value) = result else {
+				continue;
+			};
 
-		let Some(response) = stream.next().await else {
-			return Err(ClientWebSocketError::Subscription);
-		};
-
-		Ok((id, response.result))
+			if let Ok(response) = serde_json::from_value::<SubscriptionResult>(value)
+				&& response.id == id
+			{
+				return Ok((id, response.result));
+			}
+		}
 	}
 
 	fn next_id(&self) -> Result<u32, ClientWebSocketError> {
@@ -202,23 +208,27 @@ impl Unsubscription {
 				.map_err(|_| ClientWebSocketError::ConnectionError)?;
 		}
 
-		let mut stream = self.receiver.filter_map(|value| {
-			let Ok(value) = value else {
-				return future::ready(None);
+		// Same re-poll loop as `create_subscription`: `filter_map` would park
+		// this future whenever it consumed a replayed frame that does not
+		// match, because `Forked` only arms the socket waker once its buffer
+		// is empty.
+		let mut stream = self.receiver;
+
+		loop {
+			let Some(result) = stream.next().await else {
+				return Err(ClientWebSocketError::Unsubscription);
 			};
 
-			future::ready(
-				serde_json::from_value::<UnsubscriptionResult>(value)
-					.ok()
-					.filter(|value| value.id == self.id),
-			)
-		});
+			let Ok(value) = result else {
+				continue;
+			};
 
-		let Some(_) = stream.next().await else {
-			return Err(ClientWebSocketError::Unsubscription);
-		};
-
-		Ok(())
+			if let Ok(response) = serde_json::from_value::<UnsubscriptionResult>(value)
+				&& response.id == self.id
+			{
+				return Ok(());
+			}
+		}
 	}
 }
 
@@ -324,26 +334,32 @@ impl<T: DeserializeOwned + WebSocketNotification> Stream for Subscription<T> {
 	type Item = SubscriptionResponse<T>;
 
 	fn poll_next(self: Pin<&mut Self>, cx: &mut Context<'_>) -> Poll<Option<Self::Item>> {
-		let subscription_id = self.get_unsubscription().subscription_id;
+		let subscription_id = self.id;
 		let mut this = self.project();
 
-		let Some(result) = ready!(this.receiver.as_mut().poll_next(cx)) else {
-			return Poll::Ready(None);
-		};
+		// Loop over frames until one belongs to this subscription. Returning
+		// `Pending` after consuming a buffered frame would drop the task's
+		// wakeup: `Forked` only registers the caller's waker with the
+		// websocket when its buffer runs dry, so a `Pending` returned while
+		// buffered frames remain would park this task forever. Re-polling
+		// drains the buffer and re-arms the socket waker in the same poll.
+		loop {
+			let Some(result) = ready!(this.receiver.as_mut().poll_next(cx)) else {
+				return Poll::Ready(None);
+			};
 
-		let Ok(value) = result else {
-			return Poll::Pending;
-		};
+			let Ok(value) = result else {
+				continue;
+			};
 
-		let Some(json) = serde_json::from_value::<SubscriptionResponse<T>>(value).ok() else {
-			return Poll::Pending;
-		};
+			let Ok(json) = serde_json::from_value::<SubscriptionResponse<T>>(value) else {
+				continue;
+			};
 
-		if json.method != T::NOTIFICATION || json.params.subscription != subscription_id {
-			return Poll::Pending;
+			if json.method == T::NOTIFICATION && json.params.subscription == subscription_id {
+				return Poll::Ready(Some(json));
+			}
 		}
-
-		Poll::Ready(Some(json))
 	}
 }
 

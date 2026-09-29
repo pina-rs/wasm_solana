@@ -43,11 +43,14 @@
 		"**/fixtures",
 		"**/snapshots",
 		"**/target",
-		"**/node_modules,",
+		"**/node_modules",
 		".bin/",
 		".local-cache/",
 		"**/dist/**",
-		"**/pkg/"
+		"**/pkg/",
+		"examples/package-lock.json",
+		"examples/playwright-report/**",
+		"examples/test-results/**"
 	],
 	"plugins": [
 		"https://plugins.dprint.dev/typescript-0.95.12.wasm",

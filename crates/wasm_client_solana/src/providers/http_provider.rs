@@ -260,5 +260,3 @@ pub const TESTNET: &str = "https://api.testnet.solana.com";
 pub const MAINNET: &str = "https://api.mainnet-beta.solana.com";
 /// Default endpoint of a locally running `solana-test-validator`.
 pub const LOCALNET: &str = "http://127.0.0.1:8899";
-/// Endpoint of the public debugging node maintained by the project.
-pub const DEBUG: &str = "http://34.90.18.145:8899";
