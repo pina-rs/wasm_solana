@@ -1,6 +1,5 @@
 use std::collections::HashMap;
 
-use inflector::Inflector;
 use serde::Deserialize;
 use serde::Serialize;
 pub use solana_account_decoder_client_types_wasm::ParsedAccount;
@@ -202,10 +201,37 @@ pub fn parse_account_data_v3(
 	};
 
 	Ok(ParsedAccount {
-		program: format!("{program_name:?}").to_kebab_case(),
+		program: enum_name_to_kebab_case(&format!("{program_name:?}")),
 		parsed: parsed_json,
 		space: data.len() as u64,
 	})
+}
+
+/// Convert an enum variant's `Debug` name (e.g. `SplToken2022`) to the
+/// kebab-case program name used on the wire (`spl-token-2022`).
+///
+/// Hand-rolled so the fork does not pull the `Inflector` crate — and with it
+/// the entire `regex` stack — into every wasm build for one call site.
+/// Continuation-digit boundaries like `2022` stay attached to the preceding
+/// word, matching `Inflector`'s output for these variant names.
+fn enum_name_to_kebab_case(name: &str) -> String {
+	let mut out = String::with_capacity(name.len() + 4);
+	let mut previous_was_lowercase_or_digit = false;
+	for character in name.chars() {
+		if character.is_ascii_uppercase() {
+			if previous_was_lowercase_or_digit {
+				out.push('-');
+			}
+			out.push(character.to_ascii_lowercase());
+			previous_was_lowercase_or_digit = false;
+		} else if character.is_ascii_lowercase() || character.is_ascii_digit() {
+			out.push(character);
+			previous_was_lowercase_or_digit = character.is_ascii_lowercase();
+		} else {
+			previous_was_lowercase_or_digit = false;
+		}
+	}
+	out
 }
 
 #[cfg(test)]

@@ -8,6 +8,7 @@ use std::task::ready;
 
 use fork_stream::Forked;
 use fork_stream::StreamExt as _;
+use fork_stream::Weak;
 use futures::SinkExt;
 use futures::Stream;
 use futures::StreamExt;
@@ -33,9 +34,18 @@ use crate::WebSocketMethod;
 use crate::WebSocketNotification;
 use crate::utils::get_ws_url;
 
-/// Convert a websocket message into the JSON value carried by a notification.
+/// A cloneable handle to the live edge of the shared websocket buffer.
+/// `fork_stream::Weak` itself is not `Clone`, so it is shared behind an
+/// `Arc`; upgrading yields a fork positioned at the next frame to arrive.
+type LiveEdge = Arc<Weak<SplitStream<WebSocketStream>>>;
+
+/// Parse an incoming websocket frame as JSON, so both platform backends can
+/// yield [`Value`]s from their [`Stream`] halves regardless of whether the
+/// node sent text or binary frames.
 pub trait ToWebSocketValue {
-	/// Deserialize the message, or report that it was not valid JSON.
+	/// Decode this frame into a [`Value`], failing with
+	/// [`ClientWebSocketError::InvalidMessage`] when it is neither text nor
+	/// binary, or is not valid JSON.
 	fn to_websocket_value(&self) -> Result<Value, ClientWebSocketError>;
 }
 
@@ -53,11 +63,13 @@ where
 	}
 }
 
-/// Owns the websocket connection used for pubsub subscriptions.
+/// A connection to a Solana node's pubsub endpoint.
 ///
-/// The stream is split so that many [`Subscription`]s can share one connection:
-/// writes go through a shared sink while each subscription reads from its own
-/// fork of the incoming stream.
+/// Cloning is cheap and every clone shares one socket: the sink is guarded by
+/// a mutex and the receiver is a [`Forked`] stream that each clone reads
+/// independently while the underlying frames are buffered once. That sharing
+/// is what lets many [`Subscription`]s — plus their unsubscriptions — coexist
+/// on a single websocket, which browsers limit the number of.
 #[derive(Clone, derive_more::Debug)]
 pub struct WebSocketProvider {
 	/// The websocket url.
@@ -66,18 +78,33 @@ pub struct WebSocketProvider {
 	id: Arc<std::sync::Mutex<u32>>,
 	#[debug(skip)]
 	sender: Arc<Mutex<SplitSink<WebSocketStream, Value>>>,
+	/// The root fork of the shared buffer. It is never read: it only keeps
+	/// the shared stream alive for as long as the provider exists, so that
+	/// [`Self::live_edge`] upgrades cannot fail while the provider lives.
+	#[allow(dead_code)]
 	#[debug(skip)]
 	receiver: Forked<SplitStream<WebSocketStream>>,
+	/// A [`Weak`] handle used to hand out forks at the *live edge* of the
+	/// shared buffer. Cloning the root fork instead would start every
+	/// subscription at the buffer's oldest entry, replaying the socket's
+	/// entire history before reaching live traffic — subscription setup cost
+	/// that grows linearly with the connection's age (see the
+	/// `subscription/ack_wait` benchmarks).
+	#[debug(skip)]
+	live_edge: LiveEdge,
 }
 
 impl WebSocketProvider {
-	/// Connect to `url`, rewriting an HTTP endpoint into its websocket
-	/// equivalent.
+	/// Open a pubsub connection, deriving the websocket endpoint from an RPC
+	/// URL: the scheme is rewritten from `http(s)` to `ws(s)` and any explicit
+	/// port is bumped by one, matching the agave convention of serving pubsub
+	/// one port above RPC.
 	pub fn new(url: impl Into<String>) -> Self {
 		let url = get_ws_url(url);
 		let stream = WebSocketStream::new(&url);
 		let (sink, stream) = stream.split();
 		let receiver = stream.fork();
+		let live_edge = Arc::new(receiver.downgrade());
 		let sender = Arc::new(Mutex::new(sink));
 
 		Self {
@@ -86,12 +113,26 @@ impl WebSocketProvider {
 			id: Arc::new(std::sync::Mutex::new(1000)),
 			sender,
 			receiver,
+			live_edge,
 		}
 	}
 
-	/// The websocket url this provider is connected to.
+	/// The websocket endpoint URL, after the http-to-ws rewrite done at
+	/// construction.
 	pub fn url(&self) -> &str {
 		&self.url
+	}
+
+	/// A fork positioned at the live edge of the shared buffer — the next
+	/// frame to arrive — so ack waits and new subscriptions never replay the
+	/// socket's history.
+	///
+	/// Fails only when the shared buffer is gone, which cannot happen while
+	/// this provider (and its root fork) is alive.
+	fn live_fork(&self) -> Result<Forked<SplitStream<WebSocketStream>>, ClientWebSocketError> {
+		self.live_edge
+			.upgrade()
+			.ok_or(ClientWebSocketError::ConnectionError)
 	}
 
 	/// Create a subscription and return the `id` used to create the
@@ -123,7 +164,7 @@ impl WebSocketProvider {
 		// `Pending` returned while replayed frames remain would park this
 		// future forever. Re-polling drains the buffer and re-arms the socket
 		// waker in the same poll.
-		let mut stream = self.receiver.clone();
+		let mut stream = self.live_fork()?;
 
 		loop {
 			let Some(result) = stream.next().await else {
@@ -161,8 +202,9 @@ pub struct Unsubscription {
 	pub(crate) method: &'static str,
 	/// The shared sink for pushing messages into the websocket stream.
 	pub(crate) sender: Arc<Mutex<SplitSink<WebSocketStream, Value>>>,
-	/// The shared receiver for websocket messages.
-	pub(crate) receiver: Forked<SplitStream<WebSocketStream>>,
+	/// Live-edge handle for the shared receiver; upgraded when `run` sends
+	/// the request, so the ack wait starts at the traffic that follows it.
+	pub(crate) receiver: LiveEdge,
 	/// The `id` that was originally used to create the parent subscription.
 	pub(crate) id: u32,
 	/// The `subscription_id` used to unsubscribe.
@@ -185,13 +227,11 @@ impl Hash for Unsubscription {
 }
 
 impl Unsubscription {
-	/// Send the unsubscribe request and wait until the node answers it.
+	/// Send the unsubscribe request and wait for the node's ack.
 	///
-	/// Only the response id is checked. The boolean the node returns is
-	/// currently ignored, so a `false` result — meaning the subscription was
-	/// not found, for example because it had already been removed — still
-	/// returns `Ok(())`. Callers that need to distinguish that case must
-	/// inspect the response themselves.
+	/// Consumes `self` because the shared receiver is moved into the wait
+	/// loop. Errors if the request cannot be written or the connection ends
+	/// before the ack arrives.
 	pub async fn run(self) -> Result<(), ClientWebSocketError> {
 		let request = ClientRequest::builder()
 			.id(self.id)
@@ -212,7 +252,10 @@ impl Unsubscription {
 		// this future whenever it consumed a replayed frame that does not
 		// match, because `Forked` only arms the socket waker once its buffer
 		// is empty.
-		let mut stream = self.receiver;
+		let mut stream = self
+			.receiver
+			.upgrade()
+			.ok_or(ClientWebSocketError::ConnectionError)?;
 
 		loop {
 			let Some(result) = stream.next().await else {
@@ -236,9 +279,13 @@ impl Unsubscription {
 #[pin_project]
 #[derive(Clone, TypedBuilder)]
 pub struct Subscription<T: DeserializeOwned + WebSocketNotification> {
-	/// The shared receiver for receiving messages.
+	/// The shared receiver for receiving messages, forked at the live edge
+	/// when the subscription was created.
 	#[pin]
 	pub(crate) receiver: Forked<SplitStream<WebSocketStream>>,
+	/// Live-edge handle handed to [`Unsubscription`] so its ack wait skips
+	/// the frames this subscription has already consumed.
+	pub(crate) live_edge: LiveEdge,
 	/// The shared sink for pushing messages into the websocket stream.
 	pub(crate) sender: Arc<Mutex<SplitSink<WebSocketStream, Value>>>,
 	#[builder(default)]
@@ -252,15 +299,24 @@ pub struct Subscription<T: DeserializeOwned + WebSocketNotification> {
 }
 
 impl<T: DeserializeOwned + WebSocketNotification> Subscription<T> {
-	/// Build a subscription over an existing provider connection using the ids
-	/// returned by [`WebSocketProvider::create_subscription`].
-	pub fn new(ws: &WebSocketProvider, id: u32, subscription_id: SubscriptionId) -> Self {
-		Self::builder()
-			.receiver(ws.receiver.clone())
+	/// Adopt an existing subscription from a [`WebSocketProvider`], binding
+	/// the request `id` that created it and the server's `subscription_id`.
+	///
+	/// Called by the subscribe methods on
+	/// [`SolanaRpcClient`](crate::SolanaRpcClient); constructing one directly
+	/// is only needed when driving a [`WebSocketProvider`] by hand.
+	pub fn new(
+		ws: &WebSocketProvider,
+		id: u32,
+		subscription_id: SubscriptionId,
+	) -> Result<Self, ClientWebSocketError> {
+		Ok(Self::builder()
+			.receiver(ws.live_fork()?)
+			.live_edge(ws.live_edge.clone())
 			.sender(ws.sender.clone())
 			.creator_id(id)
 			.id(subscription_id)
-			.build()
+			.build())
 	}
 
 	/// Create a struct which will remove this subscription when the `run`
@@ -302,7 +358,7 @@ impl<T: DeserializeOwned + WebSocketNotification> Subscription<T> {
 		Unsubscription::builder()
 			.method(T::UNSUBSCRIBE)
 			.sender(self.sender.clone())
-			.receiver(self.receiver.clone())
+			.receiver(self.live_edge.clone())
 			.id(self.creator_id)
 			.subscription_id(self.id)
 			.build()
@@ -417,6 +473,13 @@ mod websocket_provider_reqwest {
 
 	type ReqwestResult = Result<WebSocket, WebSocketError>;
 
+	/// A lazily-connected websocket that is both a [`Stream`] and a [`Sink`]
+	/// of JSON [`Value`]s, for servers and native targets.
+	///
+	/// The connection handshake happens on first poll rather than at
+	/// construction, so building the stream never blocks; frames that arrive
+	/// as text or binary are parsed to JSON, and a synthetic
+	/// `{"connected": true}` frame marks the moment the socket opens.
 	#[derive(TypedBuilder)]
 	#[pin_project]
 	pub struct WebSocketStream {
@@ -430,6 +493,7 @@ mod websocket_provider_reqwest {
 	}
 
 	impl WebSocketStream {
+		/// Start connecting to `url`; poll the stream to drive the handshake.
 		pub fn new(url: impl Into<String>) -> Self {
 			let url = url.into();
 			#[cfg(not(target_arch = "wasm32"))]
@@ -488,7 +552,6 @@ mod websocket_provider_reqwest {
 			if let Ok(mut websocket) = result {
 				let poll_result = websocket.poll_ready_unpin(cx).map_err(Into::into);
 				this.websocket.set(Some(websocket));
-
 				return poll_result;
 			}
 
@@ -549,6 +612,13 @@ mod websocket_provider_wasm {
 	use super::ToWebSocketValue;
 	use crate::ClientWebSocketError;
 
+	/// An eagerly-connected websocket that is both a [`Stream`] and a [`Sink`]
+	/// of JSON [`Value`]s, backed by gloo for browser targets.
+	///
+	/// Unlike the reqwest variant the connection is opened at construction —
+	/// in a browser the JS API is callback-based, so there is no handshake
+	/// future to defer — which is why the browser transports must run inside
+	/// `SendWrapper`.
 	#[derive(TypedBuilder)]
 	#[pin_project]
 	pub struct WebSocketStream {
@@ -559,6 +629,8 @@ mod websocket_provider_wasm {
 	}
 
 	impl WebSocketStream {
+		/// Open the connection to `url`; panics if the browser refuses it,
+		/// matching the fail-fast behavior of the JS websocket constructor.
 		pub fn new(url: &str) -> Self {
 			Self::builder()
 				.url(url)
