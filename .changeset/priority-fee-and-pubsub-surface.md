@@ -5,7 +5,7 @@ solana-transaction-status-wasm: fix
 wasm_client_solana: breaking
 ---
 
-# Add the priority-fee estimate API and complete the pubsub surface
+# Priority fee estimation and complete pubsub surface
 
 `getPriorityFeeEstimate` is the modern replacement for `getRecentPrioritizationFees`: it prices a specific transaction (or a set of locked accounts) at a chosen urgency percentile instead of reporting raw per-slot fee levels. Three client methods cover transaction-based, configured, and account-based estimation; `get_recent_prioritization_fees*` are now `#[deprecated]` with pointers to the replacements. `getMaxShredInsertSlot` — the highest slot with an inserted shred, leading retransmit — was also missing and is added.
 
