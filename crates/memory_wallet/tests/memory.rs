@@ -138,16 +138,7 @@ async fn sign_and_send_v1_transaction() -> Result<()> {
 		commitment: Some(CommitmentConfig::confirmed()),
 		..Default::default()
 	};
-	let mut fetched = None;
-	for _ in 0..25 {
-		if let Ok(transaction) = rpc.get_transaction_with_config(&signature, config).await {
-			fetched = Some(transaction);
-			break;
-		}
-		tokio::time::sleep(std::time::Duration::from_millis(400)).await;
-	}
-	let fetched =
-		fetched.expect("a confirmed transaction is served by getTransaction within 10 seconds");
+	let fetched = await_transaction(&rpc, &signature, config).await;
 	let fetched_version = fetched
 		.transaction
 		.transaction
@@ -303,4 +294,23 @@ async fn create_program_test() -> (ProgramTestContext, SolanaRpcClient) {
 	let ctx = program_test.start_with_context().await;
 
 	(ctx, rpc)
+}
+
+/// Poll `getTransaction` until the completed-block store serves the
+/// transaction (or the confirmation window elapses), keeping the test body
+/// within monostyle's complexity budget.
+async fn await_transaction(
+	rpc: &wasm_client_solana::SolanaRpcClient,
+	signature: &solana_signature::Signature,
+	config: wasm_client_solana::RpcTransactionConfig,
+) -> wasm_client_solana::solana_transaction_status::EncodedConfirmedTransactionWithStatusMeta {
+	let mut fetched = None;
+	for _ in 0..25 {
+		if let Ok(transaction) = rpc.get_transaction_with_config(signature, config).await {
+			fetched = Some(transaction);
+			break;
+		}
+		tokio::time::sleep(std::time::Duration::from_millis(400)).await;
+	}
+	fetched.expect("a confirmed transaction is served by getTransaction within 10 seconds")
 }

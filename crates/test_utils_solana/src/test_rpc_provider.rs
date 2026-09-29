@@ -116,18 +116,11 @@ impl RpcProvider for TestRpcProvider {
 						.map_err(to_error)?;
 					let encoding = request.config.encoding.unwrap_or(UiAccountEncoding::Base64);
 
-					let result = GetAccountInfoResponse {
-						context,
-						value: account.map(|account| {
-							encode_ui_account(
-								&request.pubkey,
-								&account,
-								encoding,
-								None,
-								request.config.data_slice,
-							)
-						}),
-					};
+					let data_slice = request.config.data_slice;
+					let value = account.map(|account| {
+						encoded_account(&request.pubkey, &account, encoding, data_slice)
+					});
+					let result = GetAccountInfoResponse { context, value };
 					let response = ClientResponse {
 						jsonrpc: "2.0".into(),
 						id: 0,
@@ -166,13 +159,11 @@ impl RpcProvider for TestRpcProvider {
 						.get_root_block_height()
 						.await
 						.map_err(to_error)?;
-					let result = GetLatestBlockhashResponse {
-						context,
-						value: RpcBlockhash {
-							blockhash,
-							last_valid_block_height,
-						},
+					let value = RpcBlockhash {
+						blockhash,
+						last_valid_block_height,
 					};
+					let result = GetLatestBlockhashResponse { context, value };
 					let response = ClientResponse {
 						jsonrpc: "2.0".into(),
 						id: 0,
@@ -191,29 +182,8 @@ impl RpcProvider for TestRpcProvider {
 						.await
 						.map_err(to_error)?;
 
-					let result = GetSignatureStatusesResponse {
-						context,
-						value: statuses
-							.into_iter()
-							.map(|maybe_status| {
-								maybe_status.map(|status| {
-									TransactionStatus {
-										slot: status.slot,
-										confirmations: status.confirmations,
-										status: Ok(()), // legacy field
-										err: status.err,
-										confirmation_status: status.confirmation_status.map(|v| {
-											match v {
-										    solana_banks_interface::TransactionConfirmationStatus::Processed => TransactionConfirmationStatus::Processed,
-										    solana_banks_interface::TransactionConfirmationStatus::Confirmed => TransactionConfirmationStatus::Confirmed,
-										    solana_banks_interface::TransactionConfirmationStatus::Finalized => TransactionConfirmationStatus::Finalized,
-											}
-										})
-									}
-								})
-							})
-							.collect(),
-					};
+					let value = statuses.into_iter().map(convert_status).collect::<Vec<_>>();
+					let result = GetSignatureStatusesResponse { context, value };
 					let response = ClientResponse {
 						jsonrpc: "2.0".into(),
 						id: 0,
@@ -231,16 +201,10 @@ impl RpcProvider for TestRpcProvider {
 						.and_then(|config| config.encoding)
 						.unwrap_or(UiAccountEncoding::Base64);
 					let data_slice = request.config.as_ref().and_then(|config| config.data_slice);
-					let futures = request.addresses.iter().map(|pubkey| {
-						async move {
-							let client = self.0.lock().await;
-							let account = client.banks_client.get_account(*pubkey).await.unwrap();
-
-							account.map(|account| {
-								encode_ui_account(pubkey, &account, encoding, None, data_slice)
-							})
-						}
-					});
+					let futures = request
+						.addresses
+						.iter()
+						.map(|pubkey| fetch_account(self.0.clone(), *pubkey, encoding, data_slice));
 					let value = join_all(futures).await;
 					let result = GetMultipleAccountsResponse { context, value };
 					let response = ClientResponse {
@@ -320,41 +284,13 @@ impl RpcProvider for TestRpcProvider {
 						match client.banks_client.simulate_transaction(transaction).await {
 							Ok(result) => result,
 							Err(_error) => {
-								let mut transaction = request.transaction.clone();
-								transaction.message.set_recent_blockhash(
-									client
-										.banks_client
-										.get_latest_blockhash()
-										.await
-										.map_err(to_error)?,
-								);
-
-								client
-									.banks_client
-									.simulate_transaction(transaction)
+								simulate_with_fresh_blockhash(&client.banks_client, request)
 									.await
 									.map_err(to_error)?
 							}
 						};
 
-					let result = SimulateTransactionResponse {
-						context,
-						value: SimulateTransactionResponseValue {
-							err: simulation.result.and_then(|value| value.err().clone()),
-							logs: simulation
-								.simulation_details
-								.as_ref()
-								.map(|v| v.logs.clone()),
-							accounts: Some(vec![]),
-							units_consumed: simulation
-								.simulation_details
-								.as_ref()
-								.map(|v| v.units_consumed),
-							return_data: simulation
-								.simulation_details
-								.and_then(|v| v.return_data.map(Into::into)),
-						},
-					};
+					let result = simulated_response(context, simulation);
 
 					let response = ClientResponse {
 						jsonrpc: "2.0".into(),
@@ -374,6 +310,100 @@ impl RpcProvider for TestRpcProvider {
 
 		SendWrapper::new(future).await
 	}
+}
+
+/// Fetch and encode one account for `getMultipleAccounts`; a file-level
+/// helper keeps the provider match arms within monostyle's indentation
+/// budget.
+async fn fetch_account(
+	client: Arc<Mutex<ProgramTestContext>>,
+	pubkey: solana_pubkey::Pubkey,
+	encoding: UiAccountEncoding,
+	data_slice: Option<u64>,
+) -> Option<crate::solana_account_decoder::UiAccount> {
+	let client = client.lock().await;
+	let account = client.banks_client.get_account(pubkey).await.unwrap();
+
+	account.map(|account| encoded_account(&pubkey, &account, encoding, data_slice))
+}
+
+/// Encode one fetched account for the RPC wire shape; a file-level helper
+/// keeps the provider match arms within monostyle's indentation budget.
+fn encoded_account(
+	pubkey: &solana_pubkey::Pubkey,
+	account: &solana_account::AccountSharedData,
+	encoding: UiAccountEncoding,
+	data_slice: Option<u64>,
+) -> crate::solana_account_decoder::UiAccount {
+	encode_ui_account(pubkey, account, encoding, None, data_slice)
+}
+
+/// Shape one simulation result for the RPC wire; a file-level helper keeps
+/// the provider match arms within monostyle's indentation budget.
+fn simulated_response(
+	context: Context,
+	simulation: solana_banks_interface::SimulateTransactionResult,
+) -> SimulateTransactionResponse {
+	let details = simulation.simulation_details.as_ref();
+	SimulateTransactionResponse {
+		context,
+		value: SimulateTransactionResponseValue {
+			err: simulation.result.and_then(|value| value.err().clone()),
+			logs: details.map(|v| v.logs.clone()),
+			accounts: Some(vec![]),
+			units_consumed: details.map(|v| v.units_consumed),
+			return_data: details.and_then(|v| v.return_data.clone()),
+		},
+	}
+}
+
+/// Retry a simulation after refreshing the message blockhash: banks-client
+/// simulations fail on a stale hash, so the fallback re-signs against the
+/// bank's current one.
+async fn simulate_with_fresh_blockhash(
+	banks_client: &BanksClient,
+	request: &SimulateTransactionRequest,
+) -> Result<solana_banks_interface::SimulateTransactionResult, ClientError> {
+	let mut transaction = request.transaction.clone();
+	let blockhash = banks_client
+		.get_latest_blockhash()
+		.await
+		.map_err(to_error)?;
+	transaction.message.set_recent_blockhash(blockhash);
+
+	banks_client
+		.simulate_transaction(transaction)
+		.await
+		.map_err(to_error)
+}
+
+/// Adapt one banks-client status entry to the RPC wire shape; a file-level
+/// helper keeps the provider match arms within monostyle's indentation
+/// budget.
+fn convert_status(
+	maybe_status: Option<solana_banks_interface::TransactionStatus>,
+) -> Option<TransactionStatus> {
+	maybe_status.map(|status| {
+		TransactionStatus {
+			slot: status.slot,
+			confirmations: status.confirmations,
+			status: Ok(()), // legacy field
+			err: status.err,
+			confirmation_status: status.confirmation_status.map(|v| {
+				match v {
+					solana_banks_interface::TransactionConfirmationStatus::Processed => {
+						TransactionConfirmationStatus::Processed
+					}
+					solana_banks_interface::TransactionConfirmationStatus::Confirmed => {
+						TransactionConfirmationStatus::Confirmed
+					}
+					solana_banks_interface::TransactionConfirmationStatus::Finalized => {
+						TransactionConfirmationStatus::Finalized
+					}
+				}
+			}),
+		}
+	})
 }
 
 fn to_error<T: Display>(error: T) -> ClientError {
