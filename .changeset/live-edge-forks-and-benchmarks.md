@@ -4,7 +4,7 @@ solana-transaction-status-wasm: fix
 wasm_client_solana: fix
 ---
 
-# Live-edge subscription forks, criterion benchmarks, and a leaner dependency graph
+# Live-edge subscription forks, benchmarks, leaner deps
 
 Subscription ack waits and new subscriptions now fork from the live edge of the shared websocket buffer (`fork_stream::Weak` upgrade) instead of cloning the never-read root fork, whose offset pinned them to the buffer's oldest entry. Setup previously replayed and re-parsed the socket's entire history before reaching live traffic. The new `subscription` criterion benchmark measures the ack wait at 73µs / 747µs / 10.1ms for 100 / 1k / 10k buffered frames on the old path, versus 120ns / 317ns / 1.35µs at the live edge — roughly 7,500× at 10k frames, and the gap grows linearly with connection age on busy sockets.
 
