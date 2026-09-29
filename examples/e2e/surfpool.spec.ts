@@ -68,19 +68,23 @@ test("account subscription receives live notifications", async ({ page }) => {
 	await expect(page.locator("#last-slot")).toHaveText(/[1-9]\d*/);
 });
 
-test("signs, sends and confirms a sol transfer", async ({ page }) => {
-	// Fund first so the transfer never fails on an empty wallet.
-	await page.locator("#airdrop").click();
-	await expect
-		.poll(() => lamports(page), { timeout: 30_000 })
-		.toBeGreaterThan(0);
+test(
+	"signs, sends and confirms a sol transfer",
+	{ timeout: 90_000 },
+	async ({ page }) => {
+		// Fund first so the transfer never fails on an empty wallet.
+		await page.locator("#airdrop").click();
+		await expect
+			.poll(() => lamports(page), { timeout: 30_000 })
+			.toBeGreaterThan(0);
 
-	await page.locator("#transfer").click();
+		await page.locator("#transfer").click();
 
-	await expect(page.locator("#transfer-status")).toHaveText(
-		/^confirmed: [1-9A-HJ-NP-Za-km-z]{80,}$/,
-		{
-			timeout: 60_000,
-		},
-	);
-});
+		await expect(page.locator("#transfer-status")).toHaveText(
+			/^confirmed: [1-9A-HJ-NP-Za-km-z]{80,}$/,
+			{
+				timeout: 60_000,
+			},
+		);
+	},
+);

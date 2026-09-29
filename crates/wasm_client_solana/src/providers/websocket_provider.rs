@@ -137,10 +137,15 @@ impl WebSocketProvider {
 
 	/// Create a subscription and return the `id` used to create the
 	/// subscription and `subscription_id` once a response is received.
+	/// The `id` used for the request, the server's `subscription_id`, and a
+	/// fork positioned *before the request was sent* — hand it to
+	/// [`Subscription::from_parts`] so no notification that races the
+	/// subscription handshake can slip past the stream.
 	pub async fn create_subscription<T: WebSocketMethod>(
 		&self,
 		params: T,
-	) -> Result<(u32, SubscriptionId), ClientWebSocketError> {
+	) -> Result<(u32, SubscriptionId, Forked<SplitStream<WebSocketStream>>), ClientWebSocketError>
+	{
 		let id = self.next_id()?;
 		let request = ClientRequest::builder()
 			.method(T::SUBSCRIBE)
@@ -148,6 +153,14 @@ impl WebSocketProvider {
 			.id(id)
 			.build()
 			.try_to_value()?;
+
+		// Register both forks BEFORE sending: a live-edge fork created after
+		// the send would skip any frame that lands in between — including the
+		// acknowledgement itself. The ack fork consumes only the ack; the
+		// subscription fork, positioned at the same offset, sees every
+		// notification that follows.
+		let mut ack_stream = self.live_fork()?;
+		let subscription_stream = self.live_fork()?;
 
 		// immediately drop the lock at the end of this block
 		{
@@ -164,10 +177,8 @@ impl WebSocketProvider {
 		// `Pending` returned while replayed frames remain would park this
 		// future forever. Re-polling drains the buffer and re-arms the socket
 		// waker in the same poll.
-		let mut stream = self.live_fork()?;
-
 		loop {
-			let Some(result) = stream.next().await else {
+			let Some(result) = ack_stream.next().await else {
 				return Err(ClientWebSocketError::Subscription);
 			};
 
@@ -178,7 +189,7 @@ impl WebSocketProvider {
 			if let Ok(response) = serde_json::from_value::<SubscriptionResult>(value)
 				&& response.id == id
 			{
-				return Ok((id, response.result));
+				return Ok((id, response.result, subscription_stream));
 			}
 		}
 	}
@@ -202,9 +213,11 @@ pub struct Unsubscription {
 	pub(crate) method: &'static str,
 	/// The shared sink for pushing messages into the websocket stream.
 	pub(crate) sender: Arc<Mutex<SplitSink<WebSocketStream, Value>>>,
-	/// Live-edge handle for the shared receiver; upgraded when `run` sends
-	/// the request, so the ack wait starts at the traffic that follows it.
-	pub(crate) receiver: LiveEdge,
+	/// A fork positioned when this handle was created. Owning the fork
+	/// (rather than a weak live-edge handle) keeps the shared buffer alive
+	/// even if the provider is dropped before `run`, and sees every frame
+	/// from creation onward — including the unsubscription ack.
+	pub(crate) receiver: Forked<SplitStream<WebSocketStream>>,
 	/// The `id` that was originally used to create the parent subscription.
 	pub(crate) id: u32,
 	/// The `subscription_id` used to unsubscribe.
@@ -249,13 +262,12 @@ impl Unsubscription {
 		}
 
 		// Same re-poll loop as `create_subscription`: `filter_map` would park
-		// this future whenever it consumed a replayed frame that does not
-		// match, because `Forked` only arms the socket waker once its buffer
-		// is empty.
-		let mut stream = self
-			.receiver
-			.upgrade()
-			.ok_or(ClientWebSocketError::ConnectionError)?;
+		// this future whenever it consumed a frame that does not match,
+		// because `Forked` only arms the socket waker once its buffer is
+		// empty. The fork was positioned at handle-creation time, so frames
+		// between creation and `run` — including the request itself being
+		// sent — cannot slip past it.
+		let mut stream = self.receiver;
 
 		loop {
 			let Some(result) = stream.next().await else {
@@ -319,6 +331,29 @@ impl<T: DeserializeOwned + WebSocketNotification> Subscription<T> {
 			.build())
 	}
 
+	/// Adopt a subscription from a fork that
+	/// [`WebSocketProvider::create_subscription`] positioned *before* the
+	/// subscribe request was sent.
+	///
+	/// This is the constructor the client's subscribe methods use: the
+	/// pre-positioned fork guarantees a notification that races the
+	/// subscription handshake is still delivered, which a fork created after
+	/// the ack cannot promise.
+	pub fn from_parts(
+		ws: &WebSocketProvider,
+		id: u32,
+		subscription_id: SubscriptionId,
+		receiver: Forked<SplitStream<WebSocketStream>>,
+	) -> Self {
+		Self::builder()
+			.receiver(receiver)
+			.live_edge(ws.live_edge.clone())
+			.sender(ws.sender.clone())
+			.creator_id(id)
+			.id(subscription_id)
+			.build()
+	}
+
 	/// Create a struct which will remove this subscription when the `run`
 	/// method is called. This is useful since most uses of the subscription
 	/// will consume the subscription. This can be invoked to store a way of
@@ -358,7 +393,11 @@ impl<T: DeserializeOwned + WebSocketNotification> Subscription<T> {
 		Unsubscription::builder()
 			.method(T::UNSUBSCRIBE)
 			.sender(self.sender.clone())
-			.receiver(self.live_edge.clone())
+			// Clone the subscription's own fork (not a fresh live-edge one):
+			// it is positioned at this subscription's read offset, keeps the
+			// shared buffer alive independently of the provider, and sees the
+			// unsubscription ack whenever `run` fires.
+			.receiver(self.receiver.clone())
 			.id(self.creator_id)
 			.subscription_id(self.id)
 			.build()

@@ -1117,6 +1117,26 @@ impl<'de> Deserialize<'de> for BlockSubscribeRequest {
 	}
 }
 
+/// Config for `slotSubscribe`.
+#[skip_serializing_none]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, TypedBuilder, Default)]
+#[serde(rename_all = "camelCase")]
+#[builder(field_defaults(default, setter(strip_option)))]
+pub struct RpcSlotSubscribeConfig {
+	/// Commitment level for the reported slots.
+	pub commitment: Option<CommitmentConfig>,
+}
+
+/// Config for `rootSubscribe`.
+#[skip_serializing_none]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, TypedBuilder, Default)]
+#[serde(rename_all = "camelCase")]
+#[builder(field_defaults(default, setter(strip_option)))]
+pub struct RpcRootSubscribeConfig {
+	/// Commitment level for the reported roots.
+	pub commitment: Option<CommitmentConfig>,
+}
+
 /// A `logsSubscribe` request.
 #[derive(Debug, Clone, PartialEq, Eq, TypedBuilder)]
 pub struct LogsSubscribeRequest {

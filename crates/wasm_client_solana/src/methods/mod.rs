@@ -37,8 +37,10 @@ pub use self::get_largest_accounts::*;
 pub use self::get_latest_blockhash::*;
 pub use self::get_leader_schedule::*;
 pub use self::get_max_retransmit_slot::*;
+pub use self::get_max_shred_insert_slot::*;
 pub use self::get_minimum_balance_for_rent_exemption::*;
 pub use self::get_multiple_accounts::*;
+pub use self::get_priority_fee_estimate::*;
 pub use self::get_program_accounts::*;
 pub use self::get_recent_performance_samples::*;
 pub use self::get_recent_prioritization_fees::*;
@@ -62,8 +64,11 @@ pub use self::get_vote_accounts::*;
 pub use self::is_blockhash_valid::*;
 pub use self::minimum_ledger_slot::*;
 pub use self::request_airdrop::*;
+pub use self::root_subscribe::*;
 pub use self::send_transaction::*;
+pub use self::signature_subscribe::*;
 pub use self::simulate_transaction::*;
+pub use self::slot_subscribe::*;
 
 mod get_account_info;
 mod get_balance;
@@ -90,8 +95,10 @@ mod get_largest_accounts;
 mod get_latest_blockhash;
 mod get_leader_schedule;
 mod get_max_retransmit_slot;
+mod get_max_shred_insert_slot;
 mod get_minimum_balance_for_rent_exemption;
 mod get_multiple_accounts;
+mod get_priority_fee_estimate;
 mod get_program_accounts;
 mod get_recent_performance_samples;
 mod get_recent_prioritization_fees;
@@ -115,8 +122,11 @@ mod get_vote_accounts;
 mod is_blockhash_valid;
 mod minimum_ledger_slot;
 mod request_airdrop;
+mod root_subscribe;
 mod send_transaction;
+mod signature_subscribe;
 mod simulate_transaction;
+mod slot_subscribe;
 
 /// Slot at which a response was evaluated, returned by every context-aware RPC
 /// response.
