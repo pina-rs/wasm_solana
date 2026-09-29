@@ -2,7 +2,7 @@
 solana-account-decoder-client-types-wasm: fix
 solana-account-decoder-wasm: fix
 solana-transaction-status-wasm: fix
-wasm_client_solana: feat
+wasm_client_solana: breaking
 ---
 
 # Add the priority-fee estimate API and complete the pubsub surface
@@ -11,6 +11,6 @@ wasm_client_solana: feat
 
 The pubsub surface now matches the docs: `signatureSubscribe` (with optional `receivedNotification` frames), `slotSubscribe`, and `rootSubscribe` join account/logs/program/block. The signature subscription in particular is the push-based alternative to polling `getSignatureStatuses`, enabling one-round-trip send confirmation.
 
-Two websocket correctness fixes from review: subscription and acknowledgement forks are now registered *before* the subscribe request is sent (a frame racing the handshake could previously slip past a fork created after the send), and `Unsubscription` owns its fork rather than holding a weak live-edge handle (retaining a handle past the provider's drop no longer loses the buffer). The fork benchmark now measures the same acknowledgement wait in both variants with the history drain amortized in setup, matching production.
+Two websocket correctness fixes from review: subscription and acknowledgement forks are now registered _before_ the subscribe request is sent (a frame racing the handshake could previously slip past a fork created after the send), and `Unsubscription` owns its fork rather than holding a weak live-edge handle (retaining a handle past the provider's drop no longer loses the buffer). The fork benchmark now measures the same acknowledgement wait in both variants with the history drain amortized in setup, matching production.
 
 Also from review: `base64+zstd` decode rejects oversized output instead of silently truncating at the 10 MiB cap, the hand-rolled kebab-case helper inserts the hyphen before digit suffixes (`SplToken2022` -> `spl-token-2022`, restoring Inflector parity — regression-tested), and the browser e2e transfer test gets a budget covering both its airdrop and its send.
