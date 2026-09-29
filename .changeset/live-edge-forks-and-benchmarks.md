@@ -1,7 +1,7 @@
 ---
 solana-account-decoder-wasm: fix
 solana-transaction-status-wasm: fix
-wasm_client_solana: fix
+wasm_client_solana: breaking
 ---
 
 # Live-edge subscription forks, benchmarks, leaner deps
