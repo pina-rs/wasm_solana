@@ -61,12 +61,17 @@ impl UiAccountData {
 							// blob from a hostile RPC must not be able to
 							// expand into gigabytes and OOM the process.
 							// Solana itself caps account data at 10 MiB.
+							// Read one byte beyond the cap so oversized
+							// output is rejected rather than silently
+							// truncated at the limit.
 							const MAX_ACCOUNT_DATA_LEN: usize = 10 * 1024 * 1024;
-							zstd::stream::read::Decoder::new(zstd_data.as_slice())
-								.map(|reader| reader.take(MAX_ACCOUNT_DATA_LEN as u64))
-								.and_then(|mut reader| reader.read_to_end(&mut data))
-								.map(|_| data)
-								.ok()
+							let within_limit =
+								zstd::stream::read::Decoder::new(zstd_data.as_slice())
+									.map(|reader| reader.take(MAX_ACCOUNT_DATA_LEN as u64 + 1))
+									.and_then(|mut reader| reader.read_to_end(&mut data))
+									.is_ok_and(|_| data.len() <= MAX_ACCOUNT_DATA_LEN);
+
+							within_limit.then_some(data)
 						})
 					}
 					#[cfg(not(feature = "zstd"))]

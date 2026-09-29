@@ -801,6 +801,19 @@ impl SolanaRpcClient {
 
 	/// Return recent prioritization fees without filtering by writable account
 	/// locks.
+	///
+	/// # Deprecated
+	///
+	/// Superseded by
+	/// [`get_priority_fee_estimate`](Self::get_priority_fee_estimate), which
+	/// prices a specific transaction at a chosen urgency level instead of
+	/// reporting raw per-slot fee levels; `getRecentPrioritizationFees` is
+	/// kept only for nodes that have not adopted the newer method.
+	#[deprecated(
+		since = "0.13.0",
+		note = "use `get_priority_fee_estimate` instead; the upstream method is treated as legacy"
+	)]
+	#[allow(deprecated)]
 	pub async fn get_recent_prioritization_fees(&self) -> ClientResult<Vec<RpcPrioritizationFee>> {
 		let request = GetRecentPrioritizationFeesRequest::new();
 		let response: ClientResponse<GetRecentPrioritizationFeesResponse> =
@@ -811,6 +824,15 @@ impl SolanaRpcClient {
 
 	/// Return recent prioritization fees paid by transactions that lock every
 	/// account in `addresses` as writable.
+	///
+	/// # Deprecated
+	///
+	/// Superseded by
+	/// [`get_priority_fee_estimate_for_accounts`](Self::get_priority_fee_estimate_for_accounts).
+	#[deprecated(
+		since = "0.13.0",
+		note = "use `get_priority_fee_estimate_for_accounts` instead"
+	)]
 	pub async fn get_recent_prioritization_fees_with_accounts(
 		&self,
 		addresses: Vec<Pubkey>,
@@ -818,6 +840,52 @@ impl SolanaRpcClient {
 		let request = GetRecentPrioritizationFeesRequest::new_with_accounts(addresses);
 		let response: ClientResponse<GetRecentPrioritizationFeesResponse> =
 			self.send(request).await?;
+
+		Ok(response.result.into())
+	}
+
+	/// Estimate the prioritization fee (micro-lamports per compute unit) a
+	/// transaction should carry, at the node's recommended urgency.
+	///
+	/// The estimate covers the exact compute-unit usage of `transaction`, so
+	/// it is the most accurate input for sizing a
+	/// `SetComputeUnitPrice` instruction before sending.
+	pub async fn get_priority_fee_estimate(
+		&self,
+		transaction: &VersionedTransaction,
+	) -> ClientResult<Option<u64>> {
+		let request = GetPriorityFeeEstimateRequest::new(transaction)?;
+		let response: ClientResponse<GetPriorityFeeEstimateResponse> = self.send(request).await?;
+
+		Ok(response.result.into())
+	}
+
+	/// Estimate a prioritization fee with explicit control over the urgency
+	/// level, encoding, and fee-market lookback.
+	pub async fn get_priority_fee_estimate_with_config(
+		&self,
+		transaction: &VersionedTransaction,
+		config: RpcPriorityFeeEstimateConfig,
+	) -> ClientResult<Option<u64>> {
+		let request = GetPriorityFeeEstimateRequest::new(transaction)?.with_options(config);
+		let response: ClientResponse<GetPriorityFeeEstimateResponse> = self.send(request).await?;
+
+		Ok(response.result.into())
+	}
+
+	/// Estimate a prioritization fee from the accounts a transaction will
+	/// lock, without serializing a transaction.
+	///
+	/// Cheaper for the node but less accurate for transactions with unusual
+	/// compute-unit usage; prefer
+	/// [`get_priority_fee_estimate`](Self::get_priority_fee_estimate) when a
+	/// transaction is at hand.
+	pub async fn get_priority_fee_estimate_for_accounts(
+		&self,
+		account_keys: Vec<Pubkey>,
+	) -> ClientResult<Option<u64>> {
+		let request = GetPriorityFeeEstimateRequest::new_for_accounts(account_keys);
+		let response: ClientResponse<GetPriorityFeeEstimateResponse> = self.send(request).await?;
 
 		Ok(response.result.into())
 	}
@@ -1438,6 +1506,16 @@ impl SolanaRpcClient {
 		Ok(response.result)
 	}
 
+	/// Get the max slot seen from the shred insert stage, which runs ahead of
+	/// retransmit — the earliest signal of how far the node has progressed
+	/// through the tip of the ledger.
+	pub async fn get_max_shred_insert_slot(&self) -> ClientResult<GetMaxShredInsertSlotResponse> {
+		let response: ClientResponse<GetMaxShredInsertSlotResponse> =
+			self.send(GetMaxShredInsertSlotRequest).await?;
+
+		Ok(response.result)
+	}
+
 	/// Returns the current slot leader
 	pub async fn get_slot_leader(&self) -> ClientResult<GetSlotLeaderResponse> {
 		let request = GetSlotLeaderRequest::new();
@@ -1616,8 +1694,8 @@ impl SolanaRpcClient {
 		request: impl Into<GetAccountInfoRequest>,
 	) -> ClientResult<Subscription<GetAccountInfoResponse>> {
 		let request: GetAccountInfoRequest = request.into();
-		let (id, subscription_id) = self.ws.create_subscription(request).await?;
-		let subscription = Subscription::new(&self.ws, id, subscription_id)?;
+		let (id, subscription_id, stream) = self.ws.create_subscription(request).await?;
+		let subscription = Subscription::from_parts(&self.ws, id, subscription_id, stream);
 
 		Ok(subscription)
 	}
@@ -1639,8 +1717,8 @@ impl SolanaRpcClient {
 		&self,
 		request: BlockSubscribeRequest,
 	) -> ClientResult<Subscription<BlockNotificationResponse>> {
-		let (id, subscription_id) = self.ws.create_subscription(request).await?;
-		let subscription = Subscription::new(&self.ws, id, subscription_id)?;
+		let (id, subscription_id, stream) = self.ws.create_subscription(request).await?;
+		let subscription = Subscription::from_parts(&self.ws, id, subscription_id, stream);
 
 		Ok(subscription)
 	}
@@ -1659,8 +1737,8 @@ impl SolanaRpcClient {
 		&self,
 		request: LogsSubscribeRequest,
 	) -> ClientResult<Subscription<LogsNotificationResponse>> {
-		let (id, subscription_id) = self.ws.create_subscription(request).await?;
-		let subscription = Subscription::new(&self.ws, id, subscription_id)?;
+		let (id, subscription_id, stream) = self.ws.create_subscription(request).await?;
+		let subscription = Subscription::from_parts(&self.ws, id, subscription_id, stream);
 
 		Ok(subscription)
 	}
@@ -1679,8 +1757,54 @@ impl SolanaRpcClient {
 		&self,
 		request: ProgramSubscribeRequest,
 	) -> ClientResult<Subscription<GetProgramAccountsResponse>> {
-		let (id, subscription_id) = self.ws.create_subscription(request).await?;
-		let subscription = Subscription::new(&self.ws, id, subscription_id)?;
+		let (id, subscription_id, stream) = self.ws.create_subscription(request).await?;
+		let subscription = Subscription::from_parts(&self.ws, id, subscription_id, stream);
+
+		Ok(subscription)
+	}
+
+	/// Subscribe to a transaction's confirmation status by signature.
+	///
+	/// The push-based alternative to polling
+	/// [`get_signature_statuses`](Self::get_signature_statuses): one
+	/// notification arrives when the transaction reaches the configured
+	/// commitment, carrying its final status (including the error, if any).
+	pub async fn signature_subscribe(
+		&self,
+		request: SignatureSubscribeRequest,
+	) -> ClientResult<Subscription<SignatureNotificationResponse>> {
+		let (id, subscription_id, stream) = self.ws.create_subscription(request).await?;
+		let subscription = Subscription::from_parts(&self.ws, id, subscription_id, stream);
+
+		Ok(subscription)
+	}
+
+	/// Subscribe to every slot the node processes.
+	///
+	/// The cheapest heartbeat a dApp can get: one notification per slot, with
+	/// the parent slot linking it into the fork. Also the standard way to
+	/// detect a stalled websocket connection (no slot for several seconds).
+	pub async fn slot_subscribe(
+		&self,
+		request: SlotSubscribeRequest,
+	) -> ClientResult<Subscription<SlotInfo>> {
+		let (id, subscription_id, stream) = self.ws.create_subscription(request).await?;
+		let subscription = Subscription::from_parts(&self.ws, id, subscription_id, stream);
+
+		Ok(subscription)
+	}
+
+	/// Subscribe to new roots — slots that can no longer be rolled back.
+	///
+	/// Fewer, safer events than [`slot_subscribe`](Self::slot_subscribe);
+	/// useful for checkpointing UI state that must never display data that a
+	/// fork could still roll back.
+	pub async fn root_subscribe(
+		&self,
+		request: RootSubscribeRequest,
+	) -> ClientResult<Subscription<RootNotificationResponse>> {
+		let (id, subscription_id, stream) = self.ws.create_subscription(request).await?;
+		let subscription = Subscription::from_parts(&self.ws, id, subscription_id, stream);
 
 		Ok(subscription)
 	}

@@ -150,6 +150,11 @@ fn enum_name_to_kebab_case(name: &str) -> String {
 			out.push(character.to_ascii_lowercase());
 			previous_was_lowercase_or_digit = false;
 		} else if character.is_ascii_lowercase() || character.is_ascii_digit() {
+			// A digit run after a word gets its own segment (`SplToken2022`
+			// -> `spl-token-2022`), matching Inflector's output.
+			if character.is_ascii_digit() && previous_was_lowercase_or_digit {
+				out.push('-');
+			}
 			out.push(character);
 			previous_was_lowercase_or_digit = character.is_ascii_lowercase();
 		} else {

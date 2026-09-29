@@ -9,12 +9,15 @@
 //! 1. **Frame parsing** — every notification is parsed from a JSON value into
 //!    `SubscriptionResponse<T>`; this is the per-notification tax a busy
 //!    `programSubscribe` pays.
-//! 2. **Fork replay** — `WebSocketProvider` shares one forked stream. A fork
-//!    cloned from an idle root starts at the root's offset (offset 0 without a
-//!    drain), so a new subscription re-reads and re-parses every buffered frame
-//!    before reaching live traffic: setup cost is O(history). The "root
-//!    advanced" variant models the fix (a task that keeps the root fork at the
-//!    live edge), where a new fork starts at O(1).
+//! 2. **Fork registration vs replay** — the shared buffer is read through
+//!    forks. A fork registered *before* a frame arrives receives it directly;
+//!    the pre-fix shape (cloning the never-read root fork) instead replayed the
+//!    socket's entire history to reach live traffic, making subscription setup
+//!    O(history). Both variants below wait for the same ack frame pushed into a
+//!    queue-backed stream, so the comparison measures the same acknowledgement
+//!    wait.
+
+use std::collections::VecDeque;
 
 use base64::Engine;
 use criterion::Criterion;
@@ -23,7 +26,6 @@ use criterion::criterion_main;
 use fork_stream::StreamExt as ForkStreamExt;
 use futures::StreamExt;
 use serde_json::json;
-use wasm_client_solana::Context;
 use wasm_client_solana::GetAccountInfoResponse;
 use wasm_client_solana::SubscriptionResponse;
 use wasm_client_solana::solana_account_decoder::UiAccount;
@@ -75,51 +77,94 @@ fn bench_frame_parse(c: &mut Criterion) {
 	});
 }
 
+/// A stream fed from a shared queue, so the benchmark controls exactly when
+/// each frame "arrives" — modeling a websocket whose history is already
+/// buffered and whose acknowledgement is pushed on demand.
+struct QueuedStream {
+	queue: std::sync::Arc<std::sync::Mutex<VecDeque<serde_json::Value>>>,
+}
+
+impl futures::Stream for QueuedStream {
+	type Item = Result<serde_json::Value, ()>;
+
+	fn poll_next(
+		self: std::pin::Pin<&mut Self>,
+		_cx: &mut std::task::Context<'_>,
+	) -> std::task::Poll<Option<Self::Item>> {
+		let item = self.queue.lock().unwrap().pop_front();
+		match item {
+			Some(value) => std::task::Poll::Ready(Some(Ok(value))),
+			None => std::task::Poll::Pending,
+		}
+	}
+}
+
 fn bench_fork_replay(c: &mut Criterion) {
 	for history in [100_usize, 1_000, 10_000] {
 		let frames = notification_frames(history);
+		let ack = notification_frames(1).pop().unwrap();
 
 		c.bench_function(
 			&format!("subscription/ack_wait/replaying_root/history_{history}"),
 			|b| {
 				b.iter(|| {
-					// The pre-fix shape: the root fork is never polled, so it
-					// stays at offset 0 and every new fork replays the whole
-					// buffer to find the ack at the live edge.
-					let root = futures::stream::iter(std::hint::black_box(frames.clone()))
-						.map(Ok::<_, ()>)
-						.fork();
+					// The pre-fix shape: the root fork is never advanced, so
+					// a fork cloned from it starts at the buffer's oldest
+					// entry and must replay (and clone) every buffered frame
+					// before the ack — which sits behind the whole history —
+					// is visible.
+					let queue = std::sync::Arc::new(std::sync::Mutex::new(
+						frames
+							.iter()
+							.cloned()
+							.chain(std::iter::once(ack.clone()))
+							.collect::<VecDeque<_>>(),
+					));
+					let root = QueuedStream {
+						queue: std::sync::Arc::clone(&queue),
+					}
+					.fork();
 					let mut fork = root.clone();
-					let ack = futures::executor::block_on(fork.next());
-					assert!(ack.is_some());
+					let found = futures::executor::block_on(fork.next());
+					assert!(found.is_some());
 				})
 			},
 		);
 
-		// The fixed shape: a background drain task keeps the root at the
-		// live edge (amortized, outside the ack wait), so a new fork starts
-		// where traffic is live and the ack wait reads O(1) frames. The
-		// drain runs in the setup phase, mirroring production where it is a
-		// long-lived task rather than part of any single subscription.
+		// The fixed shape: the history was consumed long before this
+		// subscription exists (frames are read as they arrive, so the drain
+		// is amortized to zero at subscribe time — it happens in the setup
+		// phase, not the measurement). The fork is then registered at the
+		// live edge *before* the ack is pushed, exactly as
+		// `create_subscription` now registers its ack and subscription forks
+		// before sending the request, and the same ack wait reads a single
+		// frame.
 		c.bench_function(
-			&format!("subscription/ack_wait/root_at_live_edge/history_{history}"),
+			&format!("subscription/ack_wait/pre_registered_fork/history_{history}"),
 			|b| {
 				b.iter_batched(
 					|| {
-						let mut root = futures::stream::iter(std::hint::black_box(frames.clone()))
-							.map(Ok::<_, ()>)
-							.fork();
-						while futures::executor::block_on(root.next()).is_some() {}
-						root
+						let queue = std::sync::Arc::new(std::sync::Mutex::new(
+							frames.iter().cloned().collect::<VecDeque<_>>(),
+						));
+						let mut root = QueuedStream {
+							queue: std::sync::Arc::clone(&queue),
+						}
+						.fork();
+						for _ in 0..history {
+							futures::executor::block_on(root.next());
+						}
+						(root, queue)
 					},
-					|mut root| {
+					|(mut root, queue)| {
 						let mut fork = root.clone();
-						// The source is exhausted; the fork yields nothing new
-						// — its starting offset is already the live edge.
-						let ack = futures::executor::block_on(fork.next());
-						assert!(ack.is_none());
+						queue.lock().unwrap().push_back(ack.clone());
+
+						let found = futures::executor::block_on(fork.next());
+						assert!(found.is_some());
+						let _ = &mut root;
 					},
-					criterion::BatchSize::SmallInput,
+					criterion::BatchSize::LargeInput,
 				)
 			},
 		);
