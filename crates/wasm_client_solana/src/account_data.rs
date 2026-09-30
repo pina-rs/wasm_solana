@@ -167,6 +167,14 @@ mod tests {
 
 	#[cfg(feature = "zstd")]
 	#[test]
+	fn rejects_malformed_base64_zstd() {
+		let data = binary("**** not base64 ****", UiAccountEncoding::Base64Zstd);
+
+		check!(decode_account_data(&data).is_none());
+	}
+
+	#[cfg(feature = "zstd")]
+	#[test]
 	fn rejects_zstd_decompression_bomb() {
 		// ~11 MiB of zeros compresses to a few kilobytes: a hostile node can
 		// hand this to any client that trusts the decompressor.

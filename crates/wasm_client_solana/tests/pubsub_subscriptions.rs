@@ -81,3 +81,22 @@ async fn slots_updates_and_vote_subscriptions() -> Result<()> {
 
 	Ok(())
 }
+
+/// A dead pubsub endpoint must fail the zero-parameter subscriptions as an
+/// error rather than hanging: the `?` on the connection is the only fallible
+/// step in both wrappers, and it needs exercising too.
+#[tokio::test(flavor = "multi_thread")]
+async fn subscriptions_fail_fast_on_dead_pubsub() {
+	let socket = std::net::TcpListener::bind("127.0.0.1:0").unwrap();
+	let port = socket.local_addr().unwrap().port();
+	drop(socket);
+	let pubsub_url = format!("ws://127.0.0.1:{port}");
+	let rpc = SolanaRpcClient::new_with_ws_and_commitment(
+		"http://127.0.0.1:1",
+		&pubsub_url,
+		solana_commitment_config::CommitmentConfig::processed(),
+	);
+
+	check!(rpc.slots_updates_subscribe().await.is_err());
+	check!(rpc.vote_subscribe().await.is_err());
+}

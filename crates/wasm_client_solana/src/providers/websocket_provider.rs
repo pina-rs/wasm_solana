@@ -527,8 +527,14 @@ mod websocket_provider_reqwest {
 		#[pin]
 		#[builder(default)]
 		websocket: Option<WebSocket>,
+		/// The in-flight handshake, latched to `None` the moment it
+		/// completes. Both split halves share this stream, so without the
+		/// latch a completed (typically failed) handshake gets polled a
+		/// second time by the other half and panics inside
+		/// `reqwest-websocket`.
 		#[pin]
-		initiator: BoxFuture<'static, ReqwestResult>,
+		#[builder(default)]
+		initiator: Option<BoxFuture<'static, ReqwestResult>>,
 	}
 
 	impl WebSocketStream {
@@ -542,7 +548,7 @@ mod websocket_provider_reqwest {
 			let boxed_future: BoxFuture<'static, ReqwestResult> = Box::pin(fut);
 
 			WebSocketStream::builder()
-				.initiator(boxed_future)
+				.initiator(Some(boxed_future))
 				.url(url)
 				.build()
 		}
@@ -562,11 +568,17 @@ mod websocket_provider_reqwest {
 				return Poll::Ready(Some(next.to_websocket_value()));
 			}
 
-			let initiator = this.initiator.as_mut();
+			// A completed handshake is never polled again: surface its
+			// failure once as an error frame (rather than a silent end of
+			// stream), then report the stream as ended on every later poll.
+			let Some(initiator) = this.initiator.as_mut().as_pin_mut() else {
+				return Poll::Ready(None);
+			};
 			let result = ready!(initiator.poll(cx));
+			this.initiator.as_mut().set(None);
 
 			let Ok(websocket) = result else {
-				return Poll::Ready(None);
+				return Poll::Ready(Some(Err(ClientWebSocketError::ConnectionError)));
 			};
 
 			this.websocket.set(Some(websocket));
@@ -585,8 +597,11 @@ mod websocket_provider_reqwest {
 				return websocket.poll_ready_unpin(cx).map_err(Into::into);
 			}
 
-			let initiator = this.initiator.as_mut();
+			let Some(initiator) = this.initiator.as_mut().as_pin_mut() else {
+				return Poll::Ready(Err(ClientWebSocketError::ConnectionError));
+			};
 			let result = ready!(initiator.poll(cx));
+			this.initiator.as_mut().set(None);
 
 			if let Ok(mut websocket) = result {
 				let poll_result = websocket.poll_ready_unpin(cx).map_err(Into::into);
@@ -627,6 +642,41 @@ mod websocket_provider_reqwest {
 			};
 
 			websocket.poll_close_unpin(cx).map_err(Into::into)
+		}
+	}
+
+	#[cfg(test)]
+	mod tests {
+
+		use assert2::check;
+		use futures::StreamExt;
+
+		use super::WebSocketStream;
+		use crate::errors::ClientWebSocketError;
+
+		/// A refused connection must surface as a single error frame followed
+		/// by a permanent end of stream — never a panic from re-polling the
+		/// completed handshake, and never a silent empty stream.
+		#[tokio::test]
+		async fn failed_handshake_errors_once_then_ends() {
+			let socket = std::net::TcpListener::bind("127.0.0.1:0").unwrap();
+			let port = socket.local_addr().unwrap().port();
+			drop(socket);
+
+			let mut stream = WebSocketStream::new(format!("ws://127.0.0.1:{port}"));
+
+			let first = stream.next().await;
+			check!(matches!(
+				first,
+				Some(Err(ClientWebSocketError::ConnectionError))
+			));
+
+			// The latched handshake keeps the stream terminal without
+			// touching the completed future again.
+			let second = stream.next().await;
+			check!(second.is_none());
+			let third = stream.next().await;
+			check!(third.is_none());
 		}
 	}
 }
