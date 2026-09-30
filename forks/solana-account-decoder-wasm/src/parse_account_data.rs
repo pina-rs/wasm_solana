@@ -2,7 +2,7 @@ use std::collections::HashMap;
 
 use serde::Deserialize;
 use serde::Serialize;
-pub use solana_account_decoder_client_types_wasm::ParsedAccount;
+pub use solana_account_decoder_client_types::ParsedAccount;
 use solana_clock::UnixTimestamp;
 use solana_instruction::error::InstructionError;
 use solana_pubkey::Pubkey;

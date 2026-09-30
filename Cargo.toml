@@ -5,9 +5,7 @@ members = [
 	"crates/test_utils_keypairs",
 	"crates/test_utils_solana",
 	"crates/wasm_client_solana",
-	"forks/solana-account-decoder-client-types-wasm",
 	"forks/solana-account-decoder-wasm",
-	"forks/solana-transaction-status-client-types-wasm",
 	"forks/solana-transaction-status-wasm",
 ]
 # Browser examples keep their own workspaces and lockfiles so framework
@@ -72,6 +70,10 @@ serde_json = { default-features = false, version = "^1" }
 serde_tuple = { default-features = false, version = "^1" }
 serde_with = { default-features = false, version = "^3" }
 solana-account = { default-features = false, version = ">=4.3.1, <4.4.0" }
+# Upstream split the wire types out of the decoder crates and made `zstd`
+# optional in 4.2.2, so the browser graph can finally use the crates.io
+# crates directly instead of a published fork.
+solana-account-decoder-client-types = { default-features = false, features = ["agave-unstable-api"], version = ">=4.2.2, <4.3.0" }
 solana-address-lookup-table-interface = { default-features = false, version = ">=3.1.0, <3.2.0" }
 solana-banks-client = { features = ["agave-unstable-api"], default-features = false, version = "^4.2" }
 solana-banks-interface = { features = ["agave-unstable-api"], default-features = false, version = "^4.2" }
@@ -116,6 +118,10 @@ solana-test-validator = { features = ["agave-unstable-api"], default-features = 
 solana-transaction = { default-features = false, features = ["serde", "wincode"], version = ">=4.1.4, <4.2.0" }
 solana-transaction-context = { default-features = false, features = ["agave-unstable-api", "bincode", "serde"], version = "^4.2" }
 solana-transaction-error = { default-features = false, features = ["serde"], version = ">=3.3.1, <3.4.0" }
+# Same upstream split as `solana-account-decoder-client-types`; the whole
+# crate hides behind `agave-unstable-api`, which is only a stability label
+# for the type surface, not a validator feature.
+solana-transaction-status-client-types = { default-features = false, features = ["agave-unstable-api"], version = ">=4.2.2, <4.3.0" }
 solana-version = { features = ["agave-unstable-api"], default-features = false, version = "^4.2" }
 solana-vote-interface = { default-features = false, version = ">=6.0.2, <6.1.0" }
 solana-zk-sdk-pod = { default-features = false, version = "^0.1" }
@@ -136,7 +142,7 @@ test-log = { default-features = false, version = "^0.2" }
 thiserror = { default-features = false, version = "^2" }
 tokio = { default-features = false, version = "^1" }
 typed-builder = { default-features = false, version = "^0.23" }
-wallet_standard = { default-features = false, version = "^0.6" }
+wallet_standard = { default-features = false, version = "^0.7" }
 wasm-bindgen = { default-features = false, version = "^0.2" }
 wasm-bindgen-futures = { default-features = false, version = "^0.4" }
 wasm-bindgen-test = { default-features = false, version = "^0.3" }
@@ -155,10 +161,11 @@ test_utils_keypairs = { path = "crates/test_utils_keypairs", version = "0.12.1" 
 test_utils_solana = { path = "crates/test_utils_solana", version = "0.12.1" }
 wasm_client_solana = { path = "crates/wasm_client_solana", version = "0.12.1" }
 
-# forks
-solana-account-decoder-client-types-wasm = { path = "forks/solana-account-decoder-client-types-wasm", version = "4.0.2" }
+# forks: only the full decoder crates stay forked. Upstream still forces
+# `zstd`, `Inflector` and (for transaction-status) `solana-entry` on them,
+# none of which build for the browser. The `-client-types` forks were
+# retired once upstream 4.2.2 made those crates wasm-safe.
 solana-account-decoder-wasm = { path = "forks/solana-account-decoder-wasm", version = "4.0.2" }
-solana-transaction-status-client-types-wasm = { path = "forks/solana-transaction-status-client-types-wasm", version = "4.0.2" }
 solana-transaction-status-wasm = { path = "forks/solana-transaction-status-wasm", version = "4.0.2" }
 
 [workspace.metadata.bin]
@@ -166,7 +173,7 @@ cargo-llvm-cov = { version = "0.9.1" }
 cargo-nextest = { version = "0.9.143" }
 cargo-semver-checks = { version = "0.50.0" }
 wait-for-them = { version = "0.5.1", bins = ["wait-for-them"] }
-wasm-bindgen-cli = { version = "0.2.128", bins = ["wasm-bindgen", "wasm-bindgen-test-runner"] }
+wasm-bindgen-cli = { version = "0.2.129", bins = ["wasm-bindgen", "wasm-bindgen-test-runner"] }
 
 [profile.dev.package]
 insta.opt-level = 3

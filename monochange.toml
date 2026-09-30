@@ -91,16 +91,8 @@ type = "cargo"
 path = "crates/wasm_client_solana"
 type = "cargo"
 
-[package.solana-account-decoder-client-types-wasm]
-path = "forks/solana-account-decoder-client-types-wasm"
-type = "cargo"
-
 [package.solana-account-decoder-wasm]
 path = "forks/solana-account-decoder-wasm"
-type = "cargo"
-
-[package.solana-transaction-status-client-types-wasm]
-path = "forks/solana-transaction-status-client-types-wasm"
 type = "cargo"
 
 [package.solana-transaction-status-wasm]
@@ -133,11 +125,12 @@ versioned_files = [
 # The forks mirror the upstream Agave crate versions they are vendored from
 # (4.2.x for the Agave 4.2 family). They version independently so a fork
 # manifest can be re-pinned when the workspace adopts a new Agave family.
+# The `-client-types` forks were retired once upstream 4.2.2 shipped those
+# crates with optional `zstd`; only the full decoder crates still need a
+# wasm-buildable patch set.
 [group.forks]
 packages = [
-	"solana-account-decoder-client-types-wasm",
 	"solana-account-decoder-wasm",
-	"solana-transaction-status-client-types-wasm",
 	"solana-transaction-status-wasm",
 ]
 release = true

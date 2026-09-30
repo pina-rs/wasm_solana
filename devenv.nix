@@ -237,6 +237,7 @@ in
         cargo test_memory_wallet_ssr
         cargo test_memory_wallet_docs
         cargo test_wasm_client_solana_ssr
+        cargo test_wasm_client_solana_zstd
         cargo test_wasm_client_solana_docs
         cargo test_streams
         WASM_BINDGEN_TEST_TIMEOUT=90 test:validator
@@ -271,6 +272,7 @@ in
         cargo coverage_memory_wallet_ssr
         cargo coverage_memory_wallet_docs
         cargo coverage_wasm_client_solana_ssr
+        cargo coverage_wasm_client_solana_zstd
         cargo coverage_wasm_client_solana_docs
         cargo coverage_streams
         cargo coverage_codecov_report

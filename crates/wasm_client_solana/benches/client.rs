@@ -86,7 +86,7 @@ fn ui_account(data_bytes: usize, seed: u8) -> UiAccount {
 	UiAccount {
 		lamports: 1_000_000_000,
 		data: UiAccountData::Binary(data, UiAccountEncoding::Base64),
-		owner: Pubkey::default(),
+		owner: Pubkey::default().to_string(),
 		executable: false,
 		rent_epoch: 0,
 		space: Some(data_bytes as u64),

@@ -34,10 +34,10 @@ use base64::prelude::BASE64_STANDARD;
 use serde::Deserialize;
 use serde::Serialize;
 use solana_account::ReadableAccount;
-pub use solana_account_decoder_client_types_wasm::UiAccount;
-pub use solana_account_decoder_client_types_wasm::UiAccountData;
-pub use solana_account_decoder_client_types_wasm::UiAccountEncoding;
-pub use solana_account_decoder_client_types_wasm::UiDataSliceConfig;
+pub use solana_account_decoder_client_types::UiAccount;
+pub use solana_account_decoder_client_types::UiAccountData;
+pub use solana_account_decoder_client_types::UiAccountEncoding;
+pub use solana_account_decoder_client_types::UiDataSliceConfig;
 use solana_fee_calculator::FeeCalculator;
 use solana_pubkey::Pubkey;
 
@@ -138,7 +138,7 @@ pub fn encode_ui_account<T: ReadableAccount>(
 	UiAccount {
 		lamports: account.lamports(),
 		data,
-		owner: *account.owner(),
+		owner: account.owner().to_string(),
 		executable: account.executable(),
 		rent_epoch: account.rent_epoch(),
 		space: Some(space as u64),

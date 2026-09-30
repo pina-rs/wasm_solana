@@ -119,6 +119,12 @@ jobs:
           cargo test_wasm_client_solana_ssr
         shell: devenv shell -- bash -e {0}
 
+      - name: test `wasm_client_solana` with `zstd`
+        run: |
+          sudo prlimit --pid $$ --nofile=1000000:1000000
+          cargo test_wasm_client_solana_zstd
+        shell: devenv shell -- bash -e {0}
+
       - name: test `wasm_client_solana` with `docs`
         run: |
           sudo prlimit --pid $$ --nofile=1000000:1000000
@@ -164,6 +170,12 @@ jobs:
         run: |
           sudo prlimit --pid $$ --nofile=1000000:1000000
           cargo coverage_memory_wallet_ssr
+        shell: devenv shell -- bash -e {0}
+
+      - name: coverage `wasm_client_solana_zstd`
+        run: |
+          sudo prlimit --pid $$ --nofile=1000000:1000000
+          cargo coverage_wasm_client_solana_zstd
         shell: devenv shell -- bash -e {0}
 
       # - name: coverage `memory_wallet_docs`

@@ -103,6 +103,12 @@ mod tests {
 
 		check!(response.id == 1);
 		check!(response.jsonrpc == "2.0");
-		check!(response.result.0 ==Signature::from_str("5VERv8NMvzbJMEkV8xnrLkEaWRtSz9CosKDYjCJjBRnbJLgp8uirBgmQpjKhoR4tjF3ZpRzrFmBV6UjKdiSZkQUW").unwrap());
+		check!(
+			response.result.0
+				== Signature::from_str(
+					"5VERv8NMvzbJMEkV8xnrLkEaWRtSz9CosKDYjCJjBRnbJLgp8uirBgmQpjKhoR4tjF3ZpRzrFmBV6UjKdiSZkQUW"
+				)
+				.unwrap()
+		);
 	}
 }

@@ -47,7 +47,7 @@ impl GetTokenAccountBalanceRequest {
 }
 
 /// Response for the `getTokenAccountBalance` RPC method.
-#[derive(Debug, Deserialize, PartialEq, Eq)]
+#[derive(Debug, Deserialize, PartialEq)]
 pub struct GetTokenAccountBalanceResponse {
 	/// The slot that the RPC node used to evaluate the request.
 	pub context: Context,

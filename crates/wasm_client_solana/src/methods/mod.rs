@@ -69,6 +69,8 @@ pub use self::send_transaction::*;
 pub use self::signature_subscribe::*;
 pub use self::simulate_transaction::*;
 pub use self::slot_subscribe::*;
+pub use self::slots_updates_subscribe::*;
+pub use self::vote_subscribe::*;
 
 mod get_account_info;
 mod get_balance;
@@ -127,6 +129,8 @@ mod send_transaction;
 mod signature_subscribe;
 mod simulate_transaction;
 mod slot_subscribe;
+mod slots_updates_subscribe;
+mod vote_subscribe;
 
 /// Slot at which a response was evaluated, returned by every context-aware RPC
 /// response.

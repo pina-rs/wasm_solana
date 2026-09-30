@@ -23,6 +23,7 @@ use solana_keypair::Keypair;
 use solana_native_token::sol_str_to_lamports;
 use solana_pubkey::Pubkey;
 use solana_rpc::rpc::JsonRpcConfig;
+use solana_rpc::rpc_pubsub_service::PubSubConfig;
 use solana_signer::Signer;
 use solana_system_interface::program as system_program;
 use solana_test_validator::TestValidator;
@@ -68,6 +69,11 @@ pub struct TestValidatorRunnerProps {
 	/// Override the epoch schedule.
 	#[builder(default)]
 	pub epoch_schedule: EpochSchedule,
+	/// Enable `voteSubscribe` on the pubsub endpoint. Production validators
+	/// keep this behind `--rpc-pubsub-enable-vote-subscription`, so tests
+	/// that assert on vote notifications must opt in explicitly.
+	#[builder(default = false)]
+	pub enable_vote_subscription: bool,
 }
 
 impl Default for TestValidatorRunnerProps {
@@ -207,6 +213,7 @@ impl TestValidatorRunner {
 			accounts,
 			warp_slot,
 			epoch_schedule,
+			enable_vote_subscription,
 		}: TestValidatorRunnerProps,
 	) -> Result<Self> {
 		let mut genesis = TestValidatorGenesis::default();
@@ -259,6 +266,10 @@ impl TestValidatorRunner {
 				faucet_addr: Some(faucet_addr),
 				enable_rpc_transaction_history: true,
 				..JsonRpcConfig::default_for_test()
+			})
+			.pubsub_config(PubSubConfig {
+				enable_vote_subscription,
+				..PubSubConfig::default_for_tests()
 			})
 			// Needed to prevent all account transactions from failing with this error:
 			// `Attempt to debit an account but found no record of a prior credit.`

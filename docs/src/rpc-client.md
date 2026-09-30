@@ -57,16 +57,16 @@ RPC failures surface as `ClientError` with structured contents (`RpcError` with 
 
 ## Re-exports
 
-The client re-exports the wasm decoder crates under their familiar names:
+The client re-exports the decoder crates under their familiar names:
 
 ```rust,ignore
-pub use solana_account_decoder_client_types_wasm as solana_account_decoder_client_types;
+pub use solana_account_decoder_client_types; // the crates.io crate, wasm-safe since 4.2.2
 pub use solana_account_decoder_wasm as solana_account_decoder;
-pub use solana_transaction_status_client_types_wasm as solana_transaction_status_client_types;
+pub use solana_transaction_status_client_types; // likewise, from crates.io
 pub use solana_transaction_status_wasm as solana_transaction_status;
 ```
 
-This gives consumers a single import path for parsed accounts, transaction statuses and their types, regardless of which forked crate actually hosts them.
+This gives consumers a single import path for parsed accounts, transaction statuses and their types, regardless of which crate actually hosts them — and because the wire types are now the upstream ones, they unify with any other `solana-*` code in the same graph.
 
 ## Versioning
 

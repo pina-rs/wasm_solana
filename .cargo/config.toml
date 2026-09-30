@@ -59,6 +59,14 @@ test_wasm_client_solana_ssr = [
 	"-F",
 	"ssr",
 ]
+test_wasm_client_solana_zstd = [
+	"nextest",
+	"run",
+	"--package",
+	"wasm_client_solana",
+	"-F",
+	"zstd",
+]
 test_wasm_client_solana_docs = [
 	"test",
 	"--package",
@@ -100,6 +108,16 @@ coverage_wasm_client_solana_ssr = [
 	"wasm_client_solana",
 	"-F",
 	"ssr",
+]
+# The zstd-gated decode arms only exist in this variant; run both so the
+# merged codecov report covers every cfg arm of `decode_account_data`.
+coverage_wasm_client_solana_zstd = [
+	"llvm-cov",
+	"--no-report",
+	"--package",
+	"wasm_client_solana",
+	"-F",
+	"zstd",
 ]
 coverage_wasm_client_solana_docs = [
 	"llvm-cov",

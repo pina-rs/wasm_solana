@@ -5,7 +5,7 @@ use serde_tuple::Serialize_tuple;
 use serde_with::skip_serializing_none;
 use solana_clock::Slot;
 #[cfg(test)]
-use solana_transaction_status_client_types_wasm::option_serializer::OptionSerializer;
+use solana_transaction_status_client_types::option_serializer::OptionSerializer;
 
 use crate::impl_http_method;
 use crate::rpc_config::RpcBlockConfig;

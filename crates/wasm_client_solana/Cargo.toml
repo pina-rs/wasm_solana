@@ -44,7 +44,7 @@ serde_json = { workspace = true, default-features = true }
 serde_tuple = { workspace = true, default-features = true }
 serde_with = { workspace = true, default-features = true }
 solana-account = { workspace = true, default-features = true }
-solana-account-decoder-client-types-wasm = { workspace = true }
+solana-account-decoder-client-types = { workspace = true }
 solana-account-decoder-wasm = { workspace = true, default-features = true }
 solana-address-lookup-table-interface = { workspace = true, default-features = true, features = ["serde"] }
 solana-clock = { workspace = true, default-features = true }
@@ -66,7 +66,7 @@ solana-signer = { workspace = true, default-features = true }
 solana-system-interface = { workspace = true, default-features = true }
 solana-transaction = { workspace = true, default-features = true }
 solana-transaction-error = { workspace = true, default-features = true }
-solana-transaction-status-client-types-wasm = { workspace = true }
+solana-transaction-status-client-types = { workspace = true }
 solana-transaction-status-wasm = { workspace = true }
 solana-version = { workspace = true, default-features = true }
 solana-vote-interface = { workspace = true, default-features = true, features = ["bincode", "serde"] }
@@ -107,19 +107,25 @@ spl-pod = { workspace = true, default-features = true }
 test-log = { workspace = true, features = ["trace"], default-features = true }
 test_utils_insta = { workspace = true }
 test_utils_keypairs = { workspace = true }
-tokio = { workspace = true, features = ["test-util"], default-features = true }
+tokio = { workspace = true, features = ["test-util", "time"], default-features = true }
 wasm-bindgen-test = { workspace = true, default-features = true }
+
+# The pubsub integration tests drive a real in-process validator, which only
+# exists natively; the browser test target must never build the validator
+# stack, so the dependency is scoped to non-wasm targets.
+[target.'cfg(not(target_arch = "wasm32"))'.dev-dependencies]
+test_utils_solana = { workspace = true, features = ["test_validator"] }
 
 [features]
 js = ["futures-timer/wasm-bindgen", "getrandom/wasm_js"]
 ssr = ["dep:reqwest", "dep:reqwest-websocket", "dep:tokio"]
 # `zstd` account data only exists on SSR-style responses; enabling it must
-# also arm the decoder forks, otherwise `UiAccountData::decode` silently
-# returns `None` for `base64+zstd` accounts.
+# also arm the upstream client-types decoder, otherwise account data decode
+# silently returns `None` for `base64+zstd` accounts.
 zstd = [
 	"ssr",
 	"dep:zstd",
-	"solana-account-decoder-client-types-wasm/zstd",
+	"solana-account-decoder-client-types/zstd",
 	"solana-account-decoder-wasm/zstd",
 ]
 

@@ -7,7 +7,7 @@ use serde_with::serde_as;
 use serde_with::skip_serializing_none;
 use solana_signature::Signature;
 #[cfg(test)]
-use solana_transaction_status_client_types_wasm::option_serializer::OptionSerializer;
+use solana_transaction_status_client_types::option_serializer::OptionSerializer;
 
 use crate::impl_http_method;
 use crate::rpc_config::RpcTransactionConfig;
@@ -61,7 +61,7 @@ impl GetTransactionRequest {
 }
 
 /// Response for the `getTransaction` RPC method.
-#[derive(Debug, Serialize, Deserialize, PartialEq, Eq)]
+#[derive(Debug, Serialize, Deserialize, PartialEq)]
 pub struct GetTransactionResponse(Option<EncodedConfirmedTransactionWithStatusMeta>);
 
 impl From<GetTransactionResponse> for Option<EncodedConfirmedTransactionWithStatusMeta> {
@@ -95,10 +95,16 @@ mod tests {
 		let request = ClientRequest::builder()
 			.method(GetTransactionRequest::NAME)
 			.id(1)
-			.params(GetTransactionRequest::new_with_config(Signature::from_str("2nBhEBYYvfaAe16UMNqRHre4YNSskvuYgx3M6E4JP1oDYvZEJHvoPzyUidNgNX5r9sTyN1J9UxtbCXy2rqYcuyuv").unwrap(), RpcTransactionConfig {
+			.params(GetTransactionRequest::new_with_config(
+				Signature::from_str(
+					"2nBhEBYYvfaAe16UMNqRHre4YNSskvuYgx3M6E4JP1oDYvZEJHvoPzyUidNgNX5r9sTyN1J9UxtbCXy2rqYcuyuv",
+				)
+				.unwrap(),
+				RpcTransactionConfig {
 					encoding: Some(UiTransactionEncoding::Json),
 					..Default::default()
-			}))
+				},
+			))
 			.build();
 
 		insta::assert_compact_json_snapshot!(request, @r###"

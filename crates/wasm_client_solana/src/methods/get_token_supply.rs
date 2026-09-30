@@ -47,7 +47,7 @@ impl GetTokenSupplyRequest {
 }
 
 /// Response for the `getTokenSupply` RPC method.
-#[derive(Debug, Deserialize, PartialEq, Eq)]
+#[derive(Debug, Deserialize, PartialEq)]
 pub struct GetTokenSupplyResponse {
 	/// The slot that the RPC node used to evaluate the request.
 	pub context: Context,
