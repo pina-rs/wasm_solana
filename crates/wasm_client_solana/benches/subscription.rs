@@ -39,7 +39,7 @@ fn notification_frames(count: usize) -> Vec<serde_json::Value> {
 			base64::prelude::BASE64_STANDARD.encode(vec![0u8; 64]),
 			UiAccountEncoding::Base64,
 		),
-		owner: solana_pubkey::Pubkey::default(),
+		owner: solana_pubkey::Pubkey::default().to_string(),
 		executable: false,
 		rent_epoch: 0,
 		space: Some(64),

@@ -1,3 +1,0 @@
-cargo:rerun-if-changed=codegen/mod.rs
-cargo:rerun-if-changed=codegen/tuple.rs
-cargo:rerun-if-changed=build.rs

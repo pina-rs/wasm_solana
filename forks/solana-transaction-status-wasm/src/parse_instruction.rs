@@ -13,7 +13,7 @@ use solana_sdk_ids::address_lookup_table;
 use solana_sdk_ids::stake;
 use solana_sdk_ids::system_program;
 use solana_sdk_ids::vote;
-pub use solana_transaction_status_client_types_wasm::ParsedInstruction;
+pub use solana_transaction_status_client_types::ParsedInstruction;
 use thiserror::Error;
 
 use crate::parse_address_lookup_table::parse_address_lookup_table;

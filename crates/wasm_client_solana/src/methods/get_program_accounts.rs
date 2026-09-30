@@ -140,7 +140,7 @@ mod tests {
 						executable: false,
 						data: UiAccountData::LegacyBinary("2R9jLfiAQ9bgdcw6h8s44439".to_string()),
 						lamports: 15_298_080,
-						owner: pubkey!("4Nd1mBQtrMJVYVfKf2PJy9NZUZdTAsp7D4xWLs4gDB4T"),
+						owner: pubkey!("4Nd1mBQtrMJVYVfKf2PJy9NZUZdTAsp7D4xWLs4gDB4T").to_string(),
 						rent_epoch: 28,
 						space: Some(42)
 					},

@@ -1,10 +1,15 @@
 #![doc = include_str!(concat!(env!("CARGO_MANIFEST_DIR"), "/readme.md"))]
 
-pub use solana_account_decoder_client_types_wasm as solana_account_decoder_client_types;
+// The wire types come straight from the crates.io `-client-types` crates —
+// upstream made them wasm-safe in 4.2.2 — so downstream code keeps the
+// `wasm_client_solana::solana_*` paths it already used while gaining the
+// upstream type identity shared with the rest of the ecosystem.
+pub use solana_account_decoder_client_types;
 pub use solana_account_decoder_wasm as solana_account_decoder;
-pub use solana_transaction_status_client_types_wasm as solana_transaction_status_client_types;
+pub use solana_transaction_status_client_types;
 pub use solana_transaction_status_wasm as solana_transaction_status;
 
+pub use crate::account_data::*;
 pub use crate::client::*;
 pub use crate::constants::*;
 pub use crate::errors::*;
@@ -15,6 +20,8 @@ pub use crate::rpc_config::*;
 pub use crate::solana_client::*;
 pub use crate::utils::spawn_local;
 
+/// Hardened decoding of account data payloads received over RPC.
+pub mod account_data;
 mod client;
 mod constants;
 mod errors;

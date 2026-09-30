@@ -1808,4 +1808,38 @@ impl SolanaRpcClient {
 
 		Ok(subscription)
 	}
+
+	/// Subscribe to the full slot lifecycle: shreds arriving, banks being
+	/// created and frozen, dead slots and optimistic confirmations, in
+	/// addition to the processed/rooted events the other slot subscriptions
+	/// report.
+	///
+	/// This is the noisiest of the slot feeds and the payload shape is
+	/// treated as unstable upstream, so not every RPC provider exposes it.
+	/// Prefer [`slot_subscribe`](Self::slot_subscribe) unless the pipeline
+	/// stages themselves matter.
+	pub async fn slots_updates_subscribe(&self) -> ClientResult<Subscription<SlotUpdate>> {
+		let (id, subscription_id, stream) = self
+			.ws
+			.create_subscription(SlotsUpdatesSubscribeRequest)
+			.await?;
+		let subscription = Subscription::from_parts(&self.ws, id, subscription_id, stream);
+
+		Ok(subscription)
+	}
+
+	/// Subscribe to every vote the node observes on gossip: the voting
+	/// validator, the slots covered, and the locked-in bank hash.
+	///
+	/// This subscription is disabled by default on validators; it can be
+	/// enabled by passing `--rpc-pubsub-enable-vote-subscription` to
+	/// `solana-validator`. Most dApps want
+	/// [`root_subscribe`](Self::root_subscribe) instead.
+	pub async fn vote_subscribe(&self) -> ClientResult<Subscription<VoteNotification>> {
+		let (id, subscription_id, stream) =
+			self.ws.create_subscription(VoteSubscribeRequest).await?;
+		let subscription = Subscription::from_parts(&self.ws, id, subscription_id, stream);
+
+		Ok(subscription)
+	}
 }

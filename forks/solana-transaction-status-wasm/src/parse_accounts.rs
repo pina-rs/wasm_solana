@@ -1,8 +1,8 @@
 use agave_reserved_account_keys::ReservedAccountKeys;
 use solana_message::Message;
 use solana_message::v0::LoadedMessage;
-pub use solana_transaction_status_client_types_wasm::ParsedAccount;
-pub use solana_transaction_status_client_types_wasm::ParsedAccountSource;
+pub use solana_transaction_status_client_types::ParsedAccount;
+pub use solana_transaction_status_client_types::ParsedAccountSource;
 
 pub fn parse_legacy_message_accounts(message: &Message) -> Vec<ParsedAccount> {
 	let reserved_account_keys = ReservedAccountKeys::new_all_activated().active;

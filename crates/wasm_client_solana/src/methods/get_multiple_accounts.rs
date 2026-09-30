@@ -124,7 +124,7 @@ mod tests {
 						lamports: 1_000_000_000,
 						space: Some(16),
 						data: UiAccountData::Binary(String::new(), UiAccountEncoding::Base64),
-						owner: Pubkey::default(),
+						owner: Pubkey::default().to_string(),
 						executable: false,
 						rent_epoch: 2
 					}),
@@ -132,7 +132,7 @@ mod tests {
 						lamports: 5_000_000_000,
 						space: Some(0),
 						data: UiAccountData::Binary(String::new(), UiAccountEncoding::Base64),
-						owner: Pubkey::default(),
+						owner: Pubkey::default().to_string(),
 						executable: false,
 						rent_epoch: 2
 					})

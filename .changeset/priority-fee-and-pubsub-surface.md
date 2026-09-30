@@ -1,5 +1,4 @@
 ---
-solana-account-decoder-client-types-wasm: fix
 solana-account-decoder-wasm: fix
 solana-transaction-status-wasm: fix
 wasm_client_solana: breaking
@@ -13,4 +12,4 @@ The pubsub surface now matches the docs: `signatureSubscribe` (with optional `re
 
 Two websocket correctness fixes from review: subscription and acknowledgement forks are now registered _before_ the subscribe request is sent (a frame racing the handshake could previously slip past a fork created after the send), and `Unsubscription` owns its fork rather than holding a weak live-edge handle (retaining a handle past the provider's drop no longer loses the buffer). The fork benchmark now measures the same acknowledgement wait in both variants with the history drain amortized in setup, matching production.
 
-Also from review: `base64+zstd` decode rejects oversized output instead of silently truncating at the 10 MiB cap, the hand-rolled kebab-case helper inserts the hyphen before digit suffixes (`SplToken2022` -> `spl-token-2022`, restoring Inflector parity — regression-tested), and the browser e2e transfer test gets a budget covering both its airdrop and its send.
+Also from review: the hardened `decode_account_data` helper rejects `base64+zstd` output beyond the 10 MiB cluster cap instead of silently truncating, the hand-rolled kebab-case helper inserts the hyphen before digit suffixes (`SplToken2022` -> `spl-token-2022`, restoring Inflector parity — regression-tested), and the browser e2e transfer test gets a budget covering both its airdrop and its send.

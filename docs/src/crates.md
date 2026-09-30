@@ -11,9 +11,7 @@ wasm_solana/
 │   ├── test_utils_keypairs/   # fixed keypairs for tests
 │   └── test_utils_insta/      # insta snapshot redactions
 └── forks/
-    ├── solana-account-decoder-client-types-wasm/
     ├── solana-account-decoder-wasm/
-    ├── solana-transaction-status-client-types-wasm/
     └── solana-transaction-status-wasm/
 ```
 
@@ -25,7 +23,7 @@ The wasm-compatible Solana client.
 - 50+ typed RPC methods under `methods/`, each with `Request`/`Response` structs that mirror the JSON-RPC spec.
 - Pubsub subscriptions returning `Subscription<T>` streams.
 - `providers/` — `HttpProvider` (reqwest / ssr) and `WebSocketProvider` (browser / js).
-- Re-exports the forked decoding crates under `solana_account_decoder*` and `solana_transaction_status*` so consumers have one import path.
+- Re-exports the decoding crates under `solana_account_decoder*` and `solana_transaction_status*` so consumers have one import path: the wire types come from the crates.io `-client-types` crates (wasm-safe since upstream 4.2.2), the parse machinery from the two remaining forks.
 
 ### The two transports
 

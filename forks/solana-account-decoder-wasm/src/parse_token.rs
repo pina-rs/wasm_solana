@@ -1,13 +1,13 @@
 use std::str::FromStr;
 
-pub use solana_account_decoder_client_types_wasm::token::TokenAccountType;
-pub use solana_account_decoder_client_types_wasm::token::UiAccountState;
-pub use solana_account_decoder_client_types_wasm::token::UiMint;
-pub use solana_account_decoder_client_types_wasm::token::UiMultisig;
-pub use solana_account_decoder_client_types_wasm::token::UiTokenAccount;
-pub use solana_account_decoder_client_types_wasm::token::UiTokenAmount;
-pub use solana_account_decoder_client_types_wasm::token::real_number_string;
-pub use solana_account_decoder_client_types_wasm::token::real_number_string_trimmed;
+pub use solana_account_decoder_client_types::token::TokenAccountType;
+pub use solana_account_decoder_client_types::token::UiAccountState;
+pub use solana_account_decoder_client_types::token::UiMint;
+pub use solana_account_decoder_client_types::token::UiMultisig;
+pub use solana_account_decoder_client_types::token::UiTokenAccount;
+pub use solana_account_decoder_client_types::token::UiTokenAmount;
+pub use solana_account_decoder_client_types::token::real_number_string;
+pub use solana_account_decoder_client_types::token::real_number_string_trimmed;
 use solana_program_option::COption;
 use solana_program_pack::Pack;
 use solana_pubkey::Pubkey;
@@ -197,7 +197,7 @@ pub fn get_token_account_mint(data: &[u8]) -> Option<Pubkey> {
 
 #[cfg(test)]
 mod test {
-	use solana_account_decoder_client_types_wasm::token::UiExtension;
+	use solana_account_decoder_client_types::token::UiExtension;
 	use spl_token_2022_interface::extension::BaseStateWithExtensionsMut;
 	use spl_token_2022_interface::extension::ExtensionType;
 	use spl_token_2022_interface::extension::StateWithExtensionsMut;

@@ -1,9 +1,0 @@
-/Users/ifiokjr/Developer/projects/wasm_solana/wasm_solana/examples/dioxus-surfpool/target/wasm32-unknown-unknown/release/deps/solana_system_interface-6a07250d79e3f7e9.d: /Users/ifiokjr/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/solana-system-interface-3.2.0/src/lib.rs /Users/ifiokjr/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/solana-system-interface-3.2.0/src/error.rs /Users/ifiokjr/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/solana-system-interface-3.2.0/src/instruction.rs
-
-/Users/ifiokjr/Developer/projects/wasm_solana/wasm_solana/examples/dioxus-surfpool/target/wasm32-unknown-unknown/release/deps/libsolana_system_interface-6a07250d79e3f7e9.rlib: /Users/ifiokjr/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/solana-system-interface-3.2.0/src/lib.rs /Users/ifiokjr/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/solana-system-interface-3.2.0/src/error.rs /Users/ifiokjr/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/solana-system-interface-3.2.0/src/instruction.rs
-
-/Users/ifiokjr/Developer/projects/wasm_solana/wasm_solana/examples/dioxus-surfpool/target/wasm32-unknown-unknown/release/deps/libsolana_system_interface-6a07250d79e3f7e9.rmeta: /Users/ifiokjr/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/solana-system-interface-3.2.0/src/lib.rs /Users/ifiokjr/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/solana-system-interface-3.2.0/src/error.rs /Users/ifiokjr/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/solana-system-interface-3.2.0/src/instruction.rs
-
-/Users/ifiokjr/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/solana-system-interface-3.2.0/src/lib.rs:
-/Users/ifiokjr/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/solana-system-interface-3.2.0/src/error.rs:
-/Users/ifiokjr/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/solana-system-interface-3.2.0/src/instruction.rs:

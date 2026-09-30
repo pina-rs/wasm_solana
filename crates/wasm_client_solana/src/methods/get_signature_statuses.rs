@@ -108,13 +108,21 @@ mod tests {
 
 	#[test]
 	fn request() {
-		let request = ClientRequest::builder().method(GetSignatureStatusesRequest::NAME)
-				.id(1)
-				.params(GetSignatureStatusesRequest::new_with_config(
-					vec![Signature::from_str("5VERv8NMvzbJMEkV8xnrLkEaWRtSz9CosKDYjCJjBRnbJLgp8uirBgmQpjKhoR4tjF3ZpRzrFmBV6UjKdiSZkQUW").unwrap()],
-					RpcSignatureStatusConfig { search_transaction_history: true },
-				))
-				.build();
+		let request = ClientRequest::builder()
+			.method(GetSignatureStatusesRequest::NAME)
+			.id(1)
+			.params(GetSignatureStatusesRequest::new_with_config(
+				vec![
+					Signature::from_str(
+						"5VERv8NMvzbJMEkV8xnrLkEaWRtSz9CosKDYjCJjBRnbJLgp8uirBgmQpjKhoR4tjF3ZpRzrFmBV6UjKdiSZkQUW",
+					)
+					.unwrap(),
+				],
+				RpcSignatureStatusConfig {
+					search_transaction_history: true,
+				},
+			))
+			.build();
 
 		insta::assert_compact_json_snapshot!(request, @r###"
   {

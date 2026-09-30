@@ -14,7 +14,7 @@ description = "Solana account decoder"
 targets = ["x86_64-unknown-linux-gnu"]
 
 [features]
-zstd = ["dep:zstd", "solana-account-decoder-client-types-wasm/zstd"]
+zstd = ["dep:zstd", "solana-account-decoder-client-types/zstd"]
 
 [dependencies]
 base64 = { workspace = true, default-features = true }
@@ -25,7 +25,7 @@ serde = { workspace = true, default-features = true }
 serde_derive = { workspace = true, default-features = true }
 serde_json = { workspace = true, default-features = true }
 solana-account = { workspace = true, default-features = true }
-solana-account-decoder-client-types-wasm = { workspace = true }
+solana-account-decoder-client-types = { workspace = true }
 solana-address-lookup-table-interface = { workspace = true, features = ["bincode", "bytemuck"], default-features = true }
 solana-clock = { workspace = true, default-features = true }
 solana-config-interface = { workspace = true, features = ["bincode"], default-features = true }

@@ -379,3 +379,30 @@ impl RpcProvider for TestRpcProvider {
 fn to_error<T: Display>(error: T) -> ClientError {
 	ClientError::Other(error.to_string())
 }
+
+#[cfg(test)]
+mod tests {
+
+	use assert2::check;
+	use solana_account::AccountSharedData;
+	use solana_pubkey::Pubkey;
+	use wasm_client_solana::decode_account_data;
+
+	use super::*;
+
+	/// Pins the wire shape `TestRpcProvider` produces for accounts: the owner
+	/// serializes as its base-58 string (the upstream `UiAccount` shape) and
+	/// base64 encoding round-trips through the hardened decoder.
+	#[test]
+	fn encode_ui_account_produces_upstream_shape() {
+		let owner = Pubkey::default();
+		let account = AccountSharedData::new(1_000, 4, &owner);
+
+		let ui = encode_ui_account(&owner, &account, UiAccountEncoding::Base64, None, None);
+
+		check!(ui.owner == owner.to_string());
+		check!(ui.lamports == 1_000);
+		check!(ui.space == Some(4));
+		check!(decode_account_data(&ui.data) == Some(vec![0, 0, 0, 0]));
+	}
+}

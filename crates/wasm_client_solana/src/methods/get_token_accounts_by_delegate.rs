@@ -152,7 +152,7 @@ mod tests {
             Some(
             vec![RpcKeyedAccount {
                 account: UiAccount {
-                    owner: pubkey!("TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"),
+                    owner: pubkey!("TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA").to_string(),
                     data: UiAccountData::Json(ParsedAccount {
                         program: "spl-token".to_string(),
                         space: 165,
