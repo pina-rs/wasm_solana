@@ -1,8 +1,0 @@
-cargo:rerun-if-changed=./src/ts/hydrate_types.ts
-cargo:rerun-if-changed=./src/ts/initialize_streaming.ts
-cargo:rerun-if-changed=./src/ts/patch_console.ts
-cargo:rerun-if-changed=./src/ts/native.ts
-cargo:rerun-if-changed=./src/ts/core.ts
-cargo:rerun-if-changed=./src/ts/hydrate.ts
-cargo:rerun-if-changed=./src/ts/set_attribute.ts
-cargo:rerun-if-changed=./src/ts/serialize.ts

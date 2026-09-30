@@ -1,1 +1,0 @@
-leptos::html::HtmlElement<Button, (Attr<Id, &str>, leptos::tachys::html::property::Property<&str, {closure@src/main.rs:218:40: 218:47}>), (&str,)>
