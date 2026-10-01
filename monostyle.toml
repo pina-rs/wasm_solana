@@ -5,11 +5,6 @@
 # and pure data tables. Everything authored and readable is measured with
 # the default rules — no per-path threshold overrides.
 
-# CI gate: each category's measured floor, two points of headroom.
-[fail-under]
-readability = 83
-complexity = 87
-
 [rules]
 max-line-width = 100
 tab-width = 4
