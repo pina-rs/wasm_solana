@@ -80,6 +80,7 @@ mod get_block_height;
 mod get_block_production;
 mod get_block_time;
 mod get_blocks;
+
 mod get_blocks_with_limit;
 mod get_cluster_nodes;
 mod get_epoch_info;
@@ -88,6 +89,7 @@ mod get_fee_for_message;
 mod get_first_available_block;
 mod get_genesis_hash;
 mod get_health;
+
 mod get_highest_snapshot_slot;
 mod get_identity;
 mod get_inflation_governor;
@@ -96,6 +98,7 @@ mod get_inflation_reward;
 mod get_largest_accounts;
 mod get_latest_blockhash;
 mod get_leader_schedule;
+
 mod get_max_retransmit_slot;
 mod get_max_shred_insert_slot;
 mod get_minimum_balance_for_rent_exemption;

@@ -92,6 +92,7 @@ impl futures::Stream for QueuedStream {
 		_cx: &mut std::task::Context<'_>,
 	) -> std::task::Poll<Option<Self::Item>> {
 		let item = self.queue.lock().unwrap().pop_front();
+
 		match item {
 			Some(value) => std::task::Poll::Ready(Some(Ok(value))),
 			None => std::task::Poll::Pending,
@@ -154,6 +155,7 @@ fn bench_fork_replay(c: &mut Criterion) {
 						for _ in 0..history {
 							futures::executor::block_on(root.next());
 						}
+
 						(root, queue)
 					},
 					|(mut root, queue)| {

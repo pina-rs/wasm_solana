@@ -160,7 +160,9 @@ impl BlockhashQuery {
 
 		match blockhash {
 			Some(hash) if sign_only => Self::None(hash),
+
 			Some(hash) if !sign_only => Self::FeeCalculator(source, hash),
+
 			None if !sign_only => Self::All(source),
 			_ => panic!("Cannot resolve blockhash"),
 		}

@@ -144,6 +144,7 @@ fn App() -> impl IntoView {
 					}
 					Err(error) => set_status.set(format!("error: {error}")),
 				}
+
 				set_busy.set(false);
 			});
 		}
@@ -183,6 +184,7 @@ fn App() -> impl IntoView {
 					Ok((signature, false)) => format!("not confirmed: {signature}"),
 					Err(error) => format!("failed: {error}"),
 				});
+
 				set_busy.set(false);
 			});
 		}

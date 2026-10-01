@@ -17,6 +17,7 @@ where
 		} else if #[cfg(feature = "ssr")] {
 			tokio::task::spawn_local(fut);
 		}  else {
+
 			futures::executor::block_on(fut);
 		}
 	}
@@ -39,6 +40,7 @@ pub(crate) fn get_ws_url(url: impl Into<String>) -> String {
 
 		// Increase the port number by 1 if the port is specified
 		let last_index = url.rfind(':').unwrap();
+
 		if last_index != first_index
 			&& let Some(Ok(mut port)) = url.get(last_index + 1..).map(str::parse::<u16>)
 		{
