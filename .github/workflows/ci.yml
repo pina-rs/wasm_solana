@@ -24,10 +24,10 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
-      - uses: ifiokjr/monostyle@4bec1628ac06e9c2f835a2bd5783a6112551f92c # v0.3.22
+      - uses: ifiokjr/monostyle@862af88bca4b9f1046b58e462499bfcf17e4369f # v0.3.23
         if: always()
         with:
-          version: 0.3.22
+          version: 0.3.23
 
       - name: setup
         uses: ./.github/actions/devenv

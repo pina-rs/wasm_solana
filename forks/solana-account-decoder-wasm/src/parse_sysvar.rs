@@ -52,11 +52,9 @@ pub fn parse_sysvar(data: &[u8], pubkey: &Pubkey) -> Result<SysvarAccountType, P
 				.map(|recent_blockhashes| {
 					let recent_blockhashes = recent_blockhashes
 						.iter()
-						.map(|entry| {
-							UiRecentBlockhashesEntry {
-								blockhash: entry.blockhash.to_string(),
-								fee_calculator: entry.fee_calculator.into(),
-							}
+						.map(|entry| UiRecentBlockhashesEntry {
+							blockhash: entry.blockhash.to_string(),
+							fee_calculator: entry.fee_calculator.into(),
 						})
 						.collect();
 					SysvarAccountType::RecentBlockhashes(recent_blockhashes)
@@ -75,11 +73,9 @@ pub fn parse_sysvar(data: &[u8], pubkey: &Pubkey) -> Result<SysvarAccountType, P
 				.map(|slot_hashes| {
 					let slot_hashes = slot_hashes
 						.iter()
-						.map(|slot_hash| {
-							UiSlotHashEntry {
-								slot: slot_hash.0,
-								hash: slot_hash.1.to_string(),
-							}
+						.map(|slot_hash| UiSlotHashEntry {
+							slot: slot_hash.0,
+							hash: slot_hash.1.to_string(),
 						})
 						.collect();
 					SysvarAccountType::SlotHashes(slot_hashes)
@@ -97,11 +93,9 @@ pub fn parse_sysvar(data: &[u8], pubkey: &Pubkey) -> Result<SysvarAccountType, P
 			deserialize::<StakeHistory>(data).ok().map(|stake_history| {
 				let stake_history = stake_history
 					.iter()
-					.map(|entry| {
-						UiStakeHistoryEntry {
-							epoch: entry.0,
-							stake_history: entry.1.clone(),
-						}
+					.map(|entry| UiStakeHistoryEntry {
+						epoch: entry.0,
+						stake_history: entry.1.clone(),
 					})
 					.collect();
 				SysvarAccountType::StakeHistory(stake_history)

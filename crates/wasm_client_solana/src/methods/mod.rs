@@ -89,7 +89,6 @@ mod get_fee_for_message;
 mod get_first_available_block;
 mod get_genesis_hash;
 mod get_health;
-
 mod get_highest_snapshot_slot;
 mod get_identity;
 mod get_inflation_governor;
@@ -98,7 +97,6 @@ mod get_inflation_reward;
 mod get_largest_accounts;
 mod get_latest_blockhash;
 mod get_leader_schedule;
-
 mod get_max_retransmit_slot;
 mod get_max_shred_insert_slot;
 mod get_minimum_balance_for_rent_exemption;

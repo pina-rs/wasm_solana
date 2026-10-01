@@ -17,15 +17,11 @@ pub fn parse_address_lookup_table(
 		.map(|address_lookup_table| {
 			LookupTableAccountType::LookupTable(address_lookup_table.into())
 		})
-		.or_else(|err| {
-			match err {
-				InstructionError::UninitializedAccount => Ok(LookupTableAccountType::Uninitialized),
-				_ => {
-					Err(ParseAccountError::AccountNotParsable(
-						ParsableAccount::AddressLookupTable,
-					))
-				}
-			}
+		.or_else(|err| match err {
+			InstructionError::UninitializedAccount => Ok(LookupTableAccountType::Uninitialized),
+			_ => Err(ParseAccountError::AccountNotParsable(
+				ParsableAccount::AddressLookupTable,
+			)),
 		})
 }
 

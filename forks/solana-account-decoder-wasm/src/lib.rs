@@ -88,12 +88,10 @@ pub fn encode_ui_account<T: ReadableAccount>(
 			let data = encode_bs58(account, data_slice_config);
 			UiAccountData::Binary(data, encoding)
 		}
-		UiAccountEncoding::Base64 => {
-			UiAccountData::Binary(
-				BASE64_STANDARD.encode(slice_data(account.data(), data_slice_config)),
-				encoding,
-			)
-		}
+		UiAccountEncoding::Base64 => UiAccountData::Binary(
+			BASE64_STANDARD.encode(slice_data(account.data(), data_slice_config)),
+			encoding,
+		),
 		#[cfg(not(feature = "zstd"))]
 		UiAccountEncoding::Base64Zstd => {
 			// zstd support is optional in the wasm fork; fall back to plain
@@ -113,12 +111,10 @@ pub fn encode_ui_account<T: ReadableAccount>(
 				.and_then(|()| encoder.finish())
 			{
 				Ok(zstd_data) => UiAccountData::Binary(BASE64_STANDARD.encode(zstd_data), encoding),
-				Err(_) => {
-					UiAccountData::Binary(
-						BASE64_STANDARD.encode(slice_data(account.data(), data_slice_config)),
-						UiAccountEncoding::Base64,
-					)
-				}
+				Err(_) => UiAccountData::Binary(
+					BASE64_STANDARD.encode(slice_data(account.data(), data_slice_config)),
+					UiAccountEncoding::Base64,
+				),
 			}
 		}
 		UiAccountEncoding::JsonParsed => {

@@ -168,13 +168,11 @@ impl TestValidatorPorts {
 	/// Find a free set of ports, returning `None` if none could be found within
 	/// the retry budget.
 	pub fn try_random_ports() -> Option<Self> {
-		find_ports().map(|(rpc, pubsub, faucet, gossip_range)| {
-			Self {
-				rpc,
-				pubsub,
-				faucet,
-				gossip_range,
-			}
+		find_ports().map(|(rpc, pubsub, faucet, gossip_range)| Self {
+			rpc,
+			pubsub,
+			faucet,
+			gossip_range,
 		})
 	}
 
