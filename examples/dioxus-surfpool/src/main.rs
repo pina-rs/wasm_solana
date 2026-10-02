@@ -75,7 +75,6 @@ fn App() -> Element {
 	// change in Dioxus, so these live inside `use_hook` (which runs once per
 	// component instance); without that every notification would re-run the
 	// body and open a *new* account subscription per render.
-
 	// Initial load: prove the HTTP transport works with a version + balance
 	// read before flipping the status to `connected`.
 	use_hook(|| {
@@ -114,6 +113,7 @@ fn App() -> Element {
 					return;
 				}
 			};
+
 			let mut subscription = subscription;
 
 			while let Some(notification) = subscription.next().await {
@@ -134,6 +134,7 @@ fn App() -> Element {
 			if busy() {
 				return;
 			}
+
 			busy.set(true);
 			let rpc = rpc.clone();
 			spawn(async move {
@@ -152,6 +153,7 @@ fn App() -> Element {
 					}
 					Err(error) => status.set(format!("error: {error}")),
 				}
+
 				busy.set(false);
 			});
 		}
@@ -167,6 +169,7 @@ fn App() -> Element {
 			if busy() {
 				return;
 			}
+
 			busy.set(true);
 			let rpc = rpc.clone();
 			// `Keypair` is not `Clone`; rebuilding it per click from the
@@ -194,6 +197,7 @@ fn App() -> Element {
 					Ok((signature, false)) => format!("not confirmed: {signature}"),
 					Err(error) => format!("failed: {error}"),
 				});
+
 				busy.set(false);
 			});
 		}

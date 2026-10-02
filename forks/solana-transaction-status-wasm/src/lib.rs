@@ -155,19 +155,15 @@ pub fn map_inner_instructions(
 	inner_instructions
 		.into_iter()
 		.enumerate()
-		.map(|(index, instructions)| {
-			InnerInstructions {
-				index: index as u8,
-				instructions: instructions
-					.into_iter()
-					.map(|info| {
-						InnerInstruction {
-							stack_height: Some(u32::from(info.stack_height)),
-							instruction: info.instruction,
-						}
-					})
-					.collect(),
-			}
+		.map(|(index, instructions)| InnerInstructions {
+			index: index as u8,
+			instructions: instructions
+				.into_iter()
+				.map(|info| InnerInstruction {
+					stack_height: Some(u32::from(info.stack_height)),
+					instruction: info.instruction,
+				})
+				.collect(),
 		})
 		.filter(|i| !i.instructions.is_empty())
 }
@@ -330,11 +326,9 @@ impl TryFrom<ConfirmedBlock> for VersionedConfirmedBlock {
 		let txs: Vec<_> = block
 			.transactions
 			.into_iter()
-			.filter_map(|tx| {
-				match tx {
-					TransactionWithStatusMeta::MissingMetadata(_) => None,
-					TransactionWithStatusMeta::Complete(tx) => Some(tx),
-				}
+			.filter_map(|tx| match tx {
+				TransactionWithStatusMeta::MissingMetadata(_) => None,
+				TransactionWithStatusMeta::Complete(tx) => Some(tx),
 			})
 			.collect();
 
@@ -365,51 +359,45 @@ impl ConfirmedBlock {
 		options: BlockEncodingOptions,
 	) -> Result<UiConfirmedBlock, EncodeError> {
 		let (transactions, signatures) = match options.transaction_details {
-			TransactionDetails::Full => {
-				(
-					Some(
-						self.transactions
-							.into_iter()
-							.map(|tx_with_meta| {
-								tx_with_meta.encode(
-									encoding,
-									options.max_supported_transaction_version,
-									options.show_rewards,
-								)
-							})
-							.collect::<Result<Vec<_>, _>>()?,
-					),
-					None,
-				)
-			}
-			TransactionDetails::Signatures => {
-				(
-					None,
-					Some(
-						self.transactions
-							.into_iter()
-							.map(|tx_with_meta| tx_with_meta.transaction_signature().to_string())
-							.collect(),
-					),
-				)
-			}
+			TransactionDetails::Full => (
+				Some(
+					self.transactions
+						.into_iter()
+						.map(|tx_with_meta| {
+							tx_with_meta.encode(
+								encoding,
+								options.max_supported_transaction_version,
+								options.show_rewards,
+							)
+						})
+						.collect::<Result<Vec<_>, _>>()?,
+				),
+				None,
+			),
+			TransactionDetails::Signatures => (
+				None,
+				Some(
+					self.transactions
+						.into_iter()
+						.map(|tx_with_meta| tx_with_meta.transaction_signature().to_string())
+						.collect(),
+				),
+			),
 			TransactionDetails::None => (None, None),
-			TransactionDetails::Accounts => {
-				(
-					Some(
-						self.transactions
-							.into_iter()
-							.map(|tx_with_meta| {
-								tx_with_meta.build_json_accounts(
-									options.max_supported_transaction_version,
-									options.show_rewards,
-								)
-							})
-							.collect::<Result<Vec<_>, _>>()?,
-					),
-					None,
-				)
-			}
+			TransactionDetails::Accounts => (
+				Some(
+					self.transactions
+						.into_iter()
+						.map(|tx_with_meta| {
+							tx_with_meta.build_json_accounts(
+								options.max_supported_transaction_version,
+								options.show_rewards,
+							)
+						})
+						.collect::<Result<Vec<_>, _>>()?,
+				),
+				None,
+			),
 		};
 
 		Ok(UiConfirmedBlock {
@@ -495,13 +483,11 @@ impl TransactionWithStatusMeta {
 		show_rewards: bool,
 	) -> Result<EncodedTransactionWithStatusMeta, EncodeError> {
 		match self {
-			Self::MissingMetadata(ref transaction) => {
-				Ok(EncodedTransactionWithStatusMeta {
-					version: None,
-					transaction: transaction.encode(encoding),
-					meta: None,
-				})
-			}
+			Self::MissingMetadata(ref transaction) => Ok(EncodedTransactionWithStatusMeta {
+				version: None,
+				transaction: transaction.encode(encoding),
+				meta: None,
+			}),
 			Self::Complete(tx_with_meta) => {
 				tx_with_meta.encode(encoding, max_supported_transaction_version, show_rewards)
 			}
@@ -521,13 +507,11 @@ impl TransactionWithStatusMeta {
 		show_rewards: bool,
 	) -> Result<EncodedTransactionWithStatusMeta, EncodeError> {
 		match self {
-			Self::MissingMetadata(ref transaction) => {
-				Ok(EncodedTransactionWithStatusMeta {
-					version: None,
-					transaction: transaction.build_json_accounts(),
-					meta: None,
-				})
-			}
+			Self::MissingMetadata(ref transaction) => Ok(EncodedTransactionWithStatusMeta {
+				version: None,
+				transaction: transaction.build_json_accounts(),
+				meta: None,
+			}),
 			Self::Complete(tx_with_meta) => {
 				tx_with_meta.build_json_accounts(max_supported_transaction_version, show_rewards)
 			}
@@ -571,13 +555,11 @@ impl VersionedTransactionWithStatusMeta {
 		Ok(EncodedTransactionWithStatusMeta {
 			transaction: self.transaction.encode_with_meta(encoding, &self.meta),
 			meta: Some(match encoding {
-				UiTransactionEncoding::JsonParsed => {
-					parse_ui_transaction_status_meta(
-						self.meta,
-						self.transaction.message.static_account_keys(),
-						show_rewards,
-					)
-				}
+				UiTransactionEncoding::JsonParsed => parse_ui_transaction_status_meta(
+					self.meta,
+					self.transaction.message.static_account_keys(),
+					show_rewards,
+				),
 				_ => {
 					let mut meta = UiTransactionStatusMeta::from(self.meta);
 					if !show_rewards {
@@ -686,40 +668,32 @@ impl EncodableWithMeta for VersionedTransaction {
 		meta: &TransactionStatusMeta,
 	) -> Self::Encoded {
 		match encoding {
-			UiTransactionEncoding::Binary => {
-				EncodedTransaction::LegacyBinary(
-					bs58::encode(serialize_versioned_transaction(self)).into_string(),
-				)
-			}
-			UiTransactionEncoding::Base58 => {
-				EncodedTransaction::Binary(
-					bs58::encode(serialize_versioned_transaction(self)).into_string(),
-					TransactionBinaryEncoding::Base58,
-				)
-			}
-			UiTransactionEncoding::Base64 => {
-				EncodedTransaction::Binary(
-					BASE64_STANDARD.encode(serialize_versioned_transaction(self)),
-					TransactionBinaryEncoding::Base64,
-				)
-			}
+			UiTransactionEncoding::Binary => EncodedTransaction::LegacyBinary(
+				bs58::encode(serialize_versioned_transaction(self)).into_string(),
+			),
+			UiTransactionEncoding::Base58 => EncodedTransaction::Binary(
+				bs58::encode(serialize_versioned_transaction(self)).into_string(),
+				TransactionBinaryEncoding::Base58,
+			),
+			UiTransactionEncoding::Base64 => EncodedTransaction::Binary(
+				BASE64_STANDARD.encode(serialize_versioned_transaction(self)),
+				TransactionBinaryEncoding::Base64,
+			),
 			UiTransactionEncoding::Json => self.json_encode(),
-			UiTransactionEncoding::JsonParsed => {
-				EncodedTransaction::Json(UiTransaction {
-					signatures: self.signatures.iter().map(ToString::to_string).collect(),
-					message: match &self.message {
-						VersionedMessage::Legacy(message) => {
-							message.encode(UiTransactionEncoding::JsonParsed)
-						}
-						VersionedMessage::V0(message) => {
-							message.encode_with_meta(UiTransactionEncoding::JsonParsed, meta)
-						}
-						VersionedMessage::V1(message) => {
-							message.encode(UiTransactionEncoding::JsonParsed)
-						}
-					},
-				})
-			}
+			UiTransactionEncoding::JsonParsed => EncodedTransaction::Json(UiTransaction {
+				signatures: self.signatures.iter().map(ToString::to_string).collect(),
+				message: match &self.message {
+					VersionedMessage::Legacy(message) => {
+						message.encode(UiTransactionEncoding::JsonParsed)
+					}
+					VersionedMessage::V0(message) => {
+						message.encode_with_meta(UiTransactionEncoding::JsonParsed, meta)
+					}
+					VersionedMessage::V1(message) => {
+						message.encode(UiTransactionEncoding::JsonParsed)
+					}
+				},
+			}),
 		}
 	}
 
@@ -740,23 +714,17 @@ impl Encodable for VersionedTransaction {
 
 	fn encode(&self, encoding: UiTransactionEncoding) -> Self::Encoded {
 		match encoding {
-			UiTransactionEncoding::Binary => {
-				EncodedTransaction::LegacyBinary(
-					bs58::encode(serialize_versioned_transaction(self)).into_string(),
-				)
-			}
-			UiTransactionEncoding::Base58 => {
-				EncodedTransaction::Binary(
-					bs58::encode(serialize_versioned_transaction(self)).into_string(),
-					TransactionBinaryEncoding::Base58,
-				)
-			}
-			UiTransactionEncoding::Base64 => {
-				EncodedTransaction::Binary(
-					BASE64_STANDARD.encode(serialize_versioned_transaction(self)),
-					TransactionBinaryEncoding::Base64,
-				)
-			}
+			UiTransactionEncoding::Binary => EncodedTransaction::LegacyBinary(
+				bs58::encode(serialize_versioned_transaction(self)).into_string(),
+			),
+			UiTransactionEncoding::Base58 => EncodedTransaction::Binary(
+				bs58::encode(serialize_versioned_transaction(self)).into_string(),
+				TransactionBinaryEncoding::Base58,
+			),
+			UiTransactionEncoding::Base64 => EncodedTransaction::Binary(
+				BASE64_STANDARD.encode(serialize_versioned_transaction(self)),
+				TransactionBinaryEncoding::Base64,
+			),
 			UiTransactionEncoding::Json | UiTransactionEncoding::JsonParsed => {
 				EncodedTransaction::Json(UiTransaction {
 					signatures: self.signatures.iter().map(ToString::to_string).collect(),
@@ -782,23 +750,17 @@ impl Encodable for Transaction {
 
 	fn encode(&self, encoding: UiTransactionEncoding) -> Self::Encoded {
 		match encoding {
-			UiTransactionEncoding::Binary => {
-				EncodedTransaction::LegacyBinary(
-					bs58::encode(bincode::serialize(self).unwrap()).into_string(),
-				)
-			}
-			UiTransactionEncoding::Base58 => {
-				EncodedTransaction::Binary(
-					bs58::encode(bincode::serialize(self).unwrap()).into_string(),
-					TransactionBinaryEncoding::Base58,
-				)
-			}
-			UiTransactionEncoding::Base64 => {
-				EncodedTransaction::Binary(
-					BASE64_STANDARD.encode(bincode::serialize(self).unwrap()),
-					TransactionBinaryEncoding::Base64,
-				)
-			}
+			UiTransactionEncoding::Binary => EncodedTransaction::LegacyBinary(
+				bs58::encode(bincode::serialize(self).unwrap()).into_string(),
+			),
+			UiTransactionEncoding::Base58 => EncodedTransaction::Binary(
+				bs58::encode(bincode::serialize(self).unwrap()).into_string(),
+				TransactionBinaryEncoding::Base58,
+			),
+			UiTransactionEncoding::Base64 => EncodedTransaction::Binary(
+				BASE64_STANDARD.encode(bincode::serialize(self).unwrap()),
+				TransactionBinaryEncoding::Base64,
+			),
 			UiTransactionEncoding::Json | UiTransactionEncoding::JsonParsed => {
 				EncodedTransaction::Json(UiTransaction {
 					signatures: self.signatures.iter().map(ToString::to_string).collect(),

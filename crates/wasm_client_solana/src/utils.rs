@@ -25,6 +25,7 @@ where
 		} else if #[cfg(feature = "ssr")] {
 			tokio::task::spawn_local(fut);
 		}  else {
+
 			futures::executor::block_on(fut);
 		}
 	}
@@ -50,6 +51,7 @@ pub(crate) fn get_ws_url(url: impl Into<String>) -> String {
 		// pubsub port to derive, and silently wrapping to a low port would
 		// point pubsub at an unrelated service.
 		let last_index = url.rfind(':').unwrap();
+
 		if last_index != first_index
 			&& let Some(Ok(port)) = url.get(last_index + 1..).map(str::parse::<u16>)
 			&& let Some(pubsub_port) = port.checked_add(1)

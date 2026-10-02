@@ -97,6 +97,7 @@ async fn sign_and_send_v1_transaction() -> Result<()> {
 	let instruction = transfer(&pubkey, &target_pubkey, lamports);
 	let rpc = runner.rpc().clone();
 	let blockhash = rpc.get_latest_blockhash().await?;
+
 	let transaction = VersionedTransaction::new_unsigned_v1(&pubkey, &[instruction], blockhash)?;
 
 	check!(matches!(transaction.message, VersionedMessage::V1(_)));
@@ -139,13 +140,16 @@ async fn sign_and_send_v1_transaction() -> Result<()> {
 		..Default::default()
 	};
 	let mut fetched = None;
+
 	for _ in 0..25 {
 		if let Ok(transaction) = rpc.get_transaction_with_config(&signature, config).await {
 			fetched = Some(transaction);
 			break;
 		}
+
 		tokio::time::sleep(std::time::Duration::from_millis(400)).await;
 	}
+
 	let fetched =
 		fetched.expect("a confirmed transaction is served by getTransaction within 10 seconds");
 	let fetched_version = fetched

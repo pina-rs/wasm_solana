@@ -544,13 +544,11 @@ pub fn parse_token(
 					account_keys,
 				)
 			}
-			TokenInstruction::TransferFeeExtension => {
-				parse_transfer_fee_instruction(
-					&instruction.data[1..],
-					&instruction.accounts,
-					account_keys,
-				)
-			}
+			TokenInstruction::TransferFeeExtension => parse_transfer_fee_instruction(
+				&instruction.data[1..],
+				&instruction.accounts,
+				account_keys,
+			),
 			TokenInstruction::ConfidentialTransferExtension => {
 				parse_confidential_transfer_instruction(
 					&instruction.data[1..],
@@ -732,20 +730,16 @@ pub fn parse_token(
 					account_keys,
 				)
 			}
-			TokenInstruction::ScaledUiAmountExtension => {
-				parse_scaled_ui_amount_instruction(
-					&instruction.data[1..],
-					&instruction.accounts,
-					account_keys,
-				)
-			}
-			TokenInstruction::PausableExtension => {
-				parse_pausable_instruction(
-					&instruction.data[1..],
-					&instruction.accounts,
-					account_keys,
-				)
-			}
+			TokenInstruction::ScaledUiAmountExtension => parse_scaled_ui_amount_instruction(
+				&instruction.data[1..],
+				&instruction.accounts,
+				account_keys,
+			),
+			TokenInstruction::PausableExtension => parse_pausable_instruction(
+				&instruction.data[1..],
+				&instruction.accounts,
+				account_keys,
+			),
 			TokenInstruction::UnwrapLamports { amount } => {
 				check_num_token_accounts(&instruction.accounts, 3)?;
 				let mut value = json!({
@@ -770,21 +764,17 @@ pub fn parse_token(
 					info: value,
 				})
 			}
-			TokenInstruction::PermissionedBurnExtension => {
-				parse_permissioned_burn_instruction(
-					&instruction.data[1..],
-					&instruction.accounts,
-					account_keys,
-				)
-			}
-			TokenInstruction::Batch { data } => {
-				parse_batch_instruction(
-					&data,
-					instruction.program_id_index,
-					&instruction.accounts,
-					account_keys,
-				)
-			}
+			TokenInstruction::PermissionedBurnExtension => parse_permissioned_burn_instruction(
+				&instruction.data[1..],
+				&instruction.accounts,
+				account_keys,
+			),
+			TokenInstruction::Batch { data } => parse_batch_instruction(
+				&data,
+				instruction.program_id_index,
+				&instruction.accounts,
+				account_keys,
+			),
 		}
 	} else if let Ok(token_group_instruction) = TokenGroupInstruction::unpack(&instruction.data) {
 		parse_token_group_instruction(
@@ -1251,8 +1241,7 @@ mod test {
 		// Test Transfer, incl multisig
 		let recipient = Pubkey::new_unique();
 		#[allow(deprecated)]
-		let transfer_ix =
-			transfer(program_id, &account_pubkey, &recipient, &owner, &[], 42).unwrap();
+		let transfer_ix = transfer(program_id, &account_pubkey, &recipient, &owner, &[], 42).unwrap();
 		let message = Message::new(&[transfer_ix], None);
 		let compiled_instruction = &message.instructions[0];
 		assert_eq!(

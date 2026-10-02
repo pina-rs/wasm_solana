@@ -76,6 +76,7 @@ pub async fn account_subscription() -> Result<()> {
 	let lamports = rpc
 		.get_minimum_balance_for_rent_exemption(space as usize)
 		.await?;
+
 	let elapsed = js_sys::Date::now() - date.get_time();
 	console_log!("elapsed 1: {elapsed}");
 
