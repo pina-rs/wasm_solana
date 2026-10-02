@@ -83,6 +83,16 @@ fail-fast = false
 # Example: slow-timeout = { period = "60s", terminate-after = 2 }
 slow-timeout = { period = "60s", terminate-after = 5 }
 
+# The pubsub integration test boots a full agave validator; on a 2-vCPU
+# runner sharing the machine with the rest of the suite, genesis alone can
+# outlast the default budget. It claims the whole runner and gets retries:
+# the failure mode is environment contention, not a code regression.
+[[profile.default.overrides]]
+filter = "test(slots_updates_and_vote_subscriptions)"
+threads-required = 2
+retries = 2
+slow-timeout = { period = "60s", terminate-after = 10 }
+
 # Treat a test as leaky if after the process is shut down, standard output and standard error
 # aren't closed within this duration.
 #

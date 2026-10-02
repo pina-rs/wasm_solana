@@ -301,6 +301,8 @@ in
         # RUSTSEC-2025-0141: bincode 1.3.3 is unmaintained; it arrives
         # transitively through the agave snapshot crates, which still target
         # the 1.x API. Mirrors the deny.toml ignore.
+        # RUSTSEC-2026-0186 hits memmap2 0.5.10, pinned by
+        # solana-genesis-config 4.0.0 inside the validator harness only.
         cargo-audit audit \
           --db "$DEVENV_ROOT/target/advisory-db-audit" \
           --url "https://github.com/RustSec/advisory-db.git" \
@@ -312,6 +314,7 @@ in
           --ignore RUSTSEC-2026-0097 \
           --ignore RUSTSEC-2026-0292 \
           --ignore RUSTSEC-2025-0141 \
+          --ignore RUSTSEC-2026-0186 \
           --file "$DEVENV_ROOT/Cargo.lock"
       '';
       description = "Run RustSec advisory audit for Cargo.lock (ignores validator-stack advisories).";

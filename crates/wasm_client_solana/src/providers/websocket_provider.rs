@@ -1,24 +1,27 @@
+use std::collections::HashMap;
+use std::future::Future;
 use std::hash::Hash;
 use std::marker::PhantomData;
 use std::pin::Pin;
 use std::sync::Arc;
+use std::sync::atomic::AtomicBool;
+use std::sync::atomic::AtomicU64;
+use std::sync::atomic::Ordering;
 use std::task::Context;
 use std::task::Poll;
-use std::task::ready;
 
-use fork_stream::Forked;
-use fork_stream::StreamExt as _;
-use fork_stream::Weak;
 use futures::SinkExt;
 use futures::Stream;
 use futures::StreamExt;
+use futures::channel::oneshot;
 use futures::lock::Mutex;
 use futures::stream::SplitSink;
 use futures::stream::SplitStream;
-use pin_project::pin_project;
 use serde::de::DeserializeOwned;
 use serde_json::Value;
-use typed_builder::TypedBuilder;
+use tokio::sync::broadcast;
+use tokio_stream::wrappers::BroadcastStream;
+use tokio_stream::wrappers::errors::BroadcastStreamRecvError;
 
 #[cfg(feature = "ssr")]
 use self::websocket_provider_reqwest::*;
@@ -34,10 +37,15 @@ use crate::WebSocketMethod;
 use crate::WebSocketNotification;
 use crate::utils::get_ws_url;
 
-/// A cloneable handle to the live edge of the shared websocket buffer.
-/// `fork_stream::Weak` itself is not `Clone`, so it is shared behind an
-/// `Arc`; upgrading yields a fork positioned at the next frame to arrive.
-type LiveEdge = Arc<Weak<SplitStream<WebSocketStream>>>;
+/// Notifications buffered per subscription before the slowest consumer is
+/// marked as lagging.
+///
+/// One stalled subscriber used to stall the single shared buffer every
+/// subscription forked from; now each subscription has its own bounded
+/// channel, so a consumer that cannot keep up drops frames (surfaced
+/// through [`Subscription::missed_notifications`]) instead of growing
+/// without bound or blocking the socket's other subscribers.
+pub const SUBSCRIPTION_CHANNEL_CAPACITY: usize = 1024;
 
 /// Parse an incoming websocket frame as JSON, so both platform backends can
 /// yield [`Value`]s from their [`Stream`] halves regardless of whether the
@@ -63,35 +71,212 @@ where
 	}
 }
 
+/// A response still waiting for its `id` to come back over the socket.
+enum PendingRequest {
+	/// A subscribe request. The channel becomes the subscription's fan-out
+	/// as soon as the acknowledgement reveals the server-assigned
+	/// subscription id; registering it while handling the ack (rather than
+	/// in the caller) is what guarantees no notification racing the
+	/// handshake can be dropped.
+	Subscribe {
+		done: oneshot::Sender<Value>,
+		channel: broadcast::Sender<Value>,
+	},
+	/// Any other request matched by id, such as an unsubscription.
+	Ack { done: oneshot::Sender<Value> },
+}
+
+/// Bookkeeping shared between the provider handle, its subscriptions, and
+/// the socket reader task that feeds them.
+struct SharedSocket {
+	/// The socket's write half; one lock guards the single writer.
+	sink: Arc<Mutex<SplitSink<WebSocketStream, Value>>>,
+	/// Allocated request ids, shared by every handle.
+	next_id: std::sync::Mutex<u32>,
+	/// Responses that have been requested but not yet answered, by id.
+	pending: std::sync::Mutex<HashMap<u32, PendingRequest>>,
+	/// Fan-out channel per live subscription, keyed by the server-assigned
+	/// subscription id found in each notification.
+	subscriptions: std::sync::Mutex<HashMap<SubscriptionId, broadcast::Sender<Value>>>,
+}
+
+impl SharedSocket {
+	/// Allocate a fresh JSON-RPC request id.
+	fn allocate_id(&self) -> Result<u32, ClientWebSocketError> {
+		let mut id = self
+			.next_id
+			.lock()
+			.map_err(|_| ClientWebSocketError::ConnectionError)?;
+		let current = *id;
+		*id += 1;
+
+		Ok(current)
+	}
+
+	/// Write one request to the socket.
+	async fn send(&self, request: Value) -> Result<(), ClientWebSocketError> {
+		let mut lock = self.sink.lock().await;
+		lock.send(request)
+			.await
+			.map_err(|_| ClientWebSocketError::MessageSendError)
+	}
+
+	/// Send a request that expects a response matched by id, and wait for
+	/// that response envelope.
+	async fn request(&self, method: &str, params: Value) -> Result<Value, ClientWebSocketError> {
+		let id = self.allocate_id()?;
+		let request = ClientRequest::builder()
+			.method(method)
+			.params(params)
+			.id(id)
+			.build()
+			.try_to_value()?;
+		let (done, ack) = oneshot::channel();
+		self.pending
+			.lock()
+			.map_err(|_| ClientWebSocketError::ConnectionError)?
+			.insert(id, PendingRequest::Ack { done });
+
+		if let Err(error) = self.send(request).await {
+			self.forget_pending(id);
+			return Err(error);
+		}
+
+		// The reader drops the sender when the socket ends, failing this
+		// wait instead of parking it forever.
+		ack.await.map_err(|_| ClientWebSocketError::ConnectionError)
+	}
+
+	/// Drop a pending response registration, for request paths that fail
+	/// before the answer could arrive.
+	fn forget_pending(&self, id: u32) {
+		if let Ok(mut pending) = self.pending.lock() {
+			pending.remove(&id);
+		}
+	}
+}
+
+/// Deliver one decoded frame: responses go to the caller waiting on their
+/// id; notifications go to the channel registered for their subscription.
+///
+/// Pure with respect to the maps it is handed, so the routing rules are
+/// unit-testable without a socket.
+fn route(
+	value: Value,
+	pending: &mut HashMap<u32, PendingRequest>,
+	subscriptions: &mut HashMap<SubscriptionId, broadcast::Sender<Value>>,
+) {
+	let response_id = value.get("id").and_then(Value::as_u64);
+	if let Some(response_id) = response_id
+		&& let Ok(response_id) = u32::try_from(response_id)
+		&& let Some(request) = pending.remove(&response_id)
+	{
+		match request {
+			PendingRequest::Subscribe { done, channel } => {
+				if let Some(subscription_id) = envelope_subscription_id(&value) {
+					subscriptions.insert(subscription_id, channel);
+				}
+				// A rejected subscribe carries no result: the channel drops
+				// here, closing the caller's receiver immediately.
+				let _ = done.send(value);
+			}
+			PendingRequest::Ack { done } => {
+				let _ = done.send(value);
+			}
+		}
+
+		return;
+	}
+
+	let subscription_id = value
+		.pointer("/params/subscription")
+		.and_then(Value::as_u64);
+	if let Some(subscription_id) = subscription_id
+		&& let Some(channel) = subscriptions.get(&subscription_id)
+	{
+		// A send only fails when every receiver is gone, which means nobody
+		// is left to read this subscription anyway.
+		let _ = channel.send(value);
+	}
+}
+
+/// The subscription id inside a subscribe acknowledgement, if the envelope
+/// carries one.
+fn envelope_subscription_id(value: &Value) -> Option<SubscriptionId> {
+	if value.get("error").is_some() {
+		return None;
+	}
+
+	value.get("result")?.as_u64()
+}
+
+/// Spawn a future on the runtime available to the target.
+///
+/// Mirrors [`crate::utils::spawn_local`] except that `ssr` uses
+/// [`tokio::task::spawn`]: the reader and the fire-and-forget unsubscriptions
+/// must not require a `LocalSet`.
+#[cfg(feature = "js")]
+fn spawn_future<F: Future<Output = ()> + 'static>(fut: F) {
+	wasm_bindgen_futures::spawn_local(fut);
+}
+
+#[cfg(all(feature = "ssr", not(feature = "js")))]
+fn spawn_future<F: Future<Output = ()> + Send + 'static>(fut: F) {
+	tokio::task::spawn(fut);
+}
+
+#[cfg(not(any(feature = "js", feature = "ssr")))]
+fn spawn_future<F: Future<Output = ()> + 'static>(fut: F) {
+	futures::executor::block_on(fut);
+}
+
+/// Drive the socket's read half until it ends, routing every frame.
+fn spawn_reader(stream: SplitStream<WebSocketStream>, shared: Arc<SharedSocket>) {
+	spawn_future(async move {
+		let mut stream = stream;
+		while let Some(result) = stream.next().await {
+			match result {
+				Ok(value) => {
+					let Ok(mut pending) = shared.pending.lock() else {
+						break;
+					};
+					let Ok(mut subscriptions) = shared.subscriptions.lock() else {
+						break;
+					};
+					route(value, &mut pending, &mut subscriptions);
+				}
+				Err(_) => break,
+			}
+		}
+
+		// The socket ended: fail every outstanding wait and close every
+		// subscription stream rather than parking consumers forever.
+		if let Ok(mut pending) = shared.pending.lock() {
+			pending.clear();
+		}
+		if let Ok(mut subscriptions) = shared.subscriptions.lock() {
+			subscriptions.clear();
+		}
+	});
+}
+
 /// A connection to a Solana node's pubsub endpoint.
 ///
 /// Cloning is cheap and every clone shares one socket: the sink is guarded by
-/// a mutex and the receiver is a [`Forked`] stream that each clone reads
-/// independently while the underlying frames are buffered once. That sharing
-/// is what lets many [`Subscription`]s — plus their unsubscriptions — coexist
-/// on a single websocket, which browsers limit the number of.
+/// a mutex and a single reader task routes every incoming frame to the
+/// subscription it belongs to. That sharing is what lets many
+/// [`Subscription`]s — plus their unsubscriptions — coexist on a single
+/// websocket, which browsers limit the number of.
+///
+/// The reader retains nothing beyond each subscription's bounded channel, so
+/// memory stays proportional to live subscriptions rather than to the total
+/// number of frames the connection has ever received.
 #[derive(Clone, derive_more::Debug)]
 pub struct WebSocketProvider {
 	/// The websocket url.
 	url: String,
-	/// The client ID which identifies current client ID.
-	id: Arc<std::sync::Mutex<u32>>,
 	#[debug(skip)]
-	sender: Arc<Mutex<SplitSink<WebSocketStream, Value>>>,
-	/// The root fork of the shared buffer. It is never read: it only keeps
-	/// the shared stream alive for as long as the provider exists, so that
-	/// [`Self::live_edge`] upgrades cannot fail while the provider lives.
-	#[allow(dead_code)]
-	#[debug(skip)]
-	receiver: Forked<SplitStream<WebSocketStream>>,
-	/// A [`Weak`] handle used to hand out forks at the *live edge* of the
-	/// shared buffer. Cloning the root fork instead would start every
-	/// subscription at the buffer's oldest entry, replaying the socket's
-	/// entire history before reaching live traffic — subscription setup cost
-	/// that grows linearly with the connection's age (see the
-	/// `subscription/ack_wait` benchmarks).
-	#[debug(skip)]
-	live_edge: LiveEdge,
+	shared: Arc<SharedSocket>,
 }
 
 impl WebSocketProvider {
@@ -103,18 +288,17 @@ impl WebSocketProvider {
 		let url = get_ws_url(url);
 		let stream = WebSocketStream::new(&url);
 		let (sink, stream) = stream.split();
-		let receiver = stream.fork();
-		let live_edge = Arc::new(receiver.downgrade());
-		let sender = Arc::new(Mutex::new(sink));
-
-		Self {
-			url,
+		let shared = Arc::new(SharedSocket {
+			sink: Arc::new(Mutex::new(sink)),
 			// start with 1000 since the default id used for http methods is 0
-			id: Arc::new(std::sync::Mutex::new(1000)),
-			sender,
-			receiver,
-			live_edge,
-		}
+			next_id: std::sync::Mutex::new(1000),
+			pending: std::sync::Mutex::new(HashMap::new()),
+			subscriptions: std::sync::Mutex::new(HashMap::new()),
+		});
+
+		spawn_reader(stream, Arc::clone(&shared));
+
+		Self { url, shared }
 	}
 
 	/// The websocket endpoint URL, after the http-to-ws rewrite done at
@@ -123,30 +307,20 @@ impl WebSocketProvider {
 		&self.url
 	}
 
-	/// A fork positioned at the live edge of the shared buffer — the next
-	/// frame to arrive — so ack waits and new subscriptions never replay the
-	/// socket's history.
-	///
-	/// Fails only when the shared buffer is gone, which cannot happen while
-	/// this provider (and its root fork) is alive.
-	fn live_fork(&self) -> Result<Forked<SplitStream<WebSocketStream>>, ClientWebSocketError> {
-		self.live_edge
-			.upgrade()
-			.ok_or(ClientWebSocketError::ConnectionError)
-	}
-
 	/// Create a subscription and return the `id` used to create the
-	/// subscription and `subscription_id` once a response is received.
-	/// The `id` used for the request, the server's `subscription_id`, and a
-	/// fork positioned *before the request was sent* — hand it to
-	/// [`Subscription::from_parts`] so no notification that races the
-	/// subscription handshake can slip past the stream.
+	/// subscription, the server-assigned `subscription_id`, and a receiver
+	/// already positioned to see every notification of that subscription —
+	/// hand it to [`Subscription::from_parts`].
+	///
+	/// The fan-out channel is registered by the socket reader while it
+	/// handles the acknowledgement, so a notification racing the handshake
+	/// is still delivered: the reader processes it strictly after the ack
+	/// that assigned the id.
 	pub async fn create_subscription<T: WebSocketMethod>(
 		&self,
 		params: T,
-	) -> Result<(u32, SubscriptionId, Forked<SplitStream<WebSocketStream>>), ClientWebSocketError>
-	{
-		let id = self.next_id()?;
+	) -> Result<(u32, SubscriptionId, broadcast::Receiver<Value>), ClientWebSocketError> {
+		let id = self.shared.allocate_id()?;
 		let request = ClientRequest::builder()
 			.method(T::SUBSCRIBE)
 			.params(params)
@@ -154,74 +328,44 @@ impl WebSocketProvider {
 			.build()
 			.try_to_value()?;
 
-		// Register both forks BEFORE sending: a live-edge fork created after
-		// the send would skip any frame that lands in between — including the
-		// acknowledgement itself. The ack fork consumes only the ack; the
-		// subscription fork, positioned at the same offset, sees every
-		// notification that follows.
-		let mut ack_stream = self.live_fork()?;
-		let subscription_stream = self.live_fork()?;
-
-		// immediately drop the lock at the end of this block
+		// The receiver exists before the request is even sent, so there is
+		// no window in which the reader could send into a channel with no
+		// receiver and drop a frame.
+		let (channel, receiver) = broadcast::channel(SUBSCRIPTION_CHANNEL_CAPACITY);
+		let (done, ack) = oneshot::channel();
 		{
-			let mut lock = self.sender.lock().await;
-			lock.send(request)
-				.await
-				.map_err(|_| ClientWebSocketError::MessageSendError)?;
+			let mut pending = self
+				.shared
+				.pending
+				.lock()
+				.map_err(|_| ClientWebSocketError::ConnectionError)?;
+			pending.insert(id, PendingRequest::Subscribe { done, channel });
 		}
 
-		// Wait for the ack with a manual re-poll loop rather than
-		// `filter_map`: the combinator returns `Pending` after consuming a
-		// buffered frame that does not match, and `Forked` only registers the
-		// caller's waker with the websocket once its buffer runs dry — so a
-		// `Pending` returned while replayed frames remain would park this
-		// future forever. Re-polling drains the buffer and re-arms the socket
-		// waker in the same poll.
-		loop {
-			let Some(result) = ack_stream.next().await else {
-				return Err(ClientWebSocketError::Subscription);
-			};
-
-			let Ok(value) = result else {
-				continue;
-			};
-
-			if let Ok(response) = serde_json::from_value::<SubscriptionResult>(value)
-				&& response.id == id
-			{
-				return Ok((id, response.result, subscription_stream));
-			}
+		if let Err(error) = self.shared.send(request).await {
+			self.shared.forget_pending(id);
+			return Err(error);
 		}
-	}
 
-	fn next_id(&self) -> Result<u32, ClientWebSocketError> {
-		let mut id_guard = self
-			.id
-			.lock()
-			.map_err(|_| ClientWebSocketError::ConnectionError)?;
-		let current_id = *id_guard;
-		*id_guard += 1;
+		let envelope = ack.await.map_err(|_| ClientWebSocketError::Subscription)?;
+		let response: SubscriptionResult =
+			serde_json::from_value(envelope).map_err(|_| ClientWebSocketError::Subscription)?;
 
-		Ok(current_id)
+		Ok((id, response.result, receiver))
 	}
 }
 
 /// Created from a [`Subscription`] to send a message to unsubscribe.
-#[derive(Clone, TypedBuilder)]
+#[derive(Clone)]
 pub struct Unsubscription {
 	/// The name of the method used to unsubscribe.
-	pub(crate) method: &'static str,
-	/// The shared sink for pushing messages into the websocket stream.
-	pub(crate) sender: Arc<Mutex<SplitSink<WebSocketStream, Value>>>,
-	/// A fork positioned when this handle was created. Owning the fork
-	/// (rather than a weak live-edge handle) keeps the shared buffer alive
-	/// even if the provider is dropped before `run`, and sees every frame
-	/// from creation onward — including the unsubscription ack.
-	pub(crate) receiver: Forked<SplitStream<WebSocketStream>>,
-	/// The `id` that was originally used to create the parent subscription.
-	pub(crate) id: u32,
+	method: &'static str,
+	shared: Arc<SharedSocket>,
+	/// Set once an unsubscription has actually been sent, so the
+	/// subscription's own `Drop` does not fire a second request.
+	unsubscribed: Arc<AtomicBool>,
 	/// The `subscription_id` used to unsubscribe.
-	pub(crate) subscription_id: SubscriptionId,
+	subscription_id: SubscriptionId,
 }
 
 impl PartialEq for Unsubscription {
@@ -242,72 +386,85 @@ impl Hash for Unsubscription {
 impl Unsubscription {
 	/// Send the unsubscribe request and wait for the node's ack.
 	///
-	/// Consumes `self` because the shared receiver is moved into the wait
-	/// loop. Errors if the request cannot be written or the connection ends
-	/// before the ack arrives.
+	/// Consumes `self`. Errors if the request cannot be written or the
+	/// connection ends before the ack arrives.
 	pub async fn run(self) -> Result<(), ClientWebSocketError> {
-		let request = ClientRequest::builder()
-			.id(self.id)
-			.method(self.method)
-			.params(serde_json::json!([self.subscription_id]))
-			.build()
-			.try_to_value()?;
+		let envelope = self
+			.shared
+			.request(self.method, serde_json::json!([self.subscription_id]))
+			.await?;
+		let response: UnsubscriptionResult =
+			serde_json::from_value(envelope).map_err(|_| ClientWebSocketError::Unsubscription)?;
 
-		// drop the lock immediately after this block
-		{
-			let mut lock = self.sender.lock().await;
-			lock.send(request)
-				.await
-				.map_err(|_| ClientWebSocketError::ConnectionError)?;
+		if !response.result {
+			return Err(ClientWebSocketError::Unsubscription);
 		}
 
-		// Same re-poll loop as `create_subscription`: `filter_map` would park
-		// this future whenever it consumed a frame that does not match,
-		// because `Forked` only arms the socket waker once its buffer is
-		// empty. The fork was positioned at handle-creation time, so frames
-		// between creation and `run` — including the request itself being
-		// sent — cannot slip past it.
-		let mut stream = self.receiver;
-
-		loop {
-			let Some(result) = stream.next().await else {
-				return Err(ClientWebSocketError::Unsubscription);
-			};
-
-			let Ok(value) = result else {
-				continue;
-			};
-
-			if let Ok(response) = serde_json::from_value::<UnsubscriptionResult>(value)
-				&& response.id == self.id
-			{
-				return Ok(());
-			}
+		if let Ok(mut subscriptions) = self.shared.subscriptions.lock() {
+			subscriptions.remove(&self.subscription_id);
 		}
+		self.unsubscribed.store(true, Ordering::Relaxed);
+
+		Ok(())
 	}
 }
 
-/// A [`Subscription`] is used to managed a solana websocket rpc method.
-#[pin_project]
-#[derive(Clone, TypedBuilder)]
+/// A [`Subscription`] is used to manage a solana websocket rpc method.
+///
+/// Dropping the last handle unsubscribes: a fire-and-forget request is sent
+/// on the shared socket so the node stops delivering frames for it. Call
+/// [`Subscription::unsubscribe`](Self::unsubscribe) (or run an
+/// [`Unsubscription`]) instead when the ack matters.
+#[derive(derive_more::Debug)]
 pub struct Subscription<T: DeserializeOwned + WebSocketNotification> {
-	/// The shared receiver for receiving messages, forked at the live edge
-	/// when the subscription was created.
-	#[pin]
-	pub(crate) receiver: Forked<SplitStream<WebSocketStream>>,
-	/// Live-edge handle handed to [`Unsubscription`] so its ack wait skips
-	/// the frames this subscription has already consumed.
-	pub(crate) live_edge: LiveEdge,
-	/// The shared sink for pushing messages into the websocket stream.
-	pub(crate) sender: Arc<Mutex<SplitSink<WebSocketStream, Value>>>,
-	#[builder(default)]
-	pub(crate) latest: PhantomData<T>,
+	/// This handle's own view of the subscription's fan-out, as a
+	/// [`Stream`](futures::Stream) of raw frames.
+	receiver: BroadcastStream<Value>,
+	#[debug(skip)]
+	shared: Arc<SharedSocket>,
+	/// Cleared by an explicit unsubscription so `Drop` does not send a
+	/// second request.
+	#[debug(skip)]
+	unsubscribe_on_drop: Arc<AtomicBool>,
+	/// Notifications dropped because this handle fell
+	/// [`SUBSCRIPTION_CHANNEL_CAPACITY`] frames behind; see
+	/// [`Self::missed_notifications`].
+	missed: AtomicU64,
+	latest: PhantomData<T>,
 	/// The `creator_id` that was originally used to create the parent
 	/// subscription.
-	pub(crate) creator_id: u32,
+	creator_id: u32,
 	/// The subscription `id` used to unsubscribe.
-	pub(crate) id: SubscriptionId,
-	// pub(crate) unsubscription: Unsubscription,
+	id: SubscriptionId,
+}
+
+// Every field is unconditionally `Unpin` (`PhantomData<T>` carries no
+// pinning through), so the handle can be polled without pin-projection.
+impl<T: DeserializeOwned + WebSocketNotification> Unpin for Subscription<T> {}
+
+impl<T: DeserializeOwned + WebSocketNotification> Clone for Subscription<T> {
+	fn clone(&self) -> Self {
+		// A fresh receiver at the live edge of the shared fan-out, mirroring
+		// how an independent reader would join this subscription now.
+		let receiver = self
+			.shared
+			.subscriptions
+			.lock()
+			.ok()
+			.and_then(|subscriptions| subscriptions.get(&self.id).map(|sender| sender.subscribe()))
+			.map(BroadcastStream::new)
+			.unwrap_or_else(|| BroadcastStream::new(broadcast::channel(1).1));
+
+		Self {
+			receiver,
+			shared: Arc::clone(&self.shared),
+			unsubscribe_on_drop: Arc::clone(&self.unsubscribe_on_drop),
+			missed: AtomicU64::new(0),
+			latest: PhantomData,
+			creator_id: self.creator_id,
+			id: self.id,
+		}
+	}
 }
 
 impl<T: DeserializeOwned + WebSocketNotification> Subscription<T> {
@@ -322,36 +479,46 @@ impl<T: DeserializeOwned + WebSocketNotification> Subscription<T> {
 		id: u32,
 		subscription_id: SubscriptionId,
 	) -> Result<Self, ClientWebSocketError> {
-		Ok(Self::builder()
-			.receiver(ws.live_fork()?)
-			.live_edge(ws.live_edge.clone())
-			.sender(ws.sender.clone())
-			.creator_id(id)
-			.id(subscription_id)
-			.build())
+		let (channel, receiver) = broadcast::channel(SUBSCRIPTION_CHANNEL_CAPACITY);
+		ws.shared
+			.subscriptions
+			.lock()
+			.map_err(|_| ClientWebSocketError::ConnectionError)?
+			.insert(subscription_id, channel);
+
+		Ok(Self {
+			receiver: BroadcastStream::new(receiver),
+			shared: Arc::clone(&ws.shared),
+			unsubscribe_on_drop: Arc::new(AtomicBool::new(true)),
+			missed: AtomicU64::new(0),
+			latest: PhantomData,
+			creator_id: id,
+			id: subscription_id,
+		})
 	}
 
-	/// Adopt a subscription from a fork that
-	/// [`WebSocketProvider::create_subscription`] positioned *before* the
+	/// Adopt a subscription from the receiver that
+	/// [`WebSocketProvider::create_subscription`] registered before the
 	/// subscribe request was sent.
 	///
-	/// This is the constructor the client's subscribe methods use: the
-	/// pre-positioned fork guarantees a notification that races the
-	/// subscription handshake is still delivered, which a fork created after
-	/// the ack cannot promise.
+	/// This is the constructor the client's subscribe methods use; the
+	/// receiver exists from before the request was sent, so a notification
+	/// racing the handshake is still delivered.
 	pub fn from_parts(
 		ws: &WebSocketProvider,
 		id: u32,
 		subscription_id: SubscriptionId,
-		receiver: Forked<SplitStream<WebSocketStream>>,
+		receiver: broadcast::Receiver<Value>,
 	) -> Self {
-		Self::builder()
-			.receiver(receiver)
-			.live_edge(ws.live_edge.clone())
-			.sender(ws.sender.clone())
-			.creator_id(id)
-			.id(subscription_id)
-			.build()
+		Self {
+			receiver: BroadcastStream::new(receiver),
+			shared: Arc::clone(&ws.shared),
+			unsubscribe_on_drop: Arc::new(AtomicBool::new(false)),
+			missed: AtomicU64::new(0),
+			latest: PhantomData,
+			creator_id: id,
+			id: subscription_id,
+		}
 	}
 
 	/// Create a struct which will remove this subscription when the `run`
@@ -390,31 +557,26 @@ impl<T: DeserializeOwned + WebSocketNotification> Subscription<T> {
 	/// # }
 	/// ```
 	pub fn get_unsubscription(&self) -> Unsubscription {
-		Unsubscription::builder()
-			.method(T::UNSUBSCRIBE)
-			.sender(self.sender.clone())
-			// Clone the subscription's own fork (not a fresh live-edge one):
-			// it is positioned at this subscription's read offset, keeps the
-			// shared buffer alive independently of the provider, and sees the
-			// unsubscription ack whenever `run` fires.
-			.receiver(self.receiver.clone())
-			.id(self.creator_id)
-			.subscription_id(self.id)
-			.build()
+		Unsubscription {
+			method: T::UNSUBSCRIBE,
+			shared: Arc::clone(&self.shared),
+			unsubscribed: Arc::clone(&self.unsubscribe_on_drop),
+			subscription_id: self.id,
+		}
 	}
 
-	/// This must be called to unsubscribe from the websocket updates. It would
-	/// be nice if there was a way to automatically do this on `Drop`. However,
-	/// I'm not sure how to make async updates on drop. `spawn_local` was
-	/// failing.
+	/// Unsubscribe from the websocket updates and wait for the node's ack.
+	///
+	/// Prefer this over letting the subscription drop when the ack matters;
+	/// dropping sends the same request without waiting for it.
 	pub async fn unsubscribe(&self) -> Result<(), ClientWebSocketError> {
 		self.get_unsubscription().run().await?;
 
 		Ok(())
 	}
 
-	/// The `id` originally used to create this subscription. It is also used to
-	/// uniquely identify the unsubscription call.
+	/// The `id` originally used to create this subscription. It is also used
+	/// to uniquely identify the unsubscription call.
 	pub fn id(&self) -> u32 {
 		self.creator_id
 	}
@@ -423,38 +585,196 @@ impl<T: DeserializeOwned + WebSocketNotification> Subscription<T> {
 	pub fn subscription_id(&self) -> SubscriptionId {
 		self.id
 	}
+
+	/// Notifications this handle skipped because it fell more than
+	/// [`SUBSCRIPTION_CHANNEL_CAPACITY`] frames behind the node.
+	///
+	/// A nonzero count means the consumer is too slow for the feed's rate:
+	/// process the subscription on its own task, or clone it and split the
+	/// work.
+	pub fn missed_notifications(&self) -> u64 {
+		self.missed.load(Ordering::Relaxed)
+	}
+}
+
+impl<T: DeserializeOwned + WebSocketNotification> Drop for Subscription<T> {
+	fn drop(&mut self) {
+		if !self.unsubscribe_on_drop.load(Ordering::Relaxed) {
+			let shared = Arc::clone(&self.shared);
+			let method = T::UNSUBSCRIBE;
+			let subscription_id = self.id;
+			// No ack wait: the point is to stop the server sending frames
+			// once nobody is listening, not to observe the confirmation.
+			let unsubscribe = async move {
+				if let Ok(mut subscriptions) = shared.subscriptions.lock() {
+					subscriptions.remove(&subscription_id);
+				}
+
+				let request = ClientRequest::builder()
+					.method(method)
+					.params(serde_json::json!([subscription_id]))
+					.build();
+				if let Ok(request) = request.try_to_value() {
+					let _ = shared.send(request).await;
+				}
+			};
+			spawn_future(unsubscribe);
+		}
+	}
 }
 
 impl<T: DeserializeOwned + WebSocketNotification> Stream for Subscription<T> {
 	type Item = SubscriptionResponse<T>;
 
-	fn poll_next(self: Pin<&mut Self>, cx: &mut Context<'_>) -> Poll<Option<Self::Item>> {
-		let subscription_id = self.id;
-		let mut this = self.project();
+	fn poll_next(self: Pin<&mut Self>, cx: &mut Context) -> Poll<Option<Self::Item>> {
+		let this = self.get_mut();
 
-		// Loop over frames until one belongs to this subscription. Returning
-		// `Pending` after consuming a buffered frame would drop the task's
-		// wakeup: `Forked` only registers the caller's waker with the
-		// websocket when its buffer runs dry, so a `Pending` returned while
-		// buffered frames remain would park this task forever. Re-polling
-		// drains the buffer and re-arms the socket waker in the same poll.
 		loop {
-			let Some(result) = ready!(this.receiver.as_mut().poll_next(cx)) else {
-				return Poll::Ready(None);
-			};
-
-			let Ok(value) = result else {
-				continue;
-			};
-
-			let Ok(json) = serde_json::from_value::<SubscriptionResponse<T>>(value) else {
-				continue;
-			};
-
-			if json.method == T::NOTIFICATION && json.params.subscription == subscription_id {
-				return Poll::Ready(Some(json));
+			match this.receiver.poll_next_unpin(cx) {
+				Poll::Ready(Some(Ok(value))) => {
+					let Ok(json) = serde_json::from_value::<SubscriptionResponse<T>>(value) else {
+						continue;
+					};
+					if json.method != T::NOTIFICATION {
+						continue;
+					}
+					return Poll::Ready(Some(json));
+				}
+				// The handle fell behind by more than the channel capacity:
+				// count the gap and keep streaming rather than ending the
+				// subscription over it.
+				Poll::Ready(Some(Err(missed))) => {
+					let BroadcastStreamRecvError::Lagged(count) = missed;
+					this.missed.fetch_add(count, Ordering::Relaxed);
+				}
+				Poll::Ready(None) => return Poll::Ready(None),
+				Poll::Pending => return Poll::Pending,
 			}
 		}
+	}
+}
+
+#[cfg(test)]
+mod tests {
+
+	use std::collections::HashMap;
+
+	use assert2::check;
+	use futures::StreamExt;
+	use serde_json::Value;
+	use tokio::sync::broadcast;
+
+	use super::PendingRequest;
+	use super::SUBSCRIPTION_CHANNEL_CAPACITY;
+	use super::SubscriptionId;
+	use super::envelope_subscription_id;
+	use super::route;
+
+	fn subscription_map() -> HashMap<SubscriptionId, broadcast::Sender<Value>> {
+		HashMap::new()
+	}
+
+	/// A subscribe acknowledgement registers the fan-out under the
+	/// server-assigned id before the caller is woken, so a notification
+	/// racing the handshake is routed, not dropped.
+	#[test]
+	fn subscribe_ack_registers_channel_and_forwards_envelope() {
+		let mut pending = HashMap::new();
+		let mut subscriptions = subscription_map();
+		let (channel, mut receiver) = broadcast::channel(SUBSCRIPTION_CHANNEL_CAPACITY);
+		let (done, mut ack) = futures::channel::oneshot::channel();
+		pending.insert(7, PendingRequest::Subscribe { done, channel });
+
+		let ack_envelope: Value = serde_json::json!({ "jsonrpc": "2.0", "id": 7, "result": 42 });
+		route(ack_envelope.clone(), &mut pending, &mut subscriptions);
+
+		check!(pending.is_empty());
+		check!(subscriptions.contains_key(&42));
+		check!(ack.try_recv() == Ok(Some(ack_envelope)));
+
+		// The very next frame for the new subscription is delivered even
+		// though the caller has not been polled yet.
+		let notification = serde_json::json!({
+			"jsonrpc": "2.0",
+			"method": "slotNotification",
+			"params": { "result": { "slot": 1 }, "subscription": 42 },
+		});
+		route(notification.clone(), &mut pending, &mut subscriptions);
+		check!(futures::executor::block_on(receiver.recv()) == Ok(notification));
+	}
+
+	/// A rejected subscribe carries an error instead of a result: no channel
+	/// is registered and the caller's receiver closes with the envelope.
+	#[test]
+	fn rejected_subscribe_closes_channel() {
+		let mut pending = HashMap::new();
+		let mut subscriptions = subscription_map();
+		let (channel, mut receiver) = broadcast::channel(SUBSCRIPTION_CHANNEL_CAPACITY);
+		let (done, mut ack) = futures::channel::oneshot::channel();
+		pending.insert(9, PendingRequest::Subscribe { done, channel });
+
+		let error_envelope: Value = serde_json::json!({
+			"jsonrpc": "2.0",
+			"id": 9,
+			"error": { "code": -32000, "message": "failed to subscribe" },
+		});
+		route(error_envelope.clone(), &mut pending, &mut subscriptions);
+
+		check!(subscriptions.is_empty());
+		check!(ack.try_recv() == Ok(Some(error_envelope)));
+		check!(matches!(
+			futures::executor::block_on(receiver.recv()),
+			Err(broadcast::error::RecvError::Closed)
+		));
+	}
+
+	/// Plain request acks (unsubscribes) are matched by id and removed from
+	/// the pending map.
+	#[test]
+	fn plain_ack_is_delivered() {
+		let mut pending = HashMap::new();
+		let mut subscriptions = subscription_map();
+		let (done, mut ack) = futures::channel::oneshot::channel();
+		pending.insert(11, PendingRequest::Ack { done });
+
+		let envelope: Value = serde_json::json!({ "jsonrpc": "2.0", "id": 11, "result": true });
+		route(envelope.clone(), &mut pending, &mut subscriptions);
+
+		check!(pending.is_empty());
+		check!(ack.try_recv() == Ok(Some(envelope)));
+	}
+
+	/// Frames for unknown subscriptions or ids are ignored rather than
+	/// failing the reader.
+	#[test]
+	fn unknown_frames_are_dropped() {
+		let mut pending = HashMap::new();
+		let mut subscriptions = subscription_map();
+
+		let stray_ack: Value = serde_json::json!({ "jsonrpc": "2.0", "id": 404, "result": 1 });
+		route(stray_ack, &mut pending, &mut subscriptions);
+
+		let stray_notification: Value = serde_json::json!({
+			"jsonrpc": "2.0",
+			"method": "slotNotification",
+			"params": { "result": { "slot": 2 }, "subscription": 404 },
+		});
+		route(stray_notification, &mut pending, &mut subscriptions);
+
+		check!(pending.is_empty());
+		check!(subscriptions.is_empty());
+	}
+
+	#[test]
+	fn envelope_subscription_id_detection() {
+		check!(envelope_subscription_id(&serde_json::json!({ "result": 5, "id": 1 })) == Some(5));
+		check!(envelope_subscription_id(&serde_json::json!({ "id": 1 })) == None);
+		check!(
+			envelope_subscription_id(&serde_json::json!({
+				"id": 1,
+				"error": { "code": 1, "message": "no" },
+			})) == None
+		);
 	}
 }
 
