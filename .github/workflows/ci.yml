@@ -153,10 +153,6 @@ jobs:
           WASM_BINDGEN_TEST_TIMEOUT: 120
         run: |
           sudo prlimit --pid $$ --nofile=1000000:1000000
-          # The profile's bin leads the PATH so chromedriver resolves the
-          # nix chromium instead of the runner's auto-updating Chrome: both
-          # halves of the pair then come from one pinned nixpkgs revision.
-          export PATH="$DEVENV_PROFILE/bin:$PATH"
           test:validator
         shell: devenv shell -- bash -e {0}
 

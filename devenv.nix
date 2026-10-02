@@ -260,6 +260,15 @@ in
         sleep 5
 
         echo "running tests in chrome..."
+        # Both halves of the browser pair must come from the same nixpkgs
+        # revision: pin the browser binary to the profile's chromium so a
+        # runner-provided (auto-updating) Chrome can never mismatch the
+        # pinned chromedriver. The capabilities file is generated at runtime
+        # because the profile path is a nix store hash.
+        webdriver_json="$(mktemp)"
+        printf '{"goog:chromeOptions": {"binary": "%s/bin/chromium", "args": ["--headless", "--no-sandbox", "--disable-dev-shm-usage", "--disable-gpu"]}}' \
+          "$DEVENV_PROFILE" > "$webdriver_json"
+        export WASM_BINDGEN_TEST_WEBDRIVER_JSON="$webdriver_json"
         CHROMEDRIVER=$DEVENV_PROFILE/bin/chromedriver cargo test_wasm
 
         # echo "running tests in firefox..."
