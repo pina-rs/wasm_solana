@@ -308,6 +308,10 @@ in
           --ignore RUSTSEC-2026-0173 \
           --ignore RUSTSEC-2026-0097 \
           --ignore RUSTSEC-2026-0292 \
+          # bincode 1.3.3 is unmaintained (RUSTSEC-2025-0141); it arrives
+          # transitively through the agave snapshot crates, which still
+          # target the 1.x API. Mirrors the deny.toml ignore.
+          --ignore RUSTSEC-2025-0141 \
           --file "$DEVENV_ROOT/Cargo.lock"
       '';
       description = "Run RustSec advisory audit for Cargo.lock (ignores validator-stack advisories).";
