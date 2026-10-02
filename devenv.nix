@@ -288,38 +288,35 @@ in
     };
     "security:audit" = {
       exec = ''
-                set -euo pipefail
-                # The advisory DB lives inside the cached target dir; a stale or partial
-                # clone from a cache restore makes cargo-audit refuse to (re)initialize
-                # it. Remove it so the clone always starts fresh.
-                rm -rf "$DEVENV_ROOT/target/advisory-db-audit"
-                # Ignore validator-stack advisories: these crates only run inside the
-                # host-side solana-test-validator harness and are never part of any
-                # published client API surface. RUSTSEC-2026-0097 hits rand 0.7.3,
-                # which enters only through ed25519-dalek 1.x in agave-precompiles
-                # (the client's own rand 0.8.8/0.9.x pins are patched ranges).
-                # RUSTSEC-2025-0141: bincode 1.3.3 is unmaintained; it arrives
-                # transitively through the agave snapshot crates, which still target
-                # the 1.x API. Mirrors the deny.toml ignore.
-                # (the client's own rand 0.8.8/0.9.x pins are patched ranges), and
-                # solana-genesis-config 4.0.0 inside the validator harness only.
-                # Comments stay above the command: a `#` after a line continuation
-                # swallows every remaining argument.
-                cargo-audit audit \
-                  --db "$DEVENV_ROOT/target/advisory-db-audit" \
-                  --url "https://github.com/RustSec/advisory-db.git" \
-                  --deny yanked \
-                  --ignore RUSTSEC-2022-0093 \
-                  --ignore RUSTSEC-2024-0344 \
-                  --ignore RUSTSEC-2024-0421 \
-                  --ignore RUSTSEC-2026-0173 \
-                  --ignore RUSTSEC-2026-0097 \
-                  --ignore RUSTSEC-2026-0292 \
-        <<<<<<< HEAD
+        set -euo pipefail
+        # The advisory DB lives inside the cached target dir; a stale or partial
+        # clone from a cache restore makes cargo-audit refuse to (re)initialize
+        # it. Remove it so the clone always starts fresh.
+        rm -rf "$DEVENV_ROOT/target/advisory-db-audit"
+        # Ignore validator-stack advisories: these crates only run inside the
+        # host-side solana-test-validator harness and are never part of any
+        # published client API surface. RUSTSEC-2026-0097 hits rand 0.7.3,
+        # which enters only through ed25519-dalek 1.x in agave-precompiles
+        # (the client's own rand 0.8.8/0.9.x pins are patched ranges).
+        # RUSTSEC-2025-0141: bincode 1.3.3 is unmaintained; it arrives
+        # transitively through the agave snapshot crates, which still target
+        # the 1.x API. Mirrors the deny.toml ignore.
+        # (the client's own rand 0.8.8/0.9.x pins are patched ranges), and
+        # solana-genesis-config 4.0.0 inside the validator harness only.
+        # Comments stay above the command: a `#` after a line continuation
+        # swallows every remaining argument.
+        cargo-audit audit \
+          --db "$DEVENV_ROOT/target/advisory-db-audit" \
+          --url "https://github.com/RustSec/advisory-db.git" \
+          --deny yanked \
+          --ignore RUSTSEC-2022-0093 \
+          --ignore RUSTSEC-2024-0344 \
+          --ignore RUSTSEC-2024-0421 \
+          --ignore RUSTSEC-2026-0173 \
+          --ignore RUSTSEC-2026-0097 \
+          --ignore RUSTSEC-2026-0292 \
                   --ignore RUSTSEC-2025-0141 \
-        =======
-                  --ignore RUSTSEC-2026-0186 \
-        >>>>>>> f37cf4c (fix(security): ignore the pinned memmap2 advisory, bump yoke-derive)
+          --ignore RUSTSEC-2026-0186 \
                   --file "$DEVENV_ROOT/Cargo.lock"
       '';
       description = "Run RustSec advisory audit for Cargo.lock (ignores validator-stack advisories).";
