@@ -2723,16 +2723,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "00b0228411908ca8685dba7fc2cdd70ec9990a6e753e89b6ac91a84c40fbaf4b"
 
 [[package]]
-name = "fork_stream"
-version = "0.1.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "fc54cf296aa5a82dfffcc911fc7a37b0dcba605725bbb4db486f7b24d7667f9d"
-dependencies = [
- "futures 0.3.34",
- "pin-project",
-]
-
-[[package]]
 name = "form_urlencoded"
 version = "1.2.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -11180,6 +11170,7 @@ dependencies = [
  "futures-core",
  "pin-project-lite",
  "tokio",
+ "tokio-util 0.7.19",
 ]
 
 [[package]]
@@ -11902,7 +11893,6 @@ dependencies = [
  "cfg-if 1.0.5",
  "criterion",
  "derive_more 2.1.1",
- "fork_stream",
  "futures 0.3.34",
  "futures-timeout",
  "futures-timer",
@@ -11964,6 +11954,7 @@ dependencies = [
  "test_utils_solana",
  "thiserror 2.0.21",
  "tokio",
+ "tokio-stream",
  "typed-builder",
  "wallet_standard",
  "wasm-bindgen",

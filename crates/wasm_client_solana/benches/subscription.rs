@@ -9,24 +9,22 @@
 //! 1. **Frame parsing** — every notification is parsed from a JSON value into
 //!    `SubscriptionResponse<T>`; this is the per-notification tax a busy
 //!    `programSubscribe` pays.
-//! 2. **Fork registration vs replay** — the shared buffer is read through
-//!    forks. A fork registered *before* a frame arrives receives it directly;
-//!    the pre-fix shape (cloning the never-read root fork) instead replayed the
-//!    socket's entire history to reach live traffic, making subscription setup
-//!    O(history). Both variants below wait for the same ack frame pushed into a
-//!    queue-backed stream, so the comparison measures the same acknowledgement
-//!    wait.
+//! 2. **Routing** — the socket reader inspects every incoming frame once and
+//!    hands it to the subscription's fan-out channel, so one slow consumer
+//!    cannot tax another. The benchmark below measures that routing cost
+//!    against a fully-registered subscription map.
 
-use std::collections::VecDeque;
+use std::collections::HashMap;
 
 use base64::Engine;
 use criterion::Criterion;
 use criterion::criterion_group;
 use criterion::criterion_main;
-use fork_stream::StreamExt as ForkStreamExt;
 use futures::StreamExt;
 use serde_json::json;
+use tokio::sync::broadcast;
 use wasm_client_solana::GetAccountInfoResponse;
+use wasm_client_solana::SUBSCRIPTION_CHANNEL_CAPACITY;
 use wasm_client_solana::SubscriptionResponse;
 use wasm_client_solana::solana_account_decoder::UiAccount;
 use wasm_client_solana::solana_account_decoder::UiAccountData;
@@ -77,99 +75,48 @@ fn bench_frame_parse(c: &mut Criterion) {
 	});
 }
 
-/// A stream fed from a shared queue, so the benchmark controls exactly when
-/// each frame "arrives" — modeling a websocket whose history is already
-/// buffered and whose acknowledgement is pushed on demand.
-struct QueuedStream {
-	queue: std::sync::Arc<std::sync::Mutex<VecDeque<serde_json::Value>>>,
-}
-
-impl futures::Stream for QueuedStream {
-	type Item = Result<serde_json::Value, ()>;
-
-	fn poll_next(
-		self: std::pin::Pin<&mut Self>,
-		_cx: &mut std::task::Context<'_>,
-	) -> std::task::Poll<Option<Self::Item>> {
-		let item = self.queue.lock().unwrap().pop_front();
-		match item {
-			Some(value) => std::task::Poll::Ready(Some(Ok(value))),
-			None => std::task::Poll::Pending,
+/// The routing step the socket reader performs for every notification: look
+/// the subscription up by id and push the frame into its channel. The
+/// channel's capacity exceeds the frame count, so the sends measure pure
+/// routing (lookup + enqueue) with no backpressure; the drain afterwards
+/// verifies nothing was dropped.
+fn bench_routing(c: &mut Criterion) {
+	for subscriptions in [1_usize, 8, 64] {
+		let frames = notification_frames(1_000);
+		let mut map: HashMap<u64, broadcast::Sender<serde_json::Value>> = HashMap::new();
+		for id in 0..subscriptions as u64 {
+			let (sender, _) = broadcast::channel(SUBSCRIPTION_CHANNEL_CAPACITY);
+			map.insert(id, sender);
 		}
-	}
-}
-
-fn bench_fork_replay(c: &mut Criterion) {
-	for history in [100_usize, 1_000, 10_000] {
-		let frames = notification_frames(history);
-		let ack = notification_frames(1).pop().unwrap();
 
 		c.bench_function(
-			&format!("subscription/ack_wait/replaying_root/history_{history}"),
+			&format!("subscription/route_1000/subs_{subscriptions}"),
 			|b| {
 				b.iter(|| {
-					// The pre-fix shape: the root fork is never advanced, so
-					// a fork cloned from it starts at the buffer's oldest
-					// entry and must replay (and clone) every buffered frame
-					// before the ack — which sits behind the whole history —
-					// is visible.
-					let queue = std::sync::Arc::new(std::sync::Mutex::new(
-						frames
-							.iter()
-							.cloned()
-							.chain(std::iter::once(ack.clone()))
-							.collect::<VecDeque<_>>(),
-					));
-					let root = QueuedStream {
-						queue: std::sync::Arc::clone(&queue),
+					// One live receiver keeps the subscription "subscribed";
+					// the frames stay buffered because 1000
+					// < SUBSCRIPTION_CHANNEL_CAPACITY.
+					let receivers: Vec<broadcast::Receiver<serde_json::Value>> =
+						map.values().map(|sender| sender.subscribe()).collect();
+
+					for frame in std::hint::black_box(&frames) {
+						if let Some(sender) = map.get(
+							&frame
+								.pointer("/params/subscription")
+								.and_then(serde_json::Value::as_u64)
+								.unwrap_or_default(),
+						) {
+							let _ = sender.send(frame.clone());
+						}
 					}
-					.fork();
-					let mut fork = root.clone();
-					let found = futures::executor::block_on(fork.next());
-					assert!(found.is_some());
+
+					let buffered: usize = receivers.iter().map(|receiver| receiver.len()).sum();
+					assert_eq!(buffered, 1_000);
 				})
 			},
 		);
-
-		// The fixed shape: the history was consumed long before this
-		// subscription exists (frames are read as they arrive, so the drain
-		// is amortized to zero at subscribe time — it happens in the setup
-		// phase, not the measurement). The fork is then registered at the
-		// live edge *before* the ack is pushed, exactly as
-		// `create_subscription` now registers its ack and subscription forks
-		// before sending the request, and the same ack wait reads a single
-		// frame.
-		c.bench_function(
-			&format!("subscription/ack_wait/pre_registered_fork/history_{history}"),
-			|b| {
-				b.iter_batched(
-					|| {
-						let queue = std::sync::Arc::new(std::sync::Mutex::new(
-							frames.iter().cloned().collect::<VecDeque<_>>(),
-						));
-						let mut root = QueuedStream {
-							queue: std::sync::Arc::clone(&queue),
-						}
-						.fork();
-						for _ in 0..history {
-							futures::executor::block_on(root.next());
-						}
-						(root, queue)
-					},
-					|(mut root, queue)| {
-						let mut fork = root.clone();
-						queue.lock().unwrap().push_back(ack.clone());
-
-						let found = futures::executor::block_on(fork.next());
-						assert!(found.is_some());
-						let _ = &mut root;
-					},
-					criterion::BatchSize::LargeInput,
-				)
-			},
-		);
 	}
 }
 
-criterion_group!(benches, bench_frame_parse, bench_fork_replay);
+criterion_group!(benches, bench_frame_parse, bench_routing);
 criterion_main!(benches);
