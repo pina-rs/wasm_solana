@@ -22,17 +22,19 @@ use wasm_client_solana::prelude::*;
 /// `voteSubscribe` (opted into via the runner) reports its own votes.
 #[tokio::test(flavor = "multi_thread")]
 async fn slots_updates_and_vote_subscriptions() -> Result<()> {
+	eprintln!("breadcrumb: constructing validator");
 	let runner = TestValidatorRunnerProps::builder()
 		.pubkeys(vec![get_wallet_keypair().pubkey()])
 		.enable_vote_subscription(true)
 		.build()
 		.run()
 		.await;
+	eprintln!("breadcrumb: validator ready");
 	let rpc = runner.rpc().clone();
 
-	// Slot updates arrive several times per slot; a handful should include
-	// more than one distinct lifecycle stage.
+	eprintln!("breadcrumb: subscribing to slot updates");
 	let subscription = rpc.slots_updates_subscribe().await?;
+	eprintln!("breadcrumb: slot updates subscribed");
 	let unsubscription = subscription.get_unsubscription();
 	let mut stream = subscription.take(4);
 	let updates = tokio::time::timeout(Duration::from_secs(30), stream.collect::<Vec<_>>())
@@ -62,9 +64,9 @@ async fn slots_updates_and_vote_subscriptions() -> Result<()> {
 			.any(|update| matches!(update, SlotUpdate::CreatedBank { .. }))
 	);
 
-	// The validator votes on every slot it completes; one notification is
-	// enough to pin the wire shape.
+	eprintln!("breadcrumb: subscribing to votes");
 	let subscription = rpc.vote_subscribe().await?;
+	eprintln!("breadcrumb: votes subscribed");
 	let unsubscription = subscription.get_unsubscription();
 	let mut stream = subscription.take(1);
 	let votes = tokio::time::timeout(Duration::from_secs(30), stream.collect::<Vec<_>>())
