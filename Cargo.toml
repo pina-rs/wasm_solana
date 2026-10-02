@@ -47,17 +47,14 @@ futures-timeout = { default-features = false, version = "^0.2" }
 futures-timer = { default-features = false, version = "^3" }
 getrandom = { default-features = false, version = "^0.3" }
 gloo-net = { default-features = false, version = "^0.7" }
-heck = { default-features = false, version = "^0.5" }
 indexmap = { default-features = false, version = "^2" }
 insta = { default-features = false, version = "^1" }
 js-sys = { default-features = false, version = "^0.3" }
 log = { default-features = false, version = "^0.4" }
 nacl = { default-features = false, version = "^0.5" }
-paste = { default-features = false, version = "^1" }
 pin-project = { default-features = false, version = "^1" }
 port_check = { default-features = false, version = "^0.3" }
 rand = { default-features = false, version = "^0.9" }
-regex = { default-features = false, version = "^1" }
 reqwest = { default-features = false, version = "^0.12" }
 reqwest-websocket = { default-features = false, version = "^0.5" }
 semver = { default-features = false, version = "^1" }

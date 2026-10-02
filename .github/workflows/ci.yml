@@ -7,9 +7,17 @@ on:
   push:
     branches:
       - main
+    # Markdown-only changes cannot affect compiled code; the separate
+    # changeset-policy workflow still runs for changeset-only pull requests.
+    paths-ignore:
+      - "**/*.md"
+      - "docs/**"
   pull_request:
     branches:
       - main
+    paths-ignore:
+      - "**/*.md"
+      - "docs/**"
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -137,8 +145,10 @@ jobs:
           cargo test_streams
         shell: devenv shell -- bash -e {0}
 
+      # Both halves of the browser pair (chromium + chromedriver) come from
+      # the same pinned nixpkgs revision, so a runner Chrome auto-update can
+      # no longer break the session handshake silently.
       - name: test `wasm` with background validator
-        continue-on-error: true
         env:
           WASM_BINDGEN_TEST_TIMEOUT: 120
         run: |
@@ -226,10 +236,8 @@ jobs:
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: build
-        run: cargo build --locked
-        shell: devenv shell -c -- bash -e {0}
-
+      # `--all-features` is a superset of the default build; compiling the
+      # default profile separately doubled the job for no extra signal.
       - name: build all features
         run: cargo build --all-features --locked
         shell: devenv shell -c -- bash -e {0}

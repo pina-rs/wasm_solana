@@ -19,12 +19,12 @@ devenv.local.nix
 *.snap.new
 
 # setup
-/.helix
 /.vscode
 /programs/.vscode
 
 **/tmp**
-**/temp**.bin/
+**/temp*
+**/*.bin/
 node_modules/
 /.bin/
 /.local-cache/
@@ -50,16 +50,12 @@ node_modules/
 **/*.pem
 
 # tests
-/test-ledger
 /test-results
 
-**/*.pem
 lcov.info
 codecov.json
 
 # Devenv
-.devenv*
-devenv.local.nix
 
 # direnv
 .direnv
@@ -81,4 +77,4 @@ examples/playwright-report/
 
 # Example build artifacts must never be committed (7.8k files slipped in
 # via a later PR); the root /target rule does not cover nested workspaces.
-examples/*/target/
+.video_agent/

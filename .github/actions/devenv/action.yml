@@ -12,6 +12,10 @@ inputs:
     description: Number of retries for transient nix/devenv setup failures.
     required: false
     default: "3"
+  install-cargo-bins:
+    description: Install the workspace cargo binaries (llvm-cov, nextest, wasm-bindgen-cli, ...). Jobs that only need the devenv profile — the changeset policy check — pay minutes for tools they never run.
+    required: false
+    default: "true"
 
 runs:
   using: composite
@@ -91,6 +95,7 @@ runs:
       shell: bash
 
     - name: install dependencies
+      if: ${{ inputs.install-cargo-bins == 'true' }}
       env:
         SETUP_RETRIES: ${{ inputs.setup-retries }}
       run: |
