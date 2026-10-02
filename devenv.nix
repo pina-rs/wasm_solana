@@ -22,6 +22,7 @@ in
       cargo-nextest
       cargo-run-bin
       chromedriver
+      chromium
       cmake
       curl
       custom.agave

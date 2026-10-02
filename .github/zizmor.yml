@@ -19,6 +19,5 @@ rules:
     ignore:
       - changeset-policy.yml
       - ci.yml
-      - docs-pages.yml
-      - publish.yml
+        - publish.yml
       - release-pr.yml

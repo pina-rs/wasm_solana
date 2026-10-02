@@ -41,6 +41,10 @@ jobs:
         uses: ./.github/actions/devenv
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
+          # The policy check needs the devenv profile's monochange and
+          # toolchain, never the dev tooling; skipping its install keeps the
+          # job close to the checkout itself.
+          install-cargo-bins: "false"
 
       # Release comparison needs the tags and the default branch. A shallow
       # checkout can hide the latest release tag or produce an incomplete merge
