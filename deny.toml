@@ -4,7 +4,13 @@ all-features = true
 [advisories]
 db-path = "target/advisory-db"
 db-urls = ["https://github.com/RustSec/advisory-db.git"]
-ignore = []
+ignore = [
+	# bincode 1.3.3 is unmaintained (RUSTSEC-2025-0141). It arrives
+	# transitively through the agave snapshot crates, which still target the
+	# 1.x API; 2.x is a breaking rewrite, so clear the denial until the
+	# dependency chain migrates.
+	"RUSTSEC-2025-0141",
+]
 
 [licenses]
 allow = [
