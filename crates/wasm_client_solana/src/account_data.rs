@@ -37,6 +37,16 @@ pub const MAX_ACCOUNT_DATA_LEN: usize = 10 * 1024 * 1024;
 ///
 /// The zstd path is only compiled with the `zstd` feature; without it,
 /// `base64+zstd` payloads return `None`, exactly as upstream does.
+///
+/// ```
+/// use wasm_client_solana::decode_account_data;
+/// use wasm_client_solana::solana_account_decoder_client_types::UiAccountData;
+/// use wasm_client_solana::solana_account_decoder_client_types::UiAccountEncoding;
+///
+/// let data = UiAccountData::Binary("aGVsbG8gd29ybGQ=".to_owned(), UiAccountEncoding::Base64);
+///
+/// assert_eq!(decode_account_data(&data), Some(b"hello world".to_vec()));
+/// ```
 pub fn decode_account_data(data: &UiAccountData) -> Option<Vec<u8>> {
 	match data {
 		UiAccountData::Json(_) => None,

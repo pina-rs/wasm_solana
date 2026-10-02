@@ -2,7 +2,7 @@
 
 <br />
 
-> A WebAssembly (WASM) compatible client for interacting with the Solana RPC and PubSub APIs. It allows for sending transactions, fetching account data, subscribing to account changes, and more, from within a WASM compaitible environment like the web and serverless functions.
+> A WebAssembly (WASM) compatible client for interacting with the Solana RPC and PubSub APIs. It allows for sending transactions, fetching account data, subscribing to account changes, and more, from within a WASM compatible environment like the web and serverless functions.
 
 <br />
 
@@ -14,13 +14,13 @@ Add the following to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-wasm_client_solana = "0.10.0"
+wasm_client_solana = "0.12"
 ```
 
 Or use `cargo add`:
 
 ```bash
-cargo add wasm_client_solana
+cargo add wasm_client_solana --features js   # or ssr for native
 ```
 
 ## Building for WASM
@@ -81,9 +81,9 @@ async fn run() -> ClientResult<()> {
 [crate-link]: https://crates.io/crates/wasm_client_solana
 [docs-image]: https://docs.rs/wasm_client_solana/badge.svg
 [docs-link]: https://docs.rs/wasm_client_solana/
-[ci-status-image]: https://github.com/ifiokjr/wasm_solana/workflows/ci/badge.svg
-[ci-status-link]: https://github.com/ifiokjr/wasm_solana/actions?query=workflow:ci
+[ci-status-image]: https://github.com/pina-rs/wasm_solana/workflows/ci/badge.svg
+[ci-status-link]: https://github.com/pina-rs/wasm_solana/actions?query=workflow:ci
 [unlicense-image]: https://img.shields.io/badge/license-Unlicence-blue.svg
 [unlicense-link]: https://opensource.org/license/unlicense
-[codecov-image]: https://codecov.io/github/ifiokjr/wasm_solana/graph/badge.svg?token=87K799Q78I
-[codecov-link]: https://codecov.io/github/ifiokjr/wasm_solana
+[codecov-image]: https://codecov.io/github/pina-rs/wasm_solana/graph/badge.svg?token=87K799Q78I
+[codecov-link]: https://codecov.io/github/pina-rs/wasm_solana
