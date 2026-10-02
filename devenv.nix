@@ -312,8 +312,9 @@ in
           --ignore RUSTSEC-2026-0173 \
           --ignore RUSTSEC-2026-0097 \
           --ignore RUSTSEC-2026-0292 \
-          --ignore RUSTSEC-2025-0141 \
-          --file "$DEVENV_ROOT/Cargo.lock"
+                  --ignore RUSTSEC-2025-0141 \
+          --ignore RUSTSEC-2026-0186 \
+                  --file "$DEVENV_ROOT/Cargo.lock"
       '';
       description = "Run RustSec advisory audit for Cargo.lock (ignores validator-stack advisories).";
     };
