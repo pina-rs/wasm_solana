@@ -99,7 +99,7 @@ required-features = ["ssr"]
 [dev-dependencies]
 anyhow = { workspace = true, default-features = true }
 assert2 = { workspace = true, default-features = true }
-criterion = { workspace = true, default-features = true }
+criterion = { workspace = true, default-features = false }
 futures-timeout = { workspace = true, default-features = true }
 insta = { workspace = true, features = ["redactions", "json"], default-features = true }
 solana-keypair = { workspace = true, default-features = true }
