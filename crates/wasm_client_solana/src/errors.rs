@@ -2,6 +2,7 @@ use std::fmt;
 
 use serde::Deserialize;
 use serde::Serialize;
+use serde_json::Value;
 use solana_message::CompileError;
 use solana_signer::SignerError;
 use wallet_standard::IntoWalletError;
@@ -16,6 +17,11 @@ pub const DEFAULT_ERROR_CODE: u16 = 500u16;
 pub(crate) struct RpcErrorDetails {
 	pub(crate) code: i32,
 	pub(crate) message: String,
+	/// Machine-readable details the node attaches — for a failed
+	/// `sendTransaction` this is where the instruction error and the full
+	/// simulation logs live.
+	#[serde(default)]
+	pub(crate) data: Value,
 }
 
 impl Default for RpcErrorDetails {
@@ -23,7 +29,11 @@ impl Default for RpcErrorDetails {
 		let message = "Internal Server Error".into();
 		let code = DEFAULT_ERROR_CODE.into();
 
-		Self { code, message }
+		Self {
+			code,
+			message,
+			data: Value::Null,
+		}
 	}
 }
 
@@ -48,6 +58,15 @@ impl Default for RpcError {
 }
 
 impl RpcError {
+	/// The machine-readable payload the node attached, if any.
+	///
+	/// For a rejected `sendTransaction` this carries the instruction error
+	/// and the full simulation logs — the difference between debugging a
+	/// failure and guessing at it.
+	pub fn data(&self) -> &Value {
+		&self.error.data
+	}
+
 	/// Build an error from a message, using Solana's `303` custom error code.
 	///
 	/// Used for client side failures such as a missing account or a signature
@@ -55,7 +74,11 @@ impl RpcError {
 	pub fn new(message: impl Into<String>) -> Self {
 		let message = message.into();
 		let code = 303;
-		let error = RpcErrorDetails { code, message };
+		let error = RpcErrorDetails {
+			code,
+			message,
+			data: Value::Null,
+		};
 
 		RpcError {
 			error,
@@ -66,7 +89,19 @@ impl RpcError {
 
 impl fmt::Display for RpcError {
 	fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-		f.write_str(format!("Client error: {}", self.error.message).as_str())
+		write!(
+			f,
+			"Client error {}: {}",
+			self.error.code, self.error.message
+		)?;
+
+		// The data payload is where a rejected transaction explains itself
+		// (instruction error + simulation logs); keep it in the message so
+		// it survives string logging.
+		match &self.error.data {
+			Value::Null => Ok(()),
+			data => write!(f, " — {data}"),
+		}
 	}
 }
 
@@ -147,5 +182,54 @@ impl From<&gloo_net::websocket::WebSocketError> for ClientWebSocketError {
 			gloo_net::websocket::WebSocketError::MessageSendError(_) => Self::MessageSendError,
 			_ => Self::InvalidMessage,
 		}
+	}
+}
+
+#[cfg(test)]
+mod tests {
+
+	use assert2::check;
+
+	use super::*;
+
+	/// A node's error payload carries the explanation in `data` — for a
+	/// rejected send that is the instruction error and the simulation logs —
+	/// and it must survive deserialization, the accessor, and `Display`.
+	#[test]
+	fn rpc_error_preserves_data_and_code() {
+		let raw = serde_json::json!({
+			"jsonrpc": "2.0",
+			"id": 1,
+			"error": {
+				"code": -32000,
+				"message": "Transaction simulation failed",
+				"data": {
+					"err": { "InstructionError": [1, "CustomProgramError(1)"] },
+					"logs": ["Program log: boom"],
+				},
+			},
+		});
+
+		let error: RpcError = serde_json::from_value(raw).unwrap();
+
+		check!(error.data().pointer("/logs/0") == Some(&serde_json::json!("Program log: boom")));
+		let display = error.to_string();
+		check!(display.contains("-32000"));
+		check!(display.contains("Transaction simulation failed"));
+		check!(display.contains("CustomProgramError(1)"));
+	}
+
+	/// Envelopes without a `data` member still deserialize.
+	#[test]
+	fn rpc_error_without_data() {
+		let raw = serde_json::json!({
+			"jsonrpc": "2.0",
+			"id": 1,
+			"error": { "code": -32000, "message": "node behind" },
+		});
+
+		let error: RpcError = serde_json::from_value(raw).unwrap();
+		check!(error.data().is_null());
+		check!(!error.to_string().contains("—"));
 	}
 }

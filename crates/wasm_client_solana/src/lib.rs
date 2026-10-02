@@ -1,5 +1,14 @@
 #![doc = include_str!(concat!(env!("CARGO_MANIFEST_DIR"), "/readme.md"))]
 
+// Both transports default off so browser and native builds never pull the
+// other's dependency tree; a bare dependency therefore has neither and would
+// otherwise fail deep inside web-sys or reqwest with confusing errors.
+#[cfg(not(any(feature = "js", feature = "ssr")))]
+compile_error!(
+	"wasm_client_solana needs exactly one transport feature: `js` for browser/wasm targets or \
+	 `ssr` for native targets"
+);
+
 // The wire types come straight from the crates.io `-client-types` crates —
 // upstream made them wasm-safe in 4.2.2 — so downstream code keeps the
 // `wasm_client_solana::solana_*` paths it already used while gaining the
