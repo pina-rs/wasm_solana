@@ -301,6 +301,10 @@ in
         # RUSTSEC-2025-0141: bincode 1.3.3 is unmaintained; it arrives
         # transitively through the agave snapshot crates, which still target
         # the 1.x API. Mirrors the deny.toml ignore.
+        # (the client's own rand 0.8.8/0.9.x pins are patched ranges), and
+        # solana-genesis-config 4.0.0 inside the validator harness only.
+        # Comments stay above the command: a `#` after a line continuation
+        # swallows every remaining argument.
         cargo-audit audit \
           --db "$DEVENV_ROOT/target/advisory-db-audit" \
           --url "https://github.com/RustSec/advisory-db.git" \

@@ -37,3 +37,7 @@ coverage:all
 ```
 
 produces `codecov.json` via `cargo llvm-cov` across the SSR suites and streams; CI uploads it to Codecov.
+
+## Browser e2e
+
+The `examples/` directory carries Leptos and Dioxus browser apps driven end-to-end by Playwright against a local surfpool node (`examples/e2e/surfpool.spec.ts`) — the same pubsub flows the wasm test suite covers, exercised in a real browser. See `examples/readme.md` for the build-and-test flow.

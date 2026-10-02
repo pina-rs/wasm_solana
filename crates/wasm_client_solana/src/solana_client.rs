@@ -1820,6 +1820,21 @@ impl SolanaRpcClient {
 	/// treated as unstable upstream, so not every RPC provider exposes it.
 	/// Prefer [`slot_subscribe`](Self::slot_subscribe) unless the pipeline
 	/// stages themselves matter.
+	///
+	/// ```no_run
+	/// # async fn run(rpc: &wasm_client_solana::SolanaRpcClient) -> wasm_client_solana::ClientResult<()> {
+	/// use wasm_client_solana::prelude::*;
+	///
+	/// let subscription = rpc.slots_updates_subscribe().await?;
+	/// let mut updates = subscription.take(4);
+	///
+	/// while let Some(update) = updates.next().await {
+	///     // `FirstShredReceived`, `CreatedBank`, `Frozen`, `Root`, ...
+	///     log::info!("slot lifecycle: {update:?}");
+	/// }
+	/// # Ok(())
+	/// # }
+	/// ```
 	pub async fn slots_updates_subscribe(&self) -> ClientResult<Subscription<SlotUpdate>> {
 		let (id, subscription_id, stream) = self
 			.ws
@@ -1837,6 +1852,20 @@ impl SolanaRpcClient {
 	/// enabled by passing `--rpc-pubsub-enable-vote-subscription` to
 	/// `solana-validator`. Most dApps want
 	/// [`root_subscribe`](Self::root_subscribe) instead.
+	///
+	/// ```no_run
+	/// # async fn run(rpc: &wasm_client_solana::SolanaRpcClient) -> wasm_client_solana::ClientResult<()> {
+	/// use wasm_client_solana::prelude::*;
+	///
+	/// let subscription = rpc.vote_subscribe().await?;
+	/// let mut votes = subscription.take(2);
+	///
+	/// while let Some(vote) = votes.next().await {
+	///     log::info!("{} voted on {}", vote.params.result.vote_pubkey, vote.params.result.slots.len());
+	/// }
+	/// # Ok(())
+	/// # }
+	/// ```
 	pub async fn vote_subscribe(&self) -> ClientResult<Subscription<VoteNotification>> {
 		let (id, subscription_id, stream) =
 			self.ws.create_subscription(VoteSubscribeRequest).await?;

@@ -29,7 +29,7 @@ Coverage spans the full read surface of the JSON-RPC spec: accounts, blocks, epo
 
 ## Commitments
 
-Every method has a `*_with_config` variant accepting `CommitmentConfig`, and config types (`RpcBlockConfig`, ...) expose the standard options (`encoding`, `data_slice`, filters). Encodings map onto `UiAccountEncoding` from the forked decoder crates, including `base64+zstd` on native targets.
+Every method has a `*_with_config` variant accepting `CommitmentConfig`, and config types (`RpcBlockConfig`, ...) expose the standard options (`encoding`, `data_slice`, filters). Encodings map onto `UiAccountEncoding` from the client-types crates, including `base64+zstd` on native targets — decode account payloads with [`decode_account_data`](https://docs.rs/wasm_client_solana/latest/wasm_client_solana/fn.decode_account_data.html), the hardened helper that caps zstd decompression at the cluster's own 10 MiB account-data limit.
 
 ## Transaction versions
 
@@ -53,7 +53,7 @@ Other v1 differences worth knowing:
 
 ## Errors
 
-RPC failures surface as `ClientError` with structured contents (`RpcError` with code + message), and Solana transaction errors are typed through `solana_transaction_error` — see `errors.rs` for the full hierarchy. The forked client-types also preserve `OptionSerializer<T>` for fields the RPC may omit, null out, or skip for backwards compatibility.
+RPC failures surface as `ClientError` with structured contents (`RpcError` with code + message), and Solana transaction errors are typed through `solana_transaction_error` — see `errors.rs` for the full hierarchy. The upstream client-types preserve `OptionSerializer<T>` for fields the RPC may omit, null out, or skip for backwards compatibility.
 
 ## Re-exports
 
@@ -67,6 +67,13 @@ pub use solana_transaction_status_wasm as solana_transaction_status;
 ```
 
 This gives consumers a single import path for parsed accounts, transaction statuses and their types, regardless of which crate actually hosts them — and because the wire types are now the upstream ones, they unify with any other `solana-*` code in the same graph.
+
+## Migrating to 0.13
+
+- `UiAccount.owner` is the upstream `String` (base-58). Parse it with `Pubkey::from_str` when you need the typed key; the wire format is unchanged.
+- `GetTokenAccountBalanceResponse`, `GetTokenSupplyResponse` and `GetTransactionResponse` no longer derive `Eq` (upstream decoder types are `PartialEq` only).
+- The `solana-*-client-types-wasm` fork crates are retired: depend on the crates.io `solana-account-decoder-client-types` / `solana-transaction-status-client-types` (with `agave-unstable-api`), or simply keep importing through `wasm_client_solana`'s re-exports, which are unchanged.
+- Prefer `decode_account_data(&ui_account.data)` over `UiAccountData::decode`: it is the hardened replacement that rejects `base64+zstd` payloads expanding past the cluster's own 10 MiB account-data cap.
 
 ## Versioning
 

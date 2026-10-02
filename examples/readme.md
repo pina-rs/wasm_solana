@@ -15,7 +15,7 @@ They are the executable counterpart of the crate's `js` feature: everything a br
 
 ## Prerequisites
 
-- [devenv](https://devenv.sh) shell for the repository (pinned Rust toolchain, `wasm-bindgen` 0.2.128 via `install:cargo:bin`, and the `getrandom_backend="wasm_js"` rustflags from `.cargo/config.toml`)
+- [devenv](https://devenv.sh) shell for the repository (pinned Rust toolchain, `wasm-bindgen` 0.2.129 via `install:cargo:bin`, and the `getrandom_backend="wasm_js"` rustflags from `.cargo/config.toml`)
 - `surfpool` on your `PATH` (`cargo install surfpool` or see [surfpool.run](https://surfpool.run))
 - Node.js and Python 3 for Playwright and the static file server
 
@@ -43,7 +43,7 @@ python3 -m http.server 4173 --directory leptos-surfpool/dist
 
 - The examples are **standalone crates** (each with its own `[workspace]` and lockfile, excluded from the repository workspace) so that framework dependencies never enter the published dependency graph or `cargo-deny` scope of `wasm_client_solana`.
 - The wasm is produced with plain `cargo build --release --target
-  wasm32-unknown-unknown` plus `wasm-bindgen --target web` — no bundler needed. `wasm-bindgen` is pinned to `0.2.128` in both apps to match the repository's `wasm-bindgen-cli` pin, which is why the shim at `../../.bin/.shims/wasm-bindgen` works out of the box. Override with the `WASM_BINDGEN` environment variable if you use a different version.
+  wasm32-unknown-unknown` plus `wasm-bindgen --target web` — no bundler needed. `wasm-bindgen` is pinned to `0.2.129` in both apps to match the repository's `wasm-bindgen-cli` pin, which is why the shim at `../../.bin/.shims/wasm-bindgen` works out of the box. Override with the `WASM_BINDGEN` environment variable if you use a different version.
 - The usual framework tooling works too (`trunk serve` for Leptos, `dx serve --platform web` for Dioxus) — the `index.html` files are written so both paths work.
 - `wasm_client_solana` derives the pubsub URL from the HTTP endpoint (`http` → `ws`, port + 1). Surfpool's defaults (`--port 8899`, `--ws-port 8900`) match that convention. If you run surfpool on non-default ports, construct the client with `SolanaRpcClient::new_with_ws_and_commitment` instead.
 - The demo keypair is the same throwaway key as `test_utils_keypairs::SECRET_KEY_WALLET`. It exists so the Playwright assertions can be relative (balance before/after) across test runs.

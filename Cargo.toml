@@ -18,9 +18,9 @@ resolver = "2"
 version = "0.12.1"
 authors = ["Ifiok Jr. <ifiokotung@gmail.com>"]
 edition = "2024"
-homepage = "https://github.com/ifiokjr/wasm_solana"
+homepage = "https://github.com/pina-rs/wasm_solana"
 license = "Unlicense"
-repository = "https://github.com/ifiokjr/wasm_solana"
+repository = "https://github.com/pina-rs/wasm_solana"
 rust-version = "1.89.0"
 
 [workspace.dependencies]
