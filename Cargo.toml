@@ -147,7 +147,7 @@ wasm-bindgen = { default-features = false, version = "^0.2" }
 wasm-bindgen-futures = { default-features = false, version = "^0.4" }
 wasm-bindgen-test = { default-features = false, version = "^0.3" }
 web-sys = { default-features = false, version = "^0.3" }
-wincode = { default-features = false, version = "^0.5" }
+wincode = { default-features = false, version = "^0.6" }
 zstd = { version = "0.13", default-features = false }
 
 solana-blake3-hasher = { default-features = false, version = "^3.1" }
