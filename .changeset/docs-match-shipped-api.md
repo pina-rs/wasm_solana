@@ -1,5 +1,5 @@
 ---
-wasm_client_solana: docs
+wasm_client_solana: fix
 ---
 
 # Docs match the shipped API
