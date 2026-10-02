@@ -522,7 +522,9 @@ impl SolanaRpcClient {
 		for _ in 0..MAX_RETRIES {
 			let signature_statuses = self.get_signature_statuses(&[*signature]).await?;
 
-			if let Some(signature_status) = signature_statuses[0].as_ref()
+			// `first()` rather than indexing: a misbehaving node returning a
+			// short array must not panic the client.
+			if let Some(signature_status) = signature_statuses.first().and_then(Option::as_ref)
 				&& signature_status.confirmation_status.is_some()
 			{
 				let current_commitment = signature_status.confirmation_status.as_ref().unwrap();
