@@ -12,18 +12,20 @@ import { expect, type Page, test } from "@playwright/test";
  * - `#notifications` / `#last-slot` are fed by an `accountSubscribe`
  *   websocket subscription on the demo wallet.
  */
-
 async function lamports(page: Page): Promise<number> {
 	const text = await page.locator("#balance").innerText();
 	const match = text.match(/(\d+) lamports/);
+
 	if (!match) {
 		throw new Error(`no lamports value in #balance: "${text}"`);
 	}
+
 	return Number(match[1]);
 }
 
 async function notificationCount(page: Page): Promise<number> {
 	const text = await page.locator("#notifications").innerText();
+
 	return Number(text);
 }
 

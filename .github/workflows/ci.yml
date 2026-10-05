@@ -32,10 +32,10 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
-      - uses: ifiokjr/monostyle@27ce2de5dcef4759f1dad8804e1dbbe81b0fa9f1 # v0.3.18
+      - uses: ifiokjr/monostyle@be483a75d05cdc6d64493a3dd67025e3ecd79551 # v0.3.25
         if: always()
         with:
-          version: 0.3.18
+          version: 0.3.25
 
       - name: setup
         uses: ./.github/actions/devenv

@@ -114,6 +114,7 @@ mod tests {
 		check!(inflation_reward.amount == 2500);
 		check!(inflation_reward.effective_slot == 224);
 		check!(inflation_reward.epoch == 2);
+
 		check!(inflation_reward.post_balance == 499_999_442_500);
 	}
 }

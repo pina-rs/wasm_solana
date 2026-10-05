@@ -231,15 +231,13 @@ impl RpcProvider for TestRpcProvider {
 						.and_then(|config| config.encoding)
 						.unwrap_or(UiAccountEncoding::Base64);
 					let data_slice = request.config.as_ref().and_then(|config| config.data_slice);
-					let futures = request.addresses.iter().map(|pubkey| {
-						async move {
-							let client = self.0.lock().await;
-							let account = client.banks_client.get_account(*pubkey).await.unwrap();
+					let futures = request.addresses.iter().map(|pubkey| async move {
+						let client = self.0.lock().await;
+						let account = client.banks_client.get_account(*pubkey).await.unwrap();
 
-							account.map(|account| {
-								encode_ui_account(pubkey, &account, encoding, None, data_slice)
-							})
-						}
+						account.map(|account| {
+							encode_ui_account(pubkey, &account, encoding, None, data_slice)
+						})
 					});
 					let value = join_all(futures).await;
 					let result = GetMultipleAccountsResponse { context, value };
