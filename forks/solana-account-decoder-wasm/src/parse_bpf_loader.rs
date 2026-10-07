@@ -47,9 +47,11 @@ pub fn parse_bpf_upgradeable_loader(
 		}
 		UpgradeableLoaderState::Program {
 			programdata_address,
-		} => BpfUpgradeableLoaderAccountType::Program(UiProgram {
-			program_data: programdata_address.to_string(),
-		}),
+		} => {
+			BpfUpgradeableLoaderAccountType::Program(UiProgram {
+				program_data: programdata_address.to_string(),
+			})
+		}
 		UpgradeableLoaderState::ProgramData {
 			slot,
 			upgrade_authority_address,

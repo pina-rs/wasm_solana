@@ -21,19 +21,23 @@ pub fn parse_vote(data: &[u8], vote_pubkey: &Pubkey) -> Result<VoteAccountType, 
 	let epoch_credits = vote_state
 		.epoch_credits
 		.iter()
-		.map(|(epoch, credits, previous_credits)| UiEpochCredits {
-			epoch: *epoch,
-			credits: credits.to_string(),
-			previous_credits: previous_credits.to_string(),
+		.map(|(epoch, credits, previous_credits)| {
+			UiEpochCredits {
+				epoch: *epoch,
+				credits: credits.to_string(),
+				previous_credits: previous_credits.to_string(),
+			}
 		})
 		.collect();
 	let votes = vote_state.votes.iter().map(UiLandedVote::from).collect();
 	let authorized_voters = vote_state
 		.authorized_voters
 		.iter()
-		.map(|(epoch, authorized_voter)| UiAuthorizedVoters {
-			epoch: *epoch,
-			authorized_voter: authorized_voter.to_string(),
+		.map(|(epoch, authorized_voter)| {
+			UiAuthorizedVoters {
+				epoch: *epoch,
+				authorized_voter: authorized_voter.to_string(),
+			}
 		})
 		.collect();
 	Ok(VoteAccountType::Vote(UiVoteState {
