@@ -86,9 +86,10 @@ impl Source {
 			}
 			Self::NonceAccount(pubkey) => {
 				#[allow(clippy::redundant_closure)]
-				let data = nonce_utils::get_account_with_commitment(rpc_client, pubkey, commitment_config)
-					.await
-					.and_then(|ref a| nonce_utils::data_from_account(a))?;
+				let data =
+					nonce_utils::get_account_with_commitment(rpc_client, pubkey, commitment_config)
+						.await
+						.and_then(|ref a| nonce_utils::data_from_account(a))?;
 				Ok(data.blockhash())
 			}
 		}
@@ -123,9 +124,10 @@ impl Source {
 			}
 			Self::NonceAccount(pubkey) => {
 				#[allow(clippy::redundant_closure)]
-				let _ = nonce_utils::get_account_with_commitment(rpc_client, pubkey, commitment_config)
-					.await
-					.and_then(|ref a| nonce_utils::data_from_account(a))?;
+				let _ =
+					nonce_utils::get_account_with_commitment(rpc_client, pubkey, commitment_config)
+						.await
+						.and_then(|ref a| nonce_utils::data_from_account(a))?;
 				true
 			}
 		})
@@ -246,18 +248,22 @@ where
 	T: for<'de> SchemaRead<'de, DefaultConfig, Dst = T>,
 {
 	let decoded = match encoding {
-		UiTransactionEncoding::Base64 => wincode::deserialize(
-			&BASE64_STANDARD
-				.decode(content)
-				.map_err(|e| ClientError::Other(e.to_string()))?,
-		)
-		.map_err(|e| ClientError::Other(e.to_string()))?,
-		UiTransactionEncoding::Base58 => wincode::deserialize(
-			&bs58::decode(content)
-				.into_vec()
-				.map_err(|e| ClientError::Other(e.to_string()))?,
-		)
-		.map_err(|e| ClientError::Other(e.to_string()))?,
+		UiTransactionEncoding::Base64 => {
+			wincode::deserialize(
+				&BASE64_STANDARD
+					.decode(content)
+					.map_err(|e| ClientError::Other(e.to_string()))?,
+			)
+			.map_err(|e| ClientError::Other(e.to_string()))?
+		}
+		UiTransactionEncoding::Base58 => {
+			wincode::deserialize(
+				&bs58::decode(content)
+					.into_vec()
+					.map_err(|e| ClientError::Other(e.to_string()))?,
+			)
+			.map_err(|e| ClientError::Other(e.to_string()))?
+		}
 		_ => {
 			return Err(RpcError::new(format!(
 				"unsupported encoding: {encoding}. Supported encodings: base58, base64"

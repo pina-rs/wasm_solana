@@ -150,9 +150,11 @@ fn bench_dispatch(c: &mut Criterion) {
 	{
 		let count = 1000;
 		let accounts: Vec<RpcKeyedAccount> = (0..count)
-			.map(|i| RpcKeyedAccount {
-				pubkey: Pubkey::new_unique(),
-				account: ui_account(256, i as u8),
+			.map(|i| {
+				RpcKeyedAccount {
+					pubkey: Pubkey::new_unique(),
+					account: ui_account(256, i as u8),
+				}
 			})
 			.collect();
 		// `GetProgramAccountsResponse` is deserialize-only, so the envelope is

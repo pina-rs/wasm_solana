@@ -279,10 +279,12 @@ pub fn parse_stake(
 				}),
 			})
 		}
-		StakeInstruction::GetMinimumDelegation => Ok(ParsedInstructionEnum {
-			instruction_type: "getMinimumDelegation".to_string(),
-			info: Value::default(),
-		}),
+		StakeInstruction::GetMinimumDelegation => {
+			Ok(ParsedInstructionEnum {
+				instruction_type: "getMinimumDelegation".to_string(),
+				info: Value::default(),
+			})
+		}
 		StakeInstruction::DeactivateDelinquent => {
 			check_num_stake_accounts(&instruction.accounts, 3)?;
 			Ok(ParsedInstructionEnum {

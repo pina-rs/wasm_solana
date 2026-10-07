@@ -21,14 +21,18 @@ pub fn parse_nonce(data: &[u8]) -> Result<UiNonceState, ParseAccountError> {
 		// length as `uninitialized` nonce. An empty account of the wrong length can never be
 		// initialized as a nonce account, and an empty account of the correct length may not be an
 		// uninitialized nonce account, since it can be assigned to another program.
-		State::Uninitialized => Err(ParseAccountError::from(
-			InstructionError::InvalidAccountData,
-		)),
-		State::Initialized(data) => Ok(UiNonceState::Initialized(UiNonceData {
-			authority: data.authority.to_string(),
-			blockhash: data.blockhash().to_string(),
-			fee_calculator: data.fee_calculator.into(),
-		})),
+		State::Uninitialized => {
+			Err(ParseAccountError::from(
+				InstructionError::InvalidAccountData,
+			))
+		}
+		State::Initialized(data) => {
+			Ok(UiNonceState::Initialized(UiNonceData {
+				authority: data.authority.to_string(),
+				blockhash: data.blockhash().to_string(),
+				fee_calculator: data.fee_calculator.into(),
+			}))
+		}
 	}
 }
 

@@ -15,7 +15,7 @@ exclude = ["examples"]
 resolver = "2"
 
 [workspace.package]
-version = "0.12.1"
+version = "0.13.0"
 authors = ["Ifiok Jr. <ifiokotung@gmail.com>"]
 edition = "2024"
 homepage = "https://github.com/pina-rs/wasm_solana"
@@ -152,18 +152,18 @@ solana-epoch-rewards-hasher = { default-features = false, version = "^3.1" }
 solana-keccak-hasher = { default-features = false, version = "^3.1" }
 
 # publishable crates
-memory_wallet = { path = "crates/memory_wallet", version = "0.12.1" }
-test_utils_insta = { path = "crates/test_utils_insta", version = "0.12.1" }
-test_utils_keypairs = { path = "crates/test_utils_keypairs", version = "0.12.1" }
-test_utils_solana = { path = "crates/test_utils_solana", version = "0.12.1" }
-wasm_client_solana = { path = "crates/wasm_client_solana", version = "0.12.1" }
+memory_wallet = { path = "crates/memory_wallet", version = "0.13.0" }
+test_utils_insta = { path = "crates/test_utils_insta", version = "0.13.0" }
+test_utils_keypairs = { path = "crates/test_utils_keypairs", version = "0.13.0" }
+test_utils_solana = { path = "crates/test_utils_solana", version = "0.13.0" }
+wasm_client_solana = { path = "crates/wasm_client_solana", version = "0.13.0" }
 
 # forks: only the full decoder crates stay forked. Upstream still forces
 # `zstd`, `Inflector` and (for transaction-status) `solana-entry` on them,
 # none of which build for the browser. The `-client-types` forks were
 # retired once upstream 4.2.2 made those crates wasm-safe.
-solana-account-decoder-wasm = { path = "forks/solana-account-decoder-wasm", version = "4.0.2" }
-solana-transaction-status-wasm = { path = "forks/solana-transaction-status-wasm", version = "4.0.2" }
+solana-account-decoder-wasm = { path = "forks/solana-account-decoder-wasm", version = "5.0.0" }
+solana-transaction-status-wasm = { path = "forks/solana-transaction-status-wasm", version = "5.0.0" }
 
 [workspace.metadata.bin]
 cargo-llvm-cov = { version = "0.9.1" }

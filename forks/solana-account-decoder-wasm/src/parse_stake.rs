@@ -24,14 +24,18 @@ pub fn parse_stake(data: &[u8]) -> Result<StakeAccountType, ParseAccountError> {
 
 	let parsed_account = match stake_state {
 		StakeStateV2::Uninitialized => StakeAccountType::Uninitialized,
-		StakeStateV2::Initialized(meta) => StakeAccountType::Initialized(UiStakeAccount {
-			meta: meta.into(),
-			stake: None,
-		}),
-		StakeStateV2::Stake(meta, stake, _) => StakeAccountType::Delegated(UiStakeAccount {
-			meta: meta.into(),
-			stake: Some(stake.into()),
-		}),
+		StakeStateV2::Initialized(meta) => {
+			StakeAccountType::Initialized(UiStakeAccount {
+				meta: meta.into(),
+				stake: None,
+			})
+		}
+		StakeStateV2::Stake(meta, stake, _) => {
+			StakeAccountType::Delegated(UiStakeAccount {
+				meta: meta.into(),
+				stake: Some(stake.into()),
+			})
+		}
 		StakeStateV2::RewardsPool => StakeAccountType::RewardsPool,
 	};
 

@@ -1,0 +1,1719 @@
+{
+	"schema_version": "0.9",
+	"kind": "monochange.releaseRecord",
+	"created_at": "2026-10-07T08:54:50Z",
+	"command": "release",
+	"version": null,
+	"versions": {
+		"core": "0.13.0",
+		"forks": "5.0.0"
+	},
+	"release_targets": [
+		{
+			"id": "core",
+			"kind": "group",
+			"version": "0.13.0",
+			"version_format": "primary",
+			"tag": true,
+			"release": true,
+			"tag_name": "v0.13.0",
+			"rendered_title": "v0.13.0 (2026-10-07)",
+			"rendered_changelog_title": "[0.13.0](https://github.com/pina-rs/wasm_solana/releases/tag/v0.13.0) (2026-10-07)",
+			"members": [
+				"memory_wallet",
+				"test_utils_insta",
+				"test_utils_keypairs",
+				"test_utils_solana",
+				"wasm_client_solana"
+			]
+		},
+		{
+			"id": "forks",
+			"kind": "group",
+			"version": "5.0.0",
+			"version_format": "namespaced",
+			"tag": false,
+			"release": true,
+			"tag_name": "forks/v5.0.0",
+			"rendered_title": "forks v5.0.0 (2026-10-07)",
+			"rendered_changelog_title": "forks [5.0.0](https://github.com/pina-rs/wasm_solana/releases/tag/forks/v5.0.0) (2026-10-07)",
+			"members": [
+				"solana-account-decoder-wasm",
+				"solana-transaction-status-wasm"
+			]
+		}
+	],
+	"released_packages": [
+		"memory_wallet",
+		"solana-account-decoder-wasm",
+		"solana-transaction-status-wasm",
+		"test_utils_insta",
+		"test_utils_keypairs",
+		"test_utils_solana",
+		"wasm_client_solana"
+	],
+	"changed_files": [
+		"Cargo.lock",
+		"Cargo.toml",
+		"changelog.md",
+		"crates/memory_wallet/Cargo.toml",
+		"crates/test_utils_insta/Cargo.toml",
+		"crates/test_utils_keypairs/Cargo.toml",
+		"crates/test_utils_solana/Cargo.toml",
+		"crates/wasm_client_solana/Cargo.toml",
+		"forks/changelog.md",
+		"forks/solana-account-decoder-wasm/Cargo.toml",
+		"forks/solana-transaction-status-wasm/Cargo.toml"
+	],
+	"package_publications": [
+		{
+			"package": "memory_wallet",
+			"ecosystem": "cargo",
+			"registry": "crates_io",
+			"version": "0.13.0",
+			"mode": "builtin",
+			"trusted_publishing": {
+				"enabled": true,
+				"mode": "required",
+				"repository": "pina-rs/wasm_solana",
+				"workflow": "publish.yml",
+				"environment": "publisher"
+			}
+		},
+		{
+			"package": "solana-account-decoder-wasm",
+			"ecosystem": "cargo",
+			"registry": "crates_io",
+			"version": "5.0.0",
+			"mode": "builtin",
+			"trusted_publishing": {
+				"enabled": true,
+				"mode": "required",
+				"repository": "pina-rs/wasm_solana",
+				"workflow": "publish.yml",
+				"environment": "publisher"
+			}
+		},
+		{
+			"package": "solana-transaction-status-wasm",
+			"ecosystem": "cargo",
+			"registry": "crates_io",
+			"version": "5.0.0",
+			"mode": "builtin",
+			"trusted_publishing": {
+				"enabled": true,
+				"mode": "required",
+				"repository": "pina-rs/wasm_solana",
+				"workflow": "publish.yml",
+				"environment": "publisher"
+			}
+		},
+		{
+			"package": "test_utils_insta",
+			"ecosystem": "cargo",
+			"registry": "crates_io",
+			"version": "0.13.0",
+			"mode": "builtin",
+			"trusted_publishing": {
+				"enabled": true,
+				"mode": "required",
+				"repository": "pina-rs/wasm_solana",
+				"workflow": "publish.yml",
+				"environment": "publisher"
+			}
+		},
+		{
+			"package": "test_utils_keypairs",
+			"ecosystem": "cargo",
+			"registry": "crates_io",
+			"version": "0.13.0",
+			"mode": "builtin",
+			"trusted_publishing": {
+				"enabled": true,
+				"mode": "required",
+				"repository": "pina-rs/wasm_solana",
+				"workflow": "publish.yml",
+				"environment": "publisher"
+			}
+		},
+		{
+			"package": "test_utils_solana",
+			"ecosystem": "cargo",
+			"registry": "crates_io",
+			"version": "0.13.0",
+			"mode": "builtin",
+			"trusted_publishing": {
+				"enabled": true,
+				"mode": "required",
+				"repository": "pina-rs/wasm_solana",
+				"workflow": "publish.yml",
+				"environment": "publisher"
+			},
+			"timeout": {
+				"timeout_seconds": 900,
+				"retries": 2
+			}
+		},
+		{
+			"package": "wasm_client_solana",
+			"ecosystem": "cargo",
+			"registry": "crates_io",
+			"version": "0.13.0",
+			"mode": "builtin",
+			"trusted_publishing": {
+				"enabled": true,
+				"mode": "required",
+				"repository": "pina-rs/wasm_solana",
+				"workflow": "publish.yml",
+				"environment": "publisher"
+			}
+		}
+	],
+	"updated_changelogs": [
+		"changelog.md",
+		"forks/changelog.md"
+	],
+	"deleted_changesets": [
+		".changeset/ci-pays-for-what-it-uses.md",
+		".changeset/docs-match-shipped-api.md",
+		".changeset/document-public-api.md",
+		".changeset/fix-subscription-lost-wakeup.md",
+		".changeset/harden-http-response-path.md",
+		".changeset/live-edge-forks-and-benchmarks.md",
+		".changeset/monostyle-inline-annotations.md",
+		".changeset/monostyle-style-pass.md",
+		".changeset/priority-fee-and-pubsub-surface.md",
+		".changeset/surface-http-and-rpc-errors.md",
+		".changeset/upstream-client-types-and-pubsub.md",
+		".changeset/wallet-standard-0.7.md",
+		".changeset/zstd-feature-forwarding.md"
+	],
+	"changesets": [
+		{
+			"path": ".changeset/ci-pays-for-what-it-uses.md",
+			"summary": "Pay CI only for what each job uses",
+			"details": "The changeset-policy job no longer installs the five workspace cargo binaries it never runs (the devenv action grows an opt-out), the build job compiles the all-features build once instead of twice, and markdown-only changes skip the compile jobs entirely — the separate changeset-policy workflow still gates changeset-only pull requests. The browser wasm test becomes blocking and version-safe: chromium and chromedriver both come from the pinned nixpkgs revision, so a runner Chrome auto-update can no longer break the session handshake invisibly. Benchmarks get a `workflow_dispatch` job so the criterion suites are runnable without a local environment. Also prunes dead workspace dependencies (heck, paste, regex), untracks the machine-specific `.video_agent` path, deduplicates and repairs `.gitignore`, removes a zizmor entry for a workflow that never existed, and slims the toolchain profile CI hosts download.",
+			"targets": [
+				{
+					"id": "wasm_client_solana",
+					"kind": "package",
+					"bump": "patch",
+					"origin": "direct-change",
+					"evidence_refs": [],
+					"change_type": "fix"
+				}
+			],
+			"context": {
+				"provider": "github",
+				"host": "github.com",
+				"capabilities": {
+					"commit_web_urls": true,
+					"actor_profiles": true,
+					"review_request_lookup": true,
+					"related_issues": true,
+					"issue_comments": true
+				},
+				"introduced": {
+					"actor": {
+						"provider": "github",
+						"host": "github.com",
+						"id": null,
+						"login": "ifiokjr",
+						"display_name": "ifiokjr",
+						"url": "https://github.com/ifiokjr",
+						"source": "review_request_author"
+					},
+					"commit": {
+						"provider": "github",
+						"host": "github.com",
+						"sha": "8bccd28e9e89918cc25f471e4dbcd5873ff0d9ca",
+						"short_sha": "8bccd28",
+						"url": "https://github.com/pina-rs/wasm_solana/commit/8bccd28e9e89918cc25f471e4dbcd5873ff0d9ca",
+						"authored_at": "2026-10-02T14:15:41+01:00",
+						"committed_at": "2026-10-02T14:15:41+01:00",
+						"author_name": "Ifiok Jr.",
+						"author_email": "1160934+ifiokjr@users.noreply.github.com"
+					},
+					"review_request": {
+						"provider": "github",
+						"host": "github.com",
+						"kind": "pull_request",
+						"id": "#174",
+						"title": "chore(ci): pay only for what each job uses, pin the browser",
+						"url": "https://github.com/pina-rs/wasm_solana/pull/174",
+						"author": {
+							"provider": "github",
+							"host": "github.com",
+							"id": null,
+							"login": "ifiokjr",
+							"display_name": "ifiokjr",
+							"url": "https://github.com/ifiokjr",
+							"source": "review_request_author"
+						}
+					}
+				},
+				"last_updated": {
+					"actor": {
+						"provider": "github",
+						"host": "github.com",
+						"id": null,
+						"login": "ifiokjr",
+						"display_name": "ifiokjr",
+						"url": "https://github.com/ifiokjr",
+						"source": "review_request_author"
+					},
+					"commit": {
+						"provider": "github",
+						"host": "github.com",
+						"sha": "8bccd28e9e89918cc25f471e4dbcd5873ff0d9ca",
+						"short_sha": "8bccd28",
+						"url": "https://github.com/pina-rs/wasm_solana/commit/8bccd28e9e89918cc25f471e4dbcd5873ff0d9ca",
+						"authored_at": "2026-10-02T14:15:41+01:00",
+						"committed_at": "2026-10-02T14:15:41+01:00",
+						"author_name": "Ifiok Jr.",
+						"author_email": "1160934+ifiokjr@users.noreply.github.com"
+					},
+					"review_request": {
+						"provider": "github",
+						"host": "github.com",
+						"kind": "pull_request",
+						"id": "#174",
+						"title": "chore(ci): pay only for what each job uses, pin the browser",
+						"url": "https://github.com/pina-rs/wasm_solana/pull/174",
+						"author": {
+							"provider": "github",
+							"host": "github.com",
+							"id": null,
+							"login": "ifiokjr",
+							"display_name": "ifiokjr",
+							"url": "https://github.com/ifiokjr",
+							"source": "review_request_author"
+						}
+					}
+				},
+				"related_issues": []
+			}
+		},
+		{
+			"path": ".changeset/docs-match-shipped-api.md",
+			"summary": "Docs match the shipped API",
+			"details": "The book taught a different library: seven subscription methods that never existed, `response.value` on a `get_balance` call that returns `u64`, and a `wss://` URL handed to a constructor that takes HTTP. Every page now matches the real API — including the finished pubsub surface (`slots_updates_subscribe`, `vote_subscribe`), the hardened `decode_account_data` decoder, the two-fork story after the client-types retirement, and a migration note for the breaking 0.13 changes (`UiAccount.owner: String`, the `Eq` removals). Both browser examples are un-broken: their `wasm-bindgen` pins move to 0.2.129 to match the workspace CLI, so the documented build works again, and the crate readme stops claiming 0.10.0. New `no_run` doctests cover the pubsub additions and a running doctest covers `decode_account_data`.",
+			"targets": [
+				{
+					"id": "wasm_client_solana",
+					"kind": "package",
+					"bump": "patch",
+					"origin": "direct-change",
+					"evidence_refs": [],
+					"change_type": "fix"
+				}
+			],
+			"context": {
+				"provider": "github",
+				"host": "github.com",
+				"capabilities": {
+					"commit_web_urls": true,
+					"actor_profiles": true,
+					"review_request_lookup": true,
+					"related_issues": true,
+					"issue_comments": true
+				},
+				"introduced": {
+					"actor": {
+						"provider": "github",
+						"host": "github.com",
+						"id": null,
+						"login": "ifiokjr",
+						"display_name": "ifiokjr",
+						"url": "https://github.com/ifiokjr",
+						"source": "review_request_author"
+					},
+					"commit": {
+						"provider": "github",
+						"host": "github.com",
+						"sha": "26eda6a1c82befc86c7b5472680ea12272709352",
+						"short_sha": "26eda6a",
+						"url": "https://github.com/pina-rs/wasm_solana/commit/26eda6a1c82befc86c7b5472680ea12272709352",
+						"authored_at": "2026-10-02T13:28:43+01:00",
+						"committed_at": "2026-10-02T13:28:43+01:00",
+						"author_name": "Ifiok Jr.",
+						"author_email": "1160934+ifiokjr@users.noreply.github.com"
+					},
+					"review_request": {
+						"provider": "github",
+						"host": "github.com",
+						"kind": "pull_request",
+						"id": "#172",
+						"title": "docs: match the shipped API and fix the browser examples",
+						"url": "https://github.com/pina-rs/wasm_solana/pull/172",
+						"author": {
+							"provider": "github",
+							"host": "github.com",
+							"id": null,
+							"login": "ifiokjr",
+							"display_name": "ifiokjr",
+							"url": "https://github.com/ifiokjr",
+							"source": "review_request_author"
+						}
+					}
+				},
+				"last_updated": {
+					"actor": {
+						"provider": "github",
+						"host": "github.com",
+						"id": null,
+						"login": "ifiokjr",
+						"display_name": "ifiokjr",
+						"url": "https://github.com/ifiokjr",
+						"source": "review_request_author"
+					},
+					"commit": {
+						"provider": "github",
+						"host": "github.com",
+						"sha": "26eda6a1c82befc86c7b5472680ea12272709352",
+						"short_sha": "26eda6a",
+						"url": "https://github.com/pina-rs/wasm_solana/commit/26eda6a1c82befc86c7b5472680ea12272709352",
+						"authored_at": "2026-10-02T13:28:43+01:00",
+						"committed_at": "2026-10-02T13:28:43+01:00",
+						"author_name": "Ifiok Jr.",
+						"author_email": "1160934+ifiokjr@users.noreply.github.com"
+					},
+					"review_request": {
+						"provider": "github",
+						"host": "github.com",
+						"kind": "pull_request",
+						"id": "#172",
+						"title": "docs: match the shipped API and fix the browser examples",
+						"url": "https://github.com/pina-rs/wasm_solana/pull/172",
+						"author": {
+							"provider": "github",
+							"host": "github.com",
+							"id": null,
+							"login": "ifiokjr",
+							"display_name": "ifiokjr",
+							"url": "https://github.com/ifiokjr",
+							"source": "review_request_author"
+						}
+					}
+				},
+				"related_issues": []
+			}
+		},
+		{
+			"path": ".changeset/document-public-api.md",
+			"summary": "Document the public API and make the modules public",
+			"details": "Marked `breaking` because the internal modules of `wasm_client_solana` and `test_utils_solana` become `pub mod` — the lint only enforces documentation inside public module trees, so without this the flat `pub use` re-exports would let hundreds of items escape it. The flat re-exports remain the supported import style, but every item is now also reachable by module path, which is new public API surface.\n\nEnable the `missing_docs` lint across the workspace and document every public item in `wasm_client_solana`, `memory_wallet`, the `test_utils_*` crates and the vendored Agave forks. Add `mdt` templates for documentation that appears in more than one place, so the shared wording cannot drift, and gate it in CI with a new `lint:docs` task. `rustdoc` now builds with no warnings.",
+			"targets": [
+				{
+					"id": "core",
+					"kind": "group",
+					"bump": "major",
+					"origin": "direct-change",
+					"evidence_refs": [],
+					"change_type": "breaking"
+				},
+				{
+					"id": "forks",
+					"kind": "group",
+					"bump": "major",
+					"origin": "direct-change",
+					"evidence_refs": [],
+					"change_type": "breaking"
+				}
+			],
+			"context": {
+				"provider": "github",
+				"host": "github.com",
+				"capabilities": {
+					"commit_web_urls": true,
+					"actor_profiles": true,
+					"review_request_lookup": true,
+					"related_issues": true,
+					"issue_comments": true
+				},
+				"introduced": {
+					"actor": {
+						"provider": "github",
+						"host": "github.com",
+						"id": null,
+						"login": "ifiokjr",
+						"display_name": "ifiokjr",
+						"url": "https://github.com/ifiokjr",
+						"source": "review_request_author"
+					},
+					"commit": {
+						"provider": "github",
+						"host": "github.com",
+						"sha": "43d422af38a39ae8bcfe354188f91241dc032352",
+						"short_sha": "43d422a",
+						"url": "https://github.com/pina-rs/wasm_solana/commit/43d422af38a39ae8bcfe354188f91241dc032352",
+						"authored_at": "2026-09-29T00:54:34+01:00",
+						"committed_at": "2026-09-29T00:54:34+01:00",
+						"author_name": "Ifiok Jr.",
+						"author_email": "1160934+ifiokjr@users.noreply.github.com"
+					},
+					"review_request": {
+						"provider": "github",
+						"host": "github.com",
+						"kind": "pull_request",
+						"id": "#150",
+						"title": "docs: enable missing_docs and document the public API",
+						"url": "https://github.com/pina-rs/wasm_solana/pull/150",
+						"author": {
+							"provider": "github",
+							"host": "github.com",
+							"id": null,
+							"login": "ifiokjr",
+							"display_name": "ifiokjr",
+							"url": "https://github.com/ifiokjr",
+							"source": "review_request_author"
+						}
+					}
+				},
+				"last_updated": {
+					"actor": {
+						"provider": "github",
+						"host": "github.com",
+						"id": null,
+						"login": "ifiokjr",
+						"display_name": "ifiokjr",
+						"url": "https://github.com/ifiokjr",
+						"source": "review_request_author"
+					},
+					"commit": {
+						"provider": "github",
+						"host": "github.com",
+						"sha": "43d422af38a39ae8bcfe354188f91241dc032352",
+						"short_sha": "43d422a",
+						"url": "https://github.com/pina-rs/wasm_solana/commit/43d422af38a39ae8bcfe354188f91241dc032352",
+						"authored_at": "2026-09-29T00:54:34+01:00",
+						"committed_at": "2026-09-29T00:54:34+01:00",
+						"author_name": "Ifiok Jr.",
+						"author_email": "1160934+ifiokjr@users.noreply.github.com"
+					},
+					"review_request": {
+						"provider": "github",
+						"host": "github.com",
+						"kind": "pull_request",
+						"id": "#150",
+						"title": "docs: enable missing_docs and document the public API",
+						"url": "https://github.com/pina-rs/wasm_solana/pull/150",
+						"author": {
+							"provider": "github",
+							"host": "github.com",
+							"id": null,
+							"login": "ifiokjr",
+							"display_name": "ifiokjr",
+							"url": "https://github.com/ifiokjr",
+							"source": "review_request_author"
+						}
+					}
+				},
+				"related_issues": []
+			}
+		},
+		{
+			"path": ".changeset/fix-subscription-lost-wakeup.md",
+			"summary": "Keep websocket subscriptions alive after non-matching frames",
+			"details": "Three websocket code paths returned `Poll::Pending` after consuming a frame that did not match what they were looking for: `Subscription::poll_next` (subscription acks replayed by the shared fork buffer, other subscriptions' notifications, undeserializable frames) and the `filter_map`-based ack waits in `create_subscription` and `Unsubscription::run` (the combinator returns `Pending` after a filtered item without re-polling).\n\n`Forked` only registers the caller's waker with the underlying websocket once its buffer runs dry, so any `Pending` returned while buffered frames remain parked the consuming task with no wakeup armed — the first notification after a subscription ack was never delivered, and un-subscribing replayed history and stalled forever. The browser test for `accountSubscribe` has been silently failing for this reason (the CI wasm step is `continue-on-error`).\n\nAll three paths now re-poll in a loop until they find a matching frame, so the buffer drains and the socket waker is re-armed within the same poll. `poll_next` also stops rebuilding an `Unsubscription` on every poll. Verified in a real browser against both `solana-test-validator` and a local surfpool node, plus new Leptos/Dioxus Playwright examples under `examples/`.",
+			"targets": [
+				{
+					"id": "wasm_client_solana",
+					"kind": "package",
+					"bump": "major",
+					"origin": "direct-change",
+					"evidence_refs": [],
+					"change_type": "breaking"
+				}
+			],
+			"context": {
+				"provider": "github",
+				"host": "github.com",
+				"capabilities": {
+					"commit_web_urls": true,
+					"actor_profiles": true,
+					"review_request_lookup": true,
+					"related_issues": true,
+					"issue_comments": true
+				},
+				"introduced": {
+					"actor": {
+						"provider": "github",
+						"host": "github.com",
+						"id": null,
+						"login": "ifiokjr",
+						"display_name": "ifiokjr",
+						"url": "https://github.com/ifiokjr",
+						"source": "review_request_author"
+					},
+					"commit": {
+						"provider": "github",
+						"host": "github.com",
+						"sha": "e5001dcf10767170bc03b3a9161d7916ee805428",
+						"short_sha": "e5001dc",
+						"url": "https://github.com/pina-rs/wasm_solana/commit/e5001dcf10767170bc03b3a9161d7916ee805428",
+						"authored_at": "2026-09-29T02:28:12+01:00",
+						"committed_at": "2026-09-29T02:28:12+01:00",
+						"author_name": "Ifiok Jr.",
+						"author_email": "1160934+ifiokjr@users.noreply.github.com"
+					},
+					"review_request": {
+						"provider": "github",
+						"host": "github.com",
+						"kind": "pull_request",
+						"id": "#154",
+						"title": "fix: websocket pubsub liveness, rpc hardening, browser e2e examples, enforced api docs",
+						"url": "https://github.com/pina-rs/wasm_solana/pull/154",
+						"author": {
+							"provider": "github",
+							"host": "github.com",
+							"id": null,
+							"login": "ifiokjr",
+							"display_name": "ifiokjr",
+							"url": "https://github.com/ifiokjr",
+							"source": "review_request_author"
+						}
+					}
+				},
+				"last_updated": {
+					"actor": {
+						"provider": "github",
+						"host": "github.com",
+						"id": null,
+						"login": "ifiokjr",
+						"display_name": "ifiokjr",
+						"url": "https://github.com/ifiokjr",
+						"source": "review_request_author"
+					},
+					"commit": {
+						"provider": "github",
+						"host": "github.com",
+						"sha": "e5001dcf10767170bc03b3a9161d7916ee805428",
+						"short_sha": "e5001dc",
+						"url": "https://github.com/pina-rs/wasm_solana/commit/e5001dcf10767170bc03b3a9161d7916ee805428",
+						"authored_at": "2026-09-29T02:28:12+01:00",
+						"committed_at": "2026-09-29T02:28:12+01:00",
+						"author_name": "Ifiok Jr.",
+						"author_email": "1160934+ifiokjr@users.noreply.github.com"
+					},
+					"review_request": {
+						"provider": "github",
+						"host": "github.com",
+						"kind": "pull_request",
+						"id": "#154",
+						"title": "fix: websocket pubsub liveness, rpc hardening, browser e2e examples, enforced api docs",
+						"url": "https://github.com/pina-rs/wasm_solana/pull/154",
+						"author": {
+							"provider": "github",
+							"host": "github.com",
+							"id": null,
+							"login": "ifiokjr",
+							"display_name": "ifiokjr",
+							"url": "https://github.com/ifiokjr",
+							"source": "review_request_author"
+						}
+					}
+				},
+				"related_issues": [
+					{
+						"provider": "github",
+						"host": "github.com",
+						"id": "#149",
+						"title": null,
+						"url": "https://github.com/pina-rs/wasm_solana/issues/149",
+						"relationship": "referenced_by_review_request"
+					}
+				]
+			}
+		},
+		{
+			"path": ".changeset/harden-http-response-path.md",
+			"summary": "Harden the HTTP response path and `get_multiple_accounts`",
+			"details": "- `get_multiple_accounts_with_config` filtered `None` accounts out of the response, so results no longer aligned index-wise with the requested pubkeys — a caller could attribute one account's data to another pubkey. `None` positions are now preserved, the encoding defaults to `base64` (the server's `jsonParsed` default made `UiAccountData::decode` silently return `None`), and the response is consumed instead of deep-cloning every account.\n- The generic `send` deserializer deep-cloned the entire response `Value` on every successful call — for `getProgramAccounts`-scale payloads that is a multi-megabyte copy per request, discarded on success. The error shape is now only attempted when the envelope carries a JSON-RPC `error` member.\n- Removed the leftover `println!(\"endpoint: …\")` in `SolanaRpcClient::new_with_commitment`: RPC URLs commonly embed provider API keys, and the print leaked them to stdout/logs on every construction.\n- Removed the `DEBUG` endpoint constant: it pointed at a third-party plaintext HTTP IP, inviting users to submit signed transactions over an unauthenticated connection.",
+			"targets": [
+				{
+					"id": "wasm_client_solana",
+					"kind": "package",
+					"bump": "patch",
+					"origin": "direct-change",
+					"evidence_refs": [],
+					"change_type": "fix"
+				}
+			],
+			"context": {
+				"provider": "github",
+				"host": "github.com",
+				"capabilities": {
+					"commit_web_urls": true,
+					"actor_profiles": true,
+					"review_request_lookup": true,
+					"related_issues": true,
+					"issue_comments": true
+				},
+				"introduced": {
+					"actor": {
+						"provider": "github",
+						"host": "github.com",
+						"id": null,
+						"login": "ifiokjr",
+						"display_name": "ifiokjr",
+						"url": "https://github.com/ifiokjr",
+						"source": "review_request_author"
+					},
+					"commit": {
+						"provider": "github",
+						"host": "github.com",
+						"sha": "e5001dcf10767170bc03b3a9161d7916ee805428",
+						"short_sha": "e5001dc",
+						"url": "https://github.com/pina-rs/wasm_solana/commit/e5001dcf10767170bc03b3a9161d7916ee805428",
+						"authored_at": "2026-09-29T02:28:12+01:00",
+						"committed_at": "2026-09-29T02:28:12+01:00",
+						"author_name": "Ifiok Jr.",
+						"author_email": "1160934+ifiokjr@users.noreply.github.com"
+					},
+					"review_request": {
+						"provider": "github",
+						"host": "github.com",
+						"kind": "pull_request",
+						"id": "#154",
+						"title": "fix: websocket pubsub liveness, rpc hardening, browser e2e examples, enforced api docs",
+						"url": "https://github.com/pina-rs/wasm_solana/pull/154",
+						"author": {
+							"provider": "github",
+							"host": "github.com",
+							"id": null,
+							"login": "ifiokjr",
+							"display_name": "ifiokjr",
+							"url": "https://github.com/ifiokjr",
+							"source": "review_request_author"
+						}
+					}
+				},
+				"last_updated": {
+					"actor": {
+						"provider": "github",
+						"host": "github.com",
+						"id": null,
+						"login": "ifiokjr",
+						"display_name": "ifiokjr",
+						"url": "https://github.com/ifiokjr",
+						"source": "review_request_author"
+					},
+					"commit": {
+						"provider": "github",
+						"host": "github.com",
+						"sha": "e5001dcf10767170bc03b3a9161d7916ee805428",
+						"short_sha": "e5001dc",
+						"url": "https://github.com/pina-rs/wasm_solana/commit/e5001dcf10767170bc03b3a9161d7916ee805428",
+						"authored_at": "2026-09-29T02:28:12+01:00",
+						"committed_at": "2026-09-29T02:28:12+01:00",
+						"author_name": "Ifiok Jr.",
+						"author_email": "1160934+ifiokjr@users.noreply.github.com"
+					},
+					"review_request": {
+						"provider": "github",
+						"host": "github.com",
+						"kind": "pull_request",
+						"id": "#154",
+						"title": "fix: websocket pubsub liveness, rpc hardening, browser e2e examples, enforced api docs",
+						"url": "https://github.com/pina-rs/wasm_solana/pull/154",
+						"author": {
+							"provider": "github",
+							"host": "github.com",
+							"id": null,
+							"login": "ifiokjr",
+							"display_name": "ifiokjr",
+							"url": "https://github.com/ifiokjr",
+							"source": "review_request_author"
+						}
+					}
+				},
+				"related_issues": [
+					{
+						"provider": "github",
+						"host": "github.com",
+						"id": "#149",
+						"title": null,
+						"url": "https://github.com/pina-rs/wasm_solana/issues/149",
+						"relationship": "referenced_by_review_request"
+					}
+				]
+			}
+		},
+		{
+			"path": ".changeset/live-edge-forks-and-benchmarks.md",
+			"summary": "Live-edge subscription forks, benchmarks, leaner deps",
+			"details": "Subscription ack waits and new subscriptions now fork from the live edge of the shared websocket buffer (`fork_stream::Weak` upgrade) instead of cloning the never-read root fork, whose offset pinned them to the buffer's oldest entry. Setup previously replayed and re-parsed the socket's entire history before reaching live traffic. The new `subscription` criterion benchmark measures the ack wait at 73µs / 747µs / 10.1ms for 100 / 1k / 10k buffered frames on the old path, versus 120ns / 317ns / 1.35µs at the live edge — roughly 7,500× at 10k frames, and the gap grows linearly with connection age on busy sockets.\n\nTwo new criterion suites (`cargo bench -p wasm_client_solana -F ssr`) baseline the rest of the hot paths: full mock-provider dispatch (balance 1.4µs, one 256B account 3.0µs, 100×1KiB multi-account 237µs ≈ 413 MiB/s, 1000×256B program-accounts 1.8ms ≈ 136 MiB/s), wire primitives (wincode+base64 v0 encode 149ns, base64 1KiB decode 402ns ≈ 2.4 GiB/s, base58 pubkey 467ns), and per-notification parsing (1.5µs/frame).\n\nAlso drops four unused dependencies from `wasm_client_solana` — `async-tungstenite` (and with it the tungstenite/sha1/httparse tree plus duplicate getrandom 0.2 and thiserror 1 crates), `heck`, `bv`, and `solana-zk-token-sdk` — shrinking the wasm dependency graph from 658 to 575 unique crates (−13%). The remaining `Inflector` call sites in the account-decoder and transaction-status forks are replaced with a hand-rolled kebab-case helper, removing the `regex` stack from the graph; all 149 fork fixture tests pin the converted program names byte-for-byte. Dead-code elimination meant these unused crates were already stripped from the shipped cdylib, so the wins are compile time and supply-chain surface, not binary size; the regex removal additionally benefits apps that invoke the account parsers.\n\nKnown limitation kept for a follow-up: the root fork is retained unread to keep the shared buffer alive, so buffered frames still accumulate for the provider's lifetime; routing notifications through per-subscription-id channels is the remaining fix for buffer retention.",
+			"targets": [
+				{
+					"id": "solana-account-decoder-wasm",
+					"kind": "package",
+					"bump": "patch",
+					"origin": "direct-change",
+					"evidence_refs": [],
+					"change_type": "fix"
+				},
+				{
+					"id": "solana-transaction-status-wasm",
+					"kind": "package",
+					"bump": "patch",
+					"origin": "direct-change",
+					"evidence_refs": [],
+					"change_type": "fix"
+				},
+				{
+					"id": "wasm_client_solana",
+					"kind": "package",
+					"bump": "major",
+					"origin": "direct-change",
+					"evidence_refs": [],
+					"change_type": "breaking"
+				}
+			],
+			"context": {
+				"provider": "github",
+				"host": "github.com",
+				"capabilities": {
+					"commit_web_urls": true,
+					"actor_profiles": true,
+					"review_request_lookup": true,
+					"related_issues": true,
+					"issue_comments": true
+				},
+				"introduced": {
+					"actor": {
+						"provider": "github",
+						"host": "github.com",
+						"id": null,
+						"login": "ifiokjr",
+						"display_name": "ifiokjr",
+						"url": "https://github.com/ifiokjr",
+						"source": "review_request_author"
+					},
+					"commit": {
+						"provider": "github",
+						"host": "github.com",
+						"sha": "94590097e4b0e8374ed510f51ee633042a7ccd06",
+						"short_sha": "9459009",
+						"url": "https://github.com/pina-rs/wasm_solana/commit/94590097e4b0e8374ed510f51ee633042a7ccd06",
+						"authored_at": "2026-09-29T03:26:50+01:00",
+						"committed_at": "2026-09-29T03:26:50+01:00",
+						"author_name": "Ifiok Jr.",
+						"author_email": "1160934+ifiokjr@users.noreply.github.com"
+					},
+					"review_request": {
+						"provider": "github",
+						"host": "github.com",
+						"kind": "pull_request",
+						"id": "#159",
+						"title": "perf: live-edge subscription forks, criterion benchmarks, leaner dependency graph",
+						"url": "https://github.com/pina-rs/wasm_solana/pull/159",
+						"author": {
+							"provider": "github",
+							"host": "github.com",
+							"id": null,
+							"login": "ifiokjr",
+							"display_name": "ifiokjr",
+							"url": "https://github.com/ifiokjr",
+							"source": "review_request_author"
+						}
+					}
+				},
+				"last_updated": {
+					"actor": {
+						"provider": "github",
+						"host": "github.com",
+						"id": null,
+						"login": "ifiokjr",
+						"display_name": "ifiokjr",
+						"url": "https://github.com/ifiokjr",
+						"source": "review_request_author"
+					},
+					"commit": {
+						"provider": "github",
+						"host": "github.com",
+						"sha": "94590097e4b0e8374ed510f51ee633042a7ccd06",
+						"short_sha": "9459009",
+						"url": "https://github.com/pina-rs/wasm_solana/commit/94590097e4b0e8374ed510f51ee633042a7ccd06",
+						"authored_at": "2026-09-29T03:26:50+01:00",
+						"committed_at": "2026-09-29T03:26:50+01:00",
+						"author_name": "Ifiok Jr.",
+						"author_email": "1160934+ifiokjr@users.noreply.github.com"
+					},
+					"review_request": {
+						"provider": "github",
+						"host": "github.com",
+						"kind": "pull_request",
+						"id": "#159",
+						"title": "perf: live-edge subscription forks, criterion benchmarks, leaner dependency graph",
+						"url": "https://github.com/pina-rs/wasm_solana/pull/159",
+						"author": {
+							"provider": "github",
+							"host": "github.com",
+							"id": null,
+							"login": "ifiokjr",
+							"display_name": "ifiokjr",
+							"url": "https://github.com/ifiokjr",
+							"source": "review_request_author"
+						}
+					}
+				},
+				"related_issues": [
+					{
+						"provider": "github",
+						"host": "github.com",
+						"id": "#154",
+						"title": null,
+						"url": "https://github.com/pina-rs/wasm_solana/issues/154",
+						"relationship": "referenced_by_review_request"
+					}
+				]
+			}
+		},
+		{
+			"path": ".changeset/monostyle-inline-annotations.md",
+			"summary": "Add monostyle inline annotations",
+			"details": "Style-only pass: adds `monostyle.toml` and inline style annotations across the workspace (no behavior changes), plus a `monostyle check` step in CI so annotations stay in sync with the tool.",
+			"targets": [
+				{
+					"id": "memory_wallet",
+					"kind": "package",
+					"bump": "none",
+					"origin": "direct-change",
+					"evidence_refs": [],
+					"change_type": "docs"
+				},
+				{
+					"id": "solana-account-decoder-wasm",
+					"kind": "package",
+					"bump": "patch",
+					"origin": "direct-change",
+					"evidence_refs": [],
+					"change_type": "fix"
+				},
+				{
+					"id": "solana-transaction-status-wasm",
+					"kind": "package",
+					"bump": "patch",
+					"origin": "direct-change",
+					"evidence_refs": [],
+					"change_type": "fix"
+				},
+				{
+					"id": "test_utils_insta",
+					"kind": "package",
+					"bump": "none",
+					"origin": "direct-change",
+					"evidence_refs": [],
+					"change_type": "docs"
+				},
+				{
+					"id": "test_utils_keypairs",
+					"kind": "package",
+					"bump": "none",
+					"origin": "direct-change",
+					"evidence_refs": [],
+					"change_type": "docs"
+				},
+				{
+					"id": "test_utils_solana",
+					"kind": "package",
+					"bump": "patch",
+					"origin": "direct-change",
+					"evidence_refs": [],
+					"change_type": "fix"
+				},
+				{
+					"id": "wasm_client_solana",
+					"kind": "package",
+					"bump": "patch",
+					"origin": "direct-change",
+					"evidence_refs": [],
+					"change_type": "fix"
+				}
+			],
+			"context": {
+				"provider": "github",
+				"host": "github.com",
+				"capabilities": {
+					"commit_web_urls": true,
+					"actor_profiles": true,
+					"review_request_lookup": true,
+					"related_issues": true,
+					"issue_comments": true
+				},
+				"introduced": {
+					"actor": {
+						"provider": "github",
+						"host": "github.com",
+						"id": null,
+						"login": "ifiokjr",
+						"display_name": "ifiokjr",
+						"url": "https://github.com/ifiokjr",
+						"source": "review_request_author"
+					},
+					"commit": {
+						"provider": "github",
+						"host": "github.com",
+						"sha": "9fdd63e83731b659525b02f6cfb17a5a84b0ba60",
+						"short_sha": "9fdd63e",
+						"url": "https://github.com/pina-rs/wasm_solana/commit/9fdd63e83731b659525b02f6cfb17a5a84b0ba60",
+						"authored_at": "2026-09-29T00:55:00+01:00",
+						"committed_at": "2026-09-29T00:55:00+01:00",
+						"author_name": "Ifiok Jr.",
+						"author_email": "1160934+ifiokjr@users.noreply.github.com"
+					},
+					"review_request": {
+						"provider": "github",
+						"host": "github.com",
+						"kind": "pull_request",
+						"id": "#153",
+						"title": "chore(style): add monostyle with inline annotations",
+						"url": "https://github.com/pina-rs/wasm_solana/pull/153",
+						"author": {
+							"provider": "github",
+							"host": "github.com",
+							"id": null,
+							"login": "ifiokjr",
+							"display_name": "ifiokjr",
+							"url": "https://github.com/ifiokjr",
+							"source": "review_request_author"
+						}
+					}
+				},
+				"last_updated": {
+					"actor": {
+						"provider": "github",
+						"host": "github.com",
+						"id": null,
+						"login": null,
+						"display_name": "Ifiok Jr.",
+						"url": null,
+						"source": "commit_author"
+					},
+					"commit": {
+						"provider": "github",
+						"host": "github.com",
+						"sha": "86393119f02fefffd42de1541c9b8214ac8f0f35",
+						"short_sha": "8639311",
+						"url": "https://github.com/pina-rs/wasm_solana/commit/86393119f02fefffd42de1541c9b8214ac8f0f35",
+						"authored_at": "2026-09-30T10:29:43+01:00",
+						"committed_at": "2026-09-30T10:29:43+01:00",
+						"author_name": "Ifiok Jr.",
+						"author_email": "1160934+ifiokjr@users.noreply.github.com"
+					},
+					"review_request": null
+				},
+				"related_issues": []
+			}
+		},
+		{
+			"path": ".changeset/monostyle-style-pass.md",
+			"summary": "Monostyle style pass",
+			"details": "Blank-line breathing room around control flow and returns, group splits, and collapsed blank runs, applied by `monostyle fix` and kept where rustfmt puts them. No behavior change.",
+			"targets": [
+				{
+					"id": "memory_wallet",
+					"kind": "package",
+					"bump": "patch",
+					"origin": "direct-change",
+					"evidence_refs": [],
+					"change_type": "fix"
+				},
+				{
+					"id": "wasm_client_solana",
+					"kind": "package",
+					"bump": "patch",
+					"origin": "direct-change",
+					"evidence_refs": [],
+					"change_type": "fix"
+				}
+			],
+			"context": {
+				"provider": "github",
+				"host": "github.com",
+				"capabilities": {
+					"commit_web_urls": true,
+					"actor_profiles": true,
+					"review_request_lookup": true,
+					"related_issues": true,
+					"issue_comments": true
+				},
+				"introduced": {
+					"actor": {
+						"provider": "github",
+						"host": "github.com",
+						"id": null,
+						"login": "ifiokjr",
+						"display_name": "ifiokjr",
+						"url": "https://github.com/ifiokjr",
+						"source": "review_request_author"
+					},
+					"commit": {
+						"provider": "github",
+						"host": "github.com",
+						"sha": "fce16eb83461a3a11db8f204dcafeda868b8eaf1",
+						"short_sha": "fce16eb",
+						"url": "https://github.com/pina-rs/wasm_solana/commit/fce16eb83461a3a11db8f204dcafeda868b8eaf1",
+						"authored_at": "2026-10-05T10:49:34+01:00",
+						"committed_at": "2026-10-05T10:49:34+01:00",
+						"author_name": "Ifiok Jr.",
+						"author_email": "1160934+ifiokjr@users.noreply.github.com"
+					},
+					"review_request": {
+						"provider": "github",
+						"host": "github.com",
+						"kind": "pull_request",
+						"id": "#161",
+						"title": "chore(style): add monostyle with inline annotations",
+						"url": "https://github.com/pina-rs/wasm_solana/pull/161",
+						"author": {
+							"provider": "github",
+							"host": "github.com",
+							"id": null,
+							"login": "ifiokjr",
+							"display_name": "ifiokjr",
+							"url": "https://github.com/ifiokjr",
+							"source": "review_request_author"
+						}
+					}
+				},
+				"last_updated": {
+					"actor": {
+						"provider": "github",
+						"host": "github.com",
+						"id": null,
+						"login": "ifiokjr",
+						"display_name": "ifiokjr",
+						"url": "https://github.com/ifiokjr",
+						"source": "review_request_author"
+					},
+					"commit": {
+						"provider": "github",
+						"host": "github.com",
+						"sha": "fce16eb83461a3a11db8f204dcafeda868b8eaf1",
+						"short_sha": "fce16eb",
+						"url": "https://github.com/pina-rs/wasm_solana/commit/fce16eb83461a3a11db8f204dcafeda868b8eaf1",
+						"authored_at": "2026-10-05T10:49:34+01:00",
+						"committed_at": "2026-10-05T10:49:34+01:00",
+						"author_name": "Ifiok Jr.",
+						"author_email": "1160934+ifiokjr@users.noreply.github.com"
+					},
+					"review_request": {
+						"provider": "github",
+						"host": "github.com",
+						"kind": "pull_request",
+						"id": "#161",
+						"title": "chore(style): add monostyle with inline annotations",
+						"url": "https://github.com/pina-rs/wasm_solana/pull/161",
+						"author": {
+							"provider": "github",
+							"host": "github.com",
+							"id": null,
+							"login": "ifiokjr",
+							"display_name": "ifiokjr",
+							"url": "https://github.com/ifiokjr",
+							"source": "review_request_author"
+						}
+					}
+				},
+				"related_issues": []
+			}
+		},
+		{
+			"path": ".changeset/priority-fee-and-pubsub-surface.md",
+			"summary": "Priority fee estimation and complete pubsub surface",
+			"details": "`getPriorityFeeEstimate` is the modern replacement for `getRecentPrioritizationFees`: it prices a specific transaction (or a set of locked accounts) at a chosen urgency percentile instead of reporting raw per-slot fee levels. Three client methods cover transaction-based, configured, and account-based estimation; `get_recent_prioritization_fees*` are now `#[deprecated]` with pointers to the replacements. `getMaxShredInsertSlot` — the highest slot with an inserted shred, leading retransmit — was also missing and is added.\n\nThe pubsub surface now matches the docs: `signatureSubscribe` (with optional `receivedNotification` frames), `slotSubscribe`, and `rootSubscribe` join account/logs/program/block. The signature subscription in particular is the push-based alternative to polling `getSignatureStatuses`, enabling one-round-trip send confirmation.\n\nTwo websocket correctness fixes from review: subscription and acknowledgement forks are now registered _before_ the subscribe request is sent (a frame racing the handshake could previously slip past a fork created after the send), and `Unsubscription` owns its fork rather than holding a weak live-edge handle (retaining a handle past the provider's drop no longer loses the buffer). The fork benchmark now measures the same acknowledgement wait in both variants with the history drain amortized in setup, matching production.\n\nAlso from review: the hardened `decode_account_data` helper rejects `base64+zstd` output beyond the 10 MiB cluster cap instead of silently truncating, the hand-rolled kebab-case helper inserts the hyphen before digit suffixes (`SplToken2022` -> `spl-token-2022`, restoring Inflector parity — regression-tested), and the browser e2e transfer test gets a budget covering both its airdrop and its send.",
+			"targets": [
+				{
+					"id": "solana-account-decoder-wasm",
+					"kind": "package",
+					"bump": "patch",
+					"origin": "direct-change",
+					"evidence_refs": [],
+					"change_type": "fix"
+				},
+				{
+					"id": "solana-transaction-status-wasm",
+					"kind": "package",
+					"bump": "patch",
+					"origin": "direct-change",
+					"evidence_refs": [],
+					"change_type": "fix"
+				},
+				{
+					"id": "wasm_client_solana",
+					"kind": "package",
+					"bump": "major",
+					"origin": "direct-change",
+					"evidence_refs": [],
+					"change_type": "breaking"
+				}
+			],
+			"context": {
+				"provider": "github",
+				"host": "github.com",
+				"capabilities": {
+					"commit_web_urls": true,
+					"actor_profiles": true,
+					"review_request_lookup": true,
+					"related_issues": true,
+					"issue_comments": true
+				},
+				"introduced": {
+					"actor": {
+						"provider": "github",
+						"host": "github.com",
+						"id": null,
+						"login": "ifiokjr",
+						"display_name": "ifiokjr",
+						"url": "https://github.com/ifiokjr",
+						"source": "review_request_author"
+					},
+					"commit": {
+						"provider": "github",
+						"host": "github.com",
+						"sha": "27987e0ad54b132b922144bf2777e6117ee14a4c",
+						"short_sha": "27987e0",
+						"url": "https://github.com/pina-rs/wasm_solana/commit/27987e0ad54b132b922144bf2777e6117ee14a4c",
+						"authored_at": "2026-09-29T06:43:17+01:00",
+						"committed_at": "2026-09-29T06:43:17+01:00",
+						"author_name": "Ifiok Jr.",
+						"author_email": "1160934+ifiokjr@users.noreply.github.com"
+					},
+					"review_request": {
+						"provider": "github",
+						"host": "github.com",
+						"kind": "pull_request",
+						"id": "#162",
+						"title": "feat(rpc): priority fee estimation, completed pubsub surface, review fixes",
+						"url": "https://github.com/pina-rs/wasm_solana/pull/162",
+						"author": {
+							"provider": "github",
+							"host": "github.com",
+							"id": null,
+							"login": "ifiokjr",
+							"display_name": "ifiokjr",
+							"url": "https://github.com/ifiokjr",
+							"source": "review_request_author"
+						}
+					}
+				},
+				"last_updated": {
+					"actor": {
+						"provider": "github",
+						"host": "github.com",
+						"id": null,
+						"login": null,
+						"display_name": "Ifiok Jr.",
+						"url": null,
+						"source": "commit_author"
+					},
+					"commit": {
+						"provider": "github",
+						"host": "github.com",
+						"sha": "86393119f02fefffd42de1541c9b8214ac8f0f35",
+						"short_sha": "8639311",
+						"url": "https://github.com/pina-rs/wasm_solana/commit/86393119f02fefffd42de1541c9b8214ac8f0f35",
+						"authored_at": "2026-09-30T10:29:43+01:00",
+						"committed_at": "2026-09-30T10:29:43+01:00",
+						"author_name": "Ifiok Jr.",
+						"author_email": "1160934+ifiokjr@users.noreply.github.com"
+					},
+					"review_request": null
+				},
+				"related_issues": [
+					{
+						"provider": "github",
+						"host": "github.com",
+						"id": "#150",
+						"title": null,
+						"url": "https://github.com/pina-rs/wasm_solana/issues/150",
+						"relationship": "referenced_by_review_request"
+					},
+					{
+						"provider": "github",
+						"host": "github.com",
+						"id": "#154",
+						"title": null,
+						"url": "https://github.com/pina-rs/wasm_solana/issues/154",
+						"relationship": "referenced_by_review_request"
+					},
+					{
+						"provider": "github",
+						"host": "github.com",
+						"id": "#159",
+						"title": null,
+						"url": "https://github.com/pina-rs/wasm_solana/issues/159",
+						"relationship": "referenced_by_review_request"
+					}
+				]
+			}
+		},
+		{
+			"path": ".changeset/surface-http-and-rpc-errors.md",
+			"summary": "Surface HTTP status and JSON-RPC error data",
+			"details": "A rate-limited 429 or a gateway 502 used to surface as \"error decoding response body\" — the status check now happens before the body parse, so the failure names the HTTP code on both transports (native reqwest and the browser fetch). `RpcError` also keeps the JSON-RPC `error.data` payload, where a rejected sendTransaction puts the instruction error and the full simulation logs: it is readable via `RpcError::data()` and included in the `Display` output (with the error code) so it survives string logging. Two panic vectors on hostile input close as well: `confirm_transaction` no longer indexes the status array out of bounds, and the pubsub port rewrite refuses to wrap past `u16::MAX` instead of pointing pubsub at an unrelated low port. A bare dependency without the `js` or `ssr` feature now fails with one clear `compile_error!` instead of confusing web-sys errors, and `spawn_local` documents its `LocalSet` panic under `ssr`.",
+			"targets": [
+				{
+					"id": "wasm_client_solana",
+					"kind": "package",
+					"bump": "patch",
+					"origin": "direct-change",
+					"evidence_refs": [],
+					"change_type": "fix"
+				}
+			],
+			"context": {
+				"provider": "github",
+				"host": "github.com",
+				"capabilities": {
+					"commit_web_urls": true,
+					"actor_profiles": true,
+					"review_request_lookup": true,
+					"related_issues": true,
+					"issue_comments": true
+				},
+				"introduced": {
+					"actor": {
+						"provider": "github",
+						"host": "github.com",
+						"id": null,
+						"login": "ifiokjr",
+						"display_name": "ifiokjr",
+						"url": "https://github.com/ifiokjr",
+						"source": "review_request_author"
+					},
+					"commit": {
+						"provider": "github",
+						"host": "github.com",
+						"sha": "ac67fa906606da6dd0e4eca58f040505dd20783e",
+						"short_sha": "ac67fa9",
+						"url": "https://github.com/pina-rs/wasm_solana/commit/ac67fa906606da6dd0e4eca58f040505dd20783e",
+						"authored_at": "2026-10-02T13:12:30+01:00",
+						"committed_at": "2026-10-02T13:12:30+01:00",
+						"author_name": "Ifiok Jr.",
+						"author_email": "1160934+ifiokjr@users.noreply.github.com"
+					},
+					"review_request": {
+						"provider": "github",
+						"host": "github.com",
+						"kind": "pull_request",
+						"id": "#173",
+						"title": "fix: surface HTTP status and JSON-RPC error data",
+						"url": "https://github.com/pina-rs/wasm_solana/pull/173",
+						"author": {
+							"provider": "github",
+							"host": "github.com",
+							"id": null,
+							"login": "ifiokjr",
+							"display_name": "ifiokjr",
+							"url": "https://github.com/ifiokjr",
+							"source": "review_request_author"
+						}
+					}
+				},
+				"last_updated": {
+					"actor": {
+						"provider": "github",
+						"host": "github.com",
+						"id": null,
+						"login": "ifiokjr",
+						"display_name": "ifiokjr",
+						"url": "https://github.com/ifiokjr",
+						"source": "review_request_author"
+					},
+					"commit": {
+						"provider": "github",
+						"host": "github.com",
+						"sha": "ac67fa906606da6dd0e4eca58f040505dd20783e",
+						"short_sha": "ac67fa9",
+						"url": "https://github.com/pina-rs/wasm_solana/commit/ac67fa906606da6dd0e4eca58f040505dd20783e",
+						"authored_at": "2026-10-02T13:12:30+01:00",
+						"committed_at": "2026-10-02T13:12:30+01:00",
+						"author_name": "Ifiok Jr.",
+						"author_email": "1160934+ifiokjr@users.noreply.github.com"
+					},
+					"review_request": {
+						"provider": "github",
+						"host": "github.com",
+						"kind": "pull_request",
+						"id": "#173",
+						"title": "fix: surface HTTP status and JSON-RPC error data",
+						"url": "https://github.com/pina-rs/wasm_solana/pull/173",
+						"author": {
+							"provider": "github",
+							"host": "github.com",
+							"id": null,
+							"login": "ifiokjr",
+							"display_name": "ifiokjr",
+							"url": "https://github.com/ifiokjr",
+							"source": "review_request_author"
+						}
+					}
+				},
+				"related_issues": []
+			}
+		},
+		{
+			"path": ".changeset/upstream-client-types-and-pubsub.md",
+			"summary": "Upstream client-types and the finished pubsub surface",
+			"details": "Adopt the crates.io `solana-account-decoder-client-types` and `solana-transaction-status-client-types` — upstream 4.2.2 made `zstd` optional in the account one and keeps nothing native-only in either — and retire the two `-client-types-wasm` forks that existed only to provide that. Two published crates disappear from every Agave upgrade cycle; only the full decoder forks remain, because upstream still forces `zstd`, `Inflector`, and (for transaction-status) `solana-entry` on those.\n\nBreaking: the forks re-export the client-types surface, so their public API shifts with the swap (`UiAccount.owner` is now the upstream `String`, the `Eq` impls are gone) — the decoder forks take a major bump even though their own parse logic is untouched. `TestValidatorRunnerProps` also gains the `enable_vote_subscription` field, which is major for exhaustive struct construction.\n\nFor `wasm_client_solana`: `UiAccount.owner` is now the upstream `String` rather than the fork's `Pubkey`-typed field, and response types that derived `Eq` over decoder types (`GetTokenAccountBalanceResponse`, `GetTokenSupplyResponse`, `GetTransactionResponse`) keep `PartialEq` only. In exchange the wire types share identity with every other `solana-*` crate in the dependency graph, including the native test stack. The fork's decompression-bomb cap survives as `decode_account_data` in this crate — a hardened replacement for `UiAccountData::decode` that rejects `base64+zstd` payloads expanding past the cluster's own 10 MiB account-data cap.\n\nThe native tests also caught a latent ssr pubsub bug: the lazily-connected reqwest websocket polled its handshake future again after it completed (both split halves share it), so any refused connection panicked the provider with `async fn resumed after completion`. The handshake is now latched — a failed connection surfaces as one error frame followed by a permanent end of stream.\n\n`slotsUpdatesSubscribe` and `voteSubscribe` complete the websocket surface: the slot-lifecycle feed arrives as a typed `SlotUpdate` enum tagged by pipeline stage, and the raw vote feed carries `Pubkey`/`Hash`/`Signature` fields instead of base-58 strings. Both are pinned by wire-format tests plus a native integration test driving an in-process validator — which is also why `TestValidatorRunnerProps` gains `enable_vote_subscription`, mirroring the `--rpc-pubsub-enable-vote-subscription` flag production validators keep disabled by default.",
+			"targets": [
+				{
+					"id": "solana-account-decoder-wasm",
+					"kind": "package",
+					"bump": "major",
+					"origin": "direct-change",
+					"evidence_refs": [],
+					"change_type": "breaking"
+				},
+				{
+					"id": "solana-transaction-status-wasm",
+					"kind": "package",
+					"bump": "major",
+					"origin": "direct-change",
+					"evidence_refs": [],
+					"change_type": "breaking"
+				},
+				{
+					"id": "test_utils_solana",
+					"kind": "package",
+					"bump": "major",
+					"origin": "direct-change",
+					"evidence_refs": [],
+					"change_type": "breaking"
+				},
+				{
+					"id": "wasm_client_solana",
+					"kind": "package",
+					"bump": "major",
+					"origin": "direct-change",
+					"evidence_refs": [],
+					"change_type": "breaking"
+				}
+			],
+			"context": {
+				"provider": "github",
+				"host": "github.com",
+				"capabilities": {
+					"commit_web_urls": true,
+					"actor_profiles": true,
+					"review_request_lookup": true,
+					"related_issues": true,
+					"issue_comments": true
+				},
+				"introduced": {
+					"actor": {
+						"provider": "github",
+						"host": "github.com",
+						"id": null,
+						"login": null,
+						"display_name": "Ifiok Jr.",
+						"url": null,
+						"source": "commit_author"
+					},
+					"commit": {
+						"provider": "github",
+						"host": "github.com",
+						"sha": "86393119f02fefffd42de1541c9b8214ac8f0f35",
+						"short_sha": "8639311",
+						"url": "https://github.com/pina-rs/wasm_solana/commit/86393119f02fefffd42de1541c9b8214ac8f0f35",
+						"authored_at": "2026-09-30T10:29:43+01:00",
+						"committed_at": "2026-09-30T10:29:43+01:00",
+						"author_name": "Ifiok Jr.",
+						"author_email": "1160934+ifiokjr@users.noreply.github.com"
+					},
+					"review_request": null
+				},
+				"last_updated": {
+					"actor": {
+						"provider": "github",
+						"host": "github.com",
+						"id": null,
+						"login": null,
+						"display_name": "Ifiok Jr.",
+						"url": null,
+						"source": "commit_author"
+					},
+					"commit": {
+						"provider": "github",
+						"host": "github.com",
+						"sha": "86393119f02fefffd42de1541c9b8214ac8f0f35",
+						"short_sha": "8639311",
+						"url": "https://github.com/pina-rs/wasm_solana/commit/86393119f02fefffd42de1541c9b8214ac8f0f35",
+						"authored_at": "2026-09-30T10:29:43+01:00",
+						"committed_at": "2026-09-30T10:29:43+01:00",
+						"author_name": "Ifiok Jr.",
+						"author_email": "1160934+ifiokjr@users.noreply.github.com"
+					},
+					"review_request": null
+				},
+				"related_issues": []
+			}
+		},
+		{
+			"path": ".changeset/wallet-standard-0.7.md",
+			"summary": "wallet_standard 0.7 lands the browser bridge fixes",
+			"details": "Bumps `wallet_standard` from `^0.6` (0.6.0) to `^0.7` (0.7.1). The release lands the pina-rs/wallet_standard#55 fixes: the browser bridge's infinite recursion in `connect_with_options`/`disconnect`, the corrected `sign_transactions` wire format, and the `solana` feature compiling standalone — the wasm-compatibility work this client's browser story depends on. The workspace's own usage of the core crate compiles unchanged on both native (ssr) and wasm32 (`js`); the breaking changes in the release are confined to `wallet_standard_browser` 0.7.0, which this workspace does not depend on.",
+			"targets": [
+				{
+					"id": "memory_wallet",
+					"kind": "package",
+					"bump": "patch",
+					"origin": "direct-change",
+					"evidence_refs": [],
+					"change_type": "fix"
+				},
+				{
+					"id": "wasm_client_solana",
+					"kind": "package",
+					"bump": "patch",
+					"origin": "direct-change",
+					"evidence_refs": [],
+					"change_type": "fix"
+				}
+			],
+			"context": {
+				"provider": "github",
+				"host": "github.com",
+				"capabilities": {
+					"commit_web_urls": true,
+					"actor_profiles": true,
+					"review_request_lookup": true,
+					"related_issues": true,
+					"issue_comments": true
+				},
+				"introduced": {
+					"actor": {
+						"provider": "github",
+						"host": "github.com",
+						"id": null,
+						"login": null,
+						"display_name": "Ifiok Jr.",
+						"url": null,
+						"source": "commit_author"
+					},
+					"commit": {
+						"provider": "github",
+						"host": "github.com",
+						"sha": "86393119f02fefffd42de1541c9b8214ac8f0f35",
+						"short_sha": "8639311",
+						"url": "https://github.com/pina-rs/wasm_solana/commit/86393119f02fefffd42de1541c9b8214ac8f0f35",
+						"authored_at": "2026-09-30T10:29:43+01:00",
+						"committed_at": "2026-09-30T10:29:43+01:00",
+						"author_name": "Ifiok Jr.",
+						"author_email": "1160934+ifiokjr@users.noreply.github.com"
+					},
+					"review_request": null
+				},
+				"last_updated": {
+					"actor": {
+						"provider": "github",
+						"host": "github.com",
+						"id": null,
+						"login": null,
+						"display_name": "Ifiok Jr.",
+						"url": null,
+						"source": "commit_author"
+					},
+					"commit": {
+						"provider": "github",
+						"host": "github.com",
+						"sha": "86393119f02fefffd42de1541c9b8214ac8f0f35",
+						"short_sha": "8639311",
+						"url": "https://github.com/pina-rs/wasm_solana/commit/86393119f02fefffd42de1541c9b8214ac8f0f35",
+						"authored_at": "2026-09-30T10:29:43+01:00",
+						"committed_at": "2026-09-30T10:29:43+01:00",
+						"author_name": "Ifiok Jr.",
+						"author_email": "1160934+ifiokjr@users.noreply.github.com"
+					},
+					"review_request": null
+				},
+				"related_issues": []
+			}
+		},
+		{
+			"path": ".changeset/zstd-feature-forwarding.md",
+			"summary": "Make the zstd feature decode base64+zstd accounts",
+			"details": "`wasm_client_solana/zstd` enabled the crate's own unused `zstd` dependency but never armed the decoder, so `base64+zstd` account data kept hitting the non-zstd arm and returned `None` — accounts silently \"disappeared\" (surfacing as `AccountNotFound`) with no error. The feature now forwards to the upstream `solana-account-decoder-client-types/zstd` and the `solana-account-decoder-wasm/zstd` fork, which matches how the encoder side is gated.\n\nDecompression is also capped: `decode_account_data` (the hardened replacement this crate recommends over the upstream `UiAccountData::decode`) rejects `base64+zstd` payloads that expand past 10 MiB — the cluster's own maximum account data size — so a tiny compressed blob from a hostile RPC can no longer expand without bound and OOM the process.",
+			"targets": [
+				{
+					"id": "wasm_client_solana",
+					"kind": "package",
+					"bump": "patch",
+					"origin": "direct-change",
+					"evidence_refs": [],
+					"change_type": "fix"
+				}
+			],
+			"context": {
+				"provider": "github",
+				"host": "github.com",
+				"capabilities": {
+					"commit_web_urls": true,
+					"actor_profiles": true,
+					"review_request_lookup": true,
+					"related_issues": true,
+					"issue_comments": true
+				},
+				"introduced": {
+					"actor": {
+						"provider": "github",
+						"host": "github.com",
+						"id": null,
+						"login": "ifiokjr",
+						"display_name": "ifiokjr",
+						"url": "https://github.com/ifiokjr",
+						"source": "review_request_author"
+					},
+					"commit": {
+						"provider": "github",
+						"host": "github.com",
+						"sha": "e5001dcf10767170bc03b3a9161d7916ee805428",
+						"short_sha": "e5001dc",
+						"url": "https://github.com/pina-rs/wasm_solana/commit/e5001dcf10767170bc03b3a9161d7916ee805428",
+						"authored_at": "2026-09-29T02:28:12+01:00",
+						"committed_at": "2026-09-29T02:28:12+01:00",
+						"author_name": "Ifiok Jr.",
+						"author_email": "1160934+ifiokjr@users.noreply.github.com"
+					},
+					"review_request": {
+						"provider": "github",
+						"host": "github.com",
+						"kind": "pull_request",
+						"id": "#154",
+						"title": "fix: websocket pubsub liveness, rpc hardening, browser e2e examples, enforced api docs",
+						"url": "https://github.com/pina-rs/wasm_solana/pull/154",
+						"author": {
+							"provider": "github",
+							"host": "github.com",
+							"id": null,
+							"login": "ifiokjr",
+							"display_name": "ifiokjr",
+							"url": "https://github.com/ifiokjr",
+							"source": "review_request_author"
+						}
+					}
+				},
+				"last_updated": {
+					"actor": {
+						"provider": "github",
+						"host": "github.com",
+						"id": null,
+						"login": null,
+						"display_name": "Ifiok Jr.",
+						"url": null,
+						"source": "commit_author"
+					},
+					"commit": {
+						"provider": "github",
+						"host": "github.com",
+						"sha": "86393119f02fefffd42de1541c9b8214ac8f0f35",
+						"short_sha": "8639311",
+						"url": "https://github.com/pina-rs/wasm_solana/commit/86393119f02fefffd42de1541c9b8214ac8f0f35",
+						"authored_at": "2026-09-30T10:29:43+01:00",
+						"committed_at": "2026-09-30T10:29:43+01:00",
+						"author_name": "Ifiok Jr.",
+						"author_email": "1160934+ifiokjr@users.noreply.github.com"
+					},
+					"review_request": null
+				},
+				"related_issues": [
+					{
+						"provider": "github",
+						"host": "github.com",
+						"id": "#149",
+						"title": null,
+						"url": "https://github.com/pina-rs/wasm_solana/issues/149",
+						"relationship": "referenced_by_review_request"
+					}
+				]
+			}
+		}
+	],
+	"changelogs": [
+		{
+			"owner_id": "core",
+			"owner_kind": "group",
+			"output": "default",
+			"stream": "default",
+			"path": "changelog.md",
+			"format": "keep_a_changelog",
+			"notes": {
+				"title": "[0.13.0](https://github.com/pina-rs/wasm_solana/releases/tag/v0.13.0) (2026-10-07)",
+				"summary": [
+					"Grouped release for `core`."
+				],
+				"sections": [
+					{
+						"title": "Breaking Changes",
+						"collapsed": false,
+						"entries": [
+							"#### Document the public API and make the modules public\n\n_Owner:_ [@ifiokjr](https://github.com/ifiokjr) · _Review:_ [PR #150](https://github.com/pina-rs/wasm_solana/pull/150)\n\nMarked `breaking` because the internal modules of `wasm_client_solana` and `test_utils_solana` become `pub mod` — the lint only enforces documentation inside public module trees, so without this the flat `pub use` re-exports would let hundreds of items escape it. The flat re-exports remain the supported import style, but every item is now also reachable by module path, which is new public API surface.\n\nEnable the `missing_docs` lint across the workspace and document every public item in `wasm_client_solana`, `memory_wallet`, the `test_utils_*` crates and the vendored Agave forks. Add `mdt` templates for documentation that appears in more than one place, so the shared wording cannot drift, and gate it in CI with a new `lint:docs` task. `rustdoc` now builds with no warnings.",
+							"#### Upstream client-types and the finished pubsub surface\n\n_Packages:_ 🔴 _test_utils_solana_, 🔴 _wasm_client_solana_\n\n_Owner:_ Ifiok Jr. · _Introduced in:_ [8639311](https://github.com/pina-rs/wasm_solana/commit/86393119f02fefffd42de1541c9b8214ac8f0f35)\n\nAdopt the crates.io `solana-account-decoder-client-types` and `solana-transaction-status-client-types` — upstream 4.2.2 made `zstd` optional in the account one and keeps nothing native-only in either — and retire the two `-client-types-wasm` forks that existed only to provide that. Two published crates disappear from every Agave upgrade cycle; only the full decoder forks remain, because upstream still forces `zstd`, `Inflector`, and (for transaction-status) `solana-entry` on those.\n\nBreaking: the forks re-export the client-types surface, so their public API shifts with the swap (`UiAccount.owner` is now the upstream `String`, the `Eq` impls are gone) — the decoder forks take a major bump even though their own parse logic is untouched. `TestValidatorRunnerProps` also gains the `enable_vote_subscription` field, which is major for exhaustive struct construction.\n\nFor `wasm_client_solana`: `UiAccount.owner` is now the upstream `String` rather than the fork's `Pubkey`-typed field, and response types that derived `Eq` over decoder types (`GetTokenAccountBalanceResponse`, `GetTokenSupplyResponse`, `GetTransactionResponse`) keep `PartialEq` only. In exchange the wire types share identity with every other `solana-*` crate in the dependency graph, including the native test stack. The fork's decompression-bomb cap survives as `decode_account_data` in this crate — a hardened replacement for `UiAccountData::decode` that rejects `base64+zstd` payloads expanding past the cluster's own 10 MiB account-data cap.\n\nThe native tests also caught a latent ssr pubsub bug: the lazily-connected reqwest websocket polled its handshake future again after it completed (both split halves share it), so any refused connection panicked the provider with `async fn resumed after completion`. The handshake is now latched — a failed connection surfaces as one error frame followed by a permanent end of stream.\n\n`slotsUpdatesSubscribe` and `voteSubscribe` complete the websocket surface: the slot-lifecycle feed arrives as a typed `SlotUpdate` enum tagged by pipeline stage, and the raw vote feed carries `Pubkey`/`Hash`/`Signature` fields instead of base-58 strings. Both are pinned by wire-format tests plus a native integration test driving an in-process validator — which is also why `TestValidatorRunnerProps` gains `enable_vote_subscription`, mirroring the `--rpc-pubsub-enable-vote-subscription` flag production validators keep disabled by default.",
+							"#### Keep websocket subscriptions alive after non-matching frames\n\n_Packages:_ 🔴 _wasm_client_solana_\n\n_Owner:_ [@ifiokjr](https://github.com/ifiokjr) · _Review:_ [PR #154](https://github.com/pina-rs/wasm_solana/pull/154) · _Related issues:_ [#149](https://github.com/pina-rs/wasm_solana/issues/149)\n\nThree websocket code paths returned `Poll::Pending` after consuming a frame that did not match what they were looking for: `Subscription::poll_next` (subscription acks replayed by the shared fork buffer, other subscriptions' notifications, undeserializable frames) and the `filter_map`-based ack waits in `create_subscription` and `Unsubscription::run` (the combinator returns `Pending` after a filtered item without re-polling).\n\n`Forked` only registers the caller's waker with the underlying websocket once its buffer runs dry, so any `Pending` returned while buffered frames remain parked the consuming task with no wakeup armed — the first notification after a subscription ack was never delivered, and un-subscribing replayed history and stalled forever. The browser test for `accountSubscribe` has been silently failing for this reason (the CI wasm step is `continue-on-error`).\n\nAll three paths now re-poll in a loop until they find a matching frame, so the buffer drains and the socket waker is re-armed within the same poll. `poll_next` also stops rebuilding an `Unsubscription` on every poll. Verified in a real browser against both `solana-test-validator` and a local surfpool node, plus new Leptos/Dioxus Playwright examples under `examples/`.",
+							"#### Live-edge subscription forks, benchmarks, leaner deps\n\n_Packages:_ 🔴 _wasm_client_solana_\n\n_Owner:_ [@ifiokjr](https://github.com/ifiokjr) · _Review:_ [PR #159](https://github.com/pina-rs/wasm_solana/pull/159) · _Related issues:_ [#154](https://github.com/pina-rs/wasm_solana/issues/154)\n\nSubscription ack waits and new subscriptions now fork from the live edge of the shared websocket buffer (`fork_stream::Weak` upgrade) instead of cloning the never-read root fork, whose offset pinned them to the buffer's oldest entry. Setup previously replayed and re-parsed the socket's entire history before reaching live traffic. The new `subscription` criterion benchmark measures the ack wait at 73µs / 747µs / 10.1ms for 100 / 1k / 10k buffered frames on the old path, versus 120ns / 317ns / 1.35µs at the live edge — roughly 7,500× at 10k frames, and the gap grows linearly with connection age on busy sockets.\n\nTwo new criterion suites (`cargo bench -p wasm_client_solana -F ssr`) baseline the rest of the hot paths: full mock-provider dispatch (balance 1.4µs, one 256B account 3.0µs, 100×1KiB multi-account 237µs ≈ 413 MiB/s, 1000×256B program-accounts 1.8ms ≈ 136 MiB/s), wire primitives (wincode+base64 v0 encode 149ns, base64 1KiB decode 402ns ≈ 2.4 GiB/s, base58 pubkey 467ns), and per-notification parsing (1.5µs/frame).\n\nAlso drops four unused dependencies from `wasm_client_solana` — `async-tungstenite` (and with it the tungstenite/sha1/httparse tree plus duplicate getrandom 0.2 and thiserror 1 crates), `heck`, `bv`, and `solana-zk-token-sdk` — shrinking the wasm dependency graph from 658 to 575 unique crates (−13%). The remaining `Inflector` call sites in the account-decoder and transaction-status forks are replaced with a hand-rolled kebab-case helper, removing the `regex` stack from the graph; all 149 fork fixture tests pin the converted program names byte-for-byte. Dead-code elimination meant these unused crates were already stripped from the shipped cdylib, so the wins are compile time and supply-chain surface, not binary size; the regex removal additionally benefits apps that invoke the account parsers.\n\nKnown limitation kept for a follow-up: the root fork is retained unread to keep the shared buffer alive, so buffered frames still accumulate for the provider's lifetime; routing notifications through per-subscription-id channels is the remaining fix for buffer retention.",
+							"#### Priority fee estimation and complete pubsub surface\n\n_Packages:_ 🔴 _wasm_client_solana_\n\n_Owner:_ [@ifiokjr](https://github.com/ifiokjr) · _Review:_ [PR #162](https://github.com/pina-rs/wasm_solana/pull/162) · _Related issues:_ [#150](https://github.com/pina-rs/wasm_solana/issues/150), [#154](https://github.com/pina-rs/wasm_solana/issues/154), [#159](https://github.com/pina-rs/wasm_solana/issues/159)\n\n`getPriorityFeeEstimate` is the modern replacement for `getRecentPrioritizationFees`: it prices a specific transaction (or a set of locked accounts) at a chosen urgency percentile instead of reporting raw per-slot fee levels. Three client methods cover transaction-based, configured, and account-based estimation; `get_recent_prioritization_fees*` are now `#[deprecated]` with pointers to the replacements. `getMaxShredInsertSlot` — the highest slot with an inserted shred, leading retransmit — was also missing and is added.\n\nThe pubsub surface now matches the docs: `signatureSubscribe` (with optional `receivedNotification` frames), `slotSubscribe`, and `rootSubscribe` join account/logs/program/block. The signature subscription in particular is the push-based alternative to polling `getSignatureStatuses`, enabling one-round-trip send confirmation.\n\nTwo websocket correctness fixes from review: subscription and acknowledgement forks are now registered _before_ the subscribe request is sent (a frame racing the handshake could previously slip past a fork created after the send), and `Unsubscription` owns its fork rather than holding a weak live-edge handle (retaining a handle past the provider's drop no longer loses the buffer). The fork benchmark now measures the same acknowledgement wait in both variants with the history drain amortized in setup, matching production.\n\nAlso from review: the hardened `decode_account_data` helper rejects `base64+zstd` output beyond the 10 MiB cluster cap instead of silently truncating, the hand-rolled kebab-case helper inserts the hyphen before digit suffixes (`SplToken2022` -> `spl-token-2022`, restoring Inflector parity — regression-tested), and the browser e2e transfer test gets a budget covering both its airdrop and its send."
+						]
+					},
+					{
+						"title": "Fixes",
+						"collapsed": false,
+						"entries": [
+							"- **Add monostyle inline annotations.** Style-only pass: adds `monostyle.toml` and inline style annotations across the workspace (no behavior changes), plus a `monostyle check` step in CI so annotations stay in sync with the tool.\n  _Packages:_ ⚪ _memory_wallet_, ⚪ _test_utils_insta_, ⚪ _test_utils_keypairs_, 🟢 _test_utils_solana_, 🟢 _wasm_client_solana_\n  _Owner:_ [@ifiokjr](https://github.com/ifiokjr) · _Review:_ [PR #153](https://github.com/pina-rs/wasm_solana/pull/153)",
+							"- **Monostyle style pass.** Blank-line breathing room around control flow and returns, group splits, and collapsed blank runs, applied by `monostyle fix` and kept where rustfmt puts them. No behavior change.\n  _Packages:_ 🟢 _memory_wallet_, 🟢 _wasm_client_solana_\n  _Owner:_ [@ifiokjr](https://github.com/ifiokjr) · _Review:_ [PR #161](https://github.com/pina-rs/wasm_solana/pull/161)",
+							"- **wallet_standard 0.7 lands the browser bridge fixes.** Bumps `wallet_standard` from `^0.6` (0.6.0) to `^0.7` (0.7.1). The release lands the pina-rs/wallet_standard#55 fixes: the browser bridge's infinite recursion in `connect_with_options`/`disconnect`, the corrected `sign_transactions` wire format, and the `solana` feature compiling standalone — the wasm-compatibility work this client's browser story depends on. The workspace's own usage of the core crate compiles unchanged on both native (ssr) and wasm32 (`js`); the breaking changes in the release are confined to `wallet_standard_browser` 0.7.0, which this workspace does not depend on.\n  _Packages:_ 🟢 _memory_wallet_, 🟢 _wasm_client_solana_\n  _Owner:_ Ifiok Jr. · _Introduced in:_ [8639311](https://github.com/pina-rs/wasm_solana/commit/86393119f02fefffd42de1541c9b8214ac8f0f35)",
+							"- **Pay CI only for what each job uses.** The changeset-policy job no longer installs the five workspace cargo binaries it never runs (the devenv action grows an opt-out), the build job compiles the all-features build once instead of twice, and markdown-only changes skip the compile jobs entirely — the separate changeset-policy workflow still gates changeset-only pull requests. The browser wasm test becomes blocking and version-safe: chromium and chromedriver both come from the pinned nixpkgs revision, so a runner Chrome auto-update can no longer break the session handshake invisibly. Benchmarks get a `workflow_dispatch` job so the criterion suites are runnable without a local environment. Also prunes dead workspace dependencies (heck, paste, regex), untracks the machine-specific `.video_agent` path, deduplicates and repairs `.gitignore`, removes a zizmor entry for a workflow that never existed, and slims the toolchain profile CI hosts download.\n  _Packages:_ 🟢 _wasm_client_solana_\n  _Owner:_ [@ifiokjr](https://github.com/ifiokjr) · _Review:_ [PR #174](https://github.com/pina-rs/wasm_solana/pull/174)",
+							"#### Docs match the shipped API\n\n_Packages:_ 🟢 _wasm_client_solana_\n\n_Owner:_ [@ifiokjr](https://github.com/ifiokjr) · _Review:_ [PR #172](https://github.com/pina-rs/wasm_solana/pull/172)\n\nThe book taught a different library: seven subscription methods that never existed, `response.value` on a `get_balance` call that returns `u64`, and a `wss://` URL handed to a constructor that takes HTTP. Every page now matches the real API — including the finished pubsub surface (`slots_updates_subscribe`, `vote_subscribe`), the hardened `decode_account_data` decoder, the two-fork story after the client-types retirement, and a migration note for the breaking 0.13 changes (`UiAccount.owner: String`, the `Eq` removals). Both browser examples are un-broken: their `wasm-bindgen` pins move to 0.2.129 to match the workspace CLI, so the documented build works again, and the crate readme stops claiming 0.10.0. New `no_run` doctests cover the pubsub additions and a running doctest covers `decode_account_data`.",
+							"#### Harden the HTTP response path and `get_multiple_accounts`\n\n_Packages:_ 🟢 _wasm_client_solana_\n\n_Owner:_ [@ifiokjr](https://github.com/ifiokjr) · _Review:_ [PR #154](https://github.com/pina-rs/wasm_solana/pull/154) · _Related issues:_ [#149](https://github.com/pina-rs/wasm_solana/issues/149)\n\n- `get_multiple_accounts_with_config` filtered `None` accounts out of the response, so results no longer aligned index-wise with the requested pubkeys — a caller could attribute one account's data to another pubkey. `None` positions are now preserved, the encoding defaults to `base64` (the server's `jsonParsed` default made `UiAccountData::decode` silently return `None`), and the response is consumed instead of deep-cloning every account.\n- The generic `send` deserializer deep-cloned the entire response `Value` on every successful call — for `getProgramAccounts`-scale payloads that is a multi-megabyte copy per request, discarded on success. The error shape is now only attempted when the envelope carries a JSON-RPC `error` member.\n- Removed the leftover `println!(\"endpoint: …\")` in `SolanaRpcClient::new_with_commitment`: RPC URLs commonly embed provider API keys, and the print leaked them to stdout/logs on every construction.\n- Removed the `DEBUG` endpoint constant: it pointed at a third-party plaintext HTTP IP, inviting users to submit signed transactions over an unauthenticated connection.",
+							"- **Surface HTTP status and JSON-RPC error data.** A rate-limited 429 or a gateway 502 used to surface as \"error decoding response body\" — the status check now happens before the body parse, so the failure names the HTTP code on both transports (native reqwest and the browser fetch). `RpcError` also keeps the JSON-RPC `error.data` payload, where a rejected sendTransaction puts the instruction error and the full simulation logs: it is readable via `RpcError::data()` and included in the `Display` output (with the error code) so it survives string logging. Two panic vectors on hostile input close as well: `confirm_transaction` no longer indexes the status array out of bounds, and the pubsub port rewrite refuses to wrap past `u16::MAX` instead of pointing pubsub at an unrelated low port. A bare dependency without the `js` or `ssr` feature now fails with one clear `compile_error!` instead of confusing web-sys errors, and `spawn_local` documents its `LocalSet` panic under `ssr`.\n  _Packages:_ 🟢 _wasm_client_solana_\n  _Owner:_ [@ifiokjr](https://github.com/ifiokjr) · _Review:_ [PR #173](https://github.com/pina-rs/wasm_solana/pull/173)",
+							"#### Make the zstd feature decode base64+zstd accounts\n\n_Packages:_ 🟢 _wasm_client_solana_\n\n_Owner:_ [@ifiokjr](https://github.com/ifiokjr) · _Review:_ [PR #154](https://github.com/pina-rs/wasm_solana/pull/154) · _Related issues:_ [#149](https://github.com/pina-rs/wasm_solana/issues/149)\n\n`wasm_client_solana/zstd` enabled the crate's own unused `zstd` dependency but never armed the decoder, so `base64+zstd` account data kept hitting the non-zstd arm and returned `None` — accounts silently \"disappeared\" (surfacing as `AccountNotFound`) with no error. The feature now forwards to the upstream `solana-account-decoder-client-types/zstd` and the `solana-account-decoder-wasm/zstd` fork, which matches how the encoder side is gated.\n\nDecompression is also capped: `decode_account_data` (the hardened replacement this crate recommends over the upstream `UiAccountData::decode`) rejects `base64+zstd` payloads that expand past 10 MiB — the cluster's own maximum account data size — so a tiny compressed blob from a hostile RPC can no longer expand without bound and OOM the process."
+						]
+					}
+				]
+			},
+			"rendered": "## [0.13.0](https://github.com/pina-rs/wasm_solana/releases/tag/v0.13.0) (2026-10-07)\n\nGrouped release for `core`.\n\n### Breaking Changes\n\n#### Document the public API and make the modules public\n\n_Owner:_ [@ifiokjr](https://github.com/ifiokjr) · _Review:_ [PR #150](https://github.com/pina-rs/wasm_solana/pull/150)\n\nMarked `breaking` because the internal modules of `wasm_client_solana` and `test_utils_solana` become `pub mod` — the lint only enforces documentation inside public module trees, so without this the flat `pub use` re-exports would let hundreds of items escape it. The flat re-exports remain the supported import style, but every item is now also reachable by module path, which is new public API surface.\n\nEnable the `missing_docs` lint across the workspace and document every public item in `wasm_client_solana`, `memory_wallet`, the `test_utils_*` crates and the vendored Agave forks. Add `mdt` templates for documentation that appears in more than one place, so the shared wording cannot drift, and gate it in CI with a new `lint:docs` task. `rustdoc` now builds with no warnings.\n\n#### Upstream client-types and the finished pubsub surface\n\n_Packages:_ 🔴 _test_utils_solana_, 🔴 _wasm_client_solana_\n\n_Owner:_ Ifiok Jr. · _Introduced in:_ [8639311](https://github.com/pina-rs/wasm_solana/commit/86393119f02fefffd42de1541c9b8214ac8f0f35)\n\nAdopt the crates.io `solana-account-decoder-client-types` and `solana-transaction-status-client-types` — upstream 4.2.2 made `zstd` optional in the account one and keeps nothing native-only in either — and retire the two `-client-types-wasm` forks that existed only to provide that. Two published crates disappear from every Agave upgrade cycle; only the full decoder forks remain, because upstream still forces `zstd`, `Inflector`, and (for transaction-status) `solana-entry` on those.\n\nBreaking: the forks re-export the client-types surface, so their public API shifts with the swap (`UiAccount.owner` is now the upstream `String`, the `Eq` impls are gone) — the decoder forks take a major bump even though their own parse logic is untouched. `TestValidatorRunnerProps` also gains the `enable_vote_subscription` field, which is major for exhaustive struct construction.\n\nFor `wasm_client_solana`: `UiAccount.owner` is now the upstream `String` rather than the fork's `Pubkey`-typed field, and response types that derived `Eq` over decoder types (`GetTokenAccountBalanceResponse`, `GetTokenSupplyResponse`, `GetTransactionResponse`) keep `PartialEq` only. In exchange the wire types share identity with every other `solana-*` crate in the dependency graph, including the native test stack. The fork's decompression-bomb cap survives as `decode_account_data` in this crate — a hardened replacement for `UiAccountData::decode` that rejects `base64+zstd` payloads expanding past the cluster's own 10 MiB account-data cap.\n\nThe native tests also caught a latent ssr pubsub bug: the lazily-connected reqwest websocket polled its handshake future again after it completed (both split halves share it), so any refused connection panicked the provider with `async fn resumed after completion`. The handshake is now latched — a failed connection surfaces as one error frame followed by a permanent end of stream.\n\n`slotsUpdatesSubscribe` and `voteSubscribe` complete the websocket surface: the slot-lifecycle feed arrives as a typed `SlotUpdate` enum tagged by pipeline stage, and the raw vote feed carries `Pubkey`/`Hash`/`Signature` fields instead of base-58 strings. Both are pinned by wire-format tests plus a native integration test driving an in-process validator — which is also why `TestValidatorRunnerProps` gains `enable_vote_subscription`, mirroring the `--rpc-pubsub-enable-vote-subscription` flag production validators keep disabled by default.\n\n#### Keep websocket subscriptions alive after non-matching frames\n\n_Packages:_ 🔴 _wasm_client_solana_\n\n_Owner:_ [@ifiokjr](https://github.com/ifiokjr) · _Review:_ [PR #154](https://github.com/pina-rs/wasm_solana/pull/154) · _Related issues:_ [#149](https://github.com/pina-rs/wasm_solana/issues/149)\n\nThree websocket code paths returned `Poll::Pending` after consuming a frame that did not match what they were looking for: `Subscription::poll_next` (subscription acks replayed by the shared fork buffer, other subscriptions' notifications, undeserializable frames) and the `filter_map`-based ack waits in `create_subscription` and `Unsubscription::run` (the combinator returns `Pending` after a filtered item without re-polling).\n\n`Forked` only registers the caller's waker with the underlying websocket once its buffer runs dry, so any `Pending` returned while buffered frames remain parked the consuming task with no wakeup armed — the first notification after a subscription ack was never delivered, and un-subscribing replayed history and stalled forever. The browser test for `accountSubscribe` has been silently failing for this reason (the CI wasm step is `continue-on-error`).\n\nAll three paths now re-poll in a loop until they find a matching frame, so the buffer drains and the socket waker is re-armed within the same poll. `poll_next` also stops rebuilding an `Unsubscription` on every poll. Verified in a real browser against both `solana-test-validator` and a local surfpool node, plus new Leptos/Dioxus Playwright examples under `examples/`.\n\n#### Live-edge subscription forks, benchmarks, leaner deps\n\n_Packages:_ 🔴 _wasm_client_solana_\n\n_Owner:_ [@ifiokjr](https://github.com/ifiokjr) · _Review:_ [PR #159](https://github.com/pina-rs/wasm_solana/pull/159) · _Related issues:_ [#154](https://github.com/pina-rs/wasm_solana/issues/154)\n\nSubscription ack waits and new subscriptions now fork from the live edge of the shared websocket buffer (`fork_stream::Weak` upgrade) instead of cloning the never-read root fork, whose offset pinned them to the buffer's oldest entry. Setup previously replayed and re-parsed the socket's entire history before reaching live traffic. The new `subscription` criterion benchmark measures the ack wait at 73µs / 747µs / 10.1ms for 100 / 1k / 10k buffered frames on the old path, versus 120ns / 317ns / 1.35µs at the live edge — roughly 7,500× at 10k frames, and the gap grows linearly with connection age on busy sockets.\n\nTwo new criterion suites (`cargo bench -p wasm_client_solana -F ssr`) baseline the rest of the hot paths: full mock-provider dispatch (balance 1.4µs, one 256B account 3.0µs, 100×1KiB multi-account 237µs ≈ 413 MiB/s, 1000×256B program-accounts 1.8ms ≈ 136 MiB/s), wire primitives (wincode+base64 v0 encode 149ns, base64 1KiB decode 402ns ≈ 2.4 GiB/s, base58 pubkey 467ns), and per-notification parsing (1.5µs/frame).\n\nAlso drops four unused dependencies from `wasm_client_solana` — `async-tungstenite` (and with it the tungstenite/sha1/httparse tree plus duplicate getrandom 0.2 and thiserror 1 crates), `heck`, `bv`, and `solana-zk-token-sdk` — shrinking the wasm dependency graph from 658 to 575 unique crates (−13%). The remaining `Inflector` call sites in the account-decoder and transaction-status forks are replaced with a hand-rolled kebab-case helper, removing the `regex` stack from the graph; all 149 fork fixture tests pin the converted program names byte-for-byte. Dead-code elimination meant these unused crates were already stripped from the shipped cdylib, so the wins are compile time and supply-chain surface, not binary size; the regex removal additionally benefits apps that invoke the account parsers.\n\nKnown limitation kept for a follow-up: the root fork is retained unread to keep the shared buffer alive, so buffered frames still accumulate for the provider's lifetime; routing notifications through per-subscription-id channels is the remaining fix for buffer retention.\n\n#### Priority fee estimation and complete pubsub surface\n\n_Packages:_ 🔴 _wasm_client_solana_\n\n_Owner:_ [@ifiokjr](https://github.com/ifiokjr) · _Review:_ [PR #162](https://github.com/pina-rs/wasm_solana/pull/162) · _Related issues:_ [#150](https://github.com/pina-rs/wasm_solana/issues/150), [#154](https://github.com/pina-rs/wasm_solana/issues/154), [#159](https://github.com/pina-rs/wasm_solana/issues/159)\n\n`getPriorityFeeEstimate` is the modern replacement for `getRecentPrioritizationFees`: it prices a specific transaction (or a set of locked accounts) at a chosen urgency percentile instead of reporting raw per-slot fee levels. Three client methods cover transaction-based, configured, and account-based estimation; `get_recent_prioritization_fees*` are now `#[deprecated]` with pointers to the replacements. `getMaxShredInsertSlot` — the highest slot with an inserted shred, leading retransmit — was also missing and is added.\n\nThe pubsub surface now matches the docs: `signatureSubscribe` (with optional `receivedNotification` frames), `slotSubscribe`, and `rootSubscribe` join account/logs/program/block. The signature subscription in particular is the push-based alternative to polling `getSignatureStatuses`, enabling one-round-trip send confirmation.\n\nTwo websocket correctness fixes from review: subscription and acknowledgement forks are now registered _before_ the subscribe request is sent (a frame racing the handshake could previously slip past a fork created after the send), and `Unsubscription` owns its fork rather than holding a weak live-edge handle (retaining a handle past the provider's drop no longer loses the buffer). The fork benchmark now measures the same acknowledgement wait in both variants with the history drain amortized in setup, matching production.\n\nAlso from review: the hardened `decode_account_data` helper rejects `base64+zstd` output beyond the 10 MiB cluster cap instead of silently truncating, the hand-rolled kebab-case helper inserts the hyphen before digit suffixes (`SplToken2022` -> `spl-token-2022`, restoring Inflector parity — regression-tested), and the browser e2e transfer test gets a budget covering both its airdrop and its send.\n\n### Fixes\n\n- **Add monostyle inline annotations.** Style-only pass: adds `monostyle.toml` and inline style annotations across the workspace (no behavior changes), plus a `monostyle check` step in CI so annotations stay in sync with the tool.\n  _Packages:_ ⚪ _memory_wallet_, ⚪ _test_utils_insta_, ⚪ _test_utils_keypairs_, 🟢 _test_utils_solana_, 🟢 _wasm_client_solana_\n  _Owner:_ [@ifiokjr](https://github.com/ifiokjr) · _Review:_ [PR #153](https://github.com/pina-rs/wasm_solana/pull/153)\n- **Monostyle style pass.** Blank-line breathing room around control flow and returns, group splits, and collapsed blank runs, applied by `monostyle fix` and kept where rustfmt puts them. No behavior change.\n  _Packages:_ 🟢 _memory_wallet_, 🟢 _wasm_client_solana_\n  _Owner:_ [@ifiokjr](https://github.com/ifiokjr) · _Review:_ [PR #161](https://github.com/pina-rs/wasm_solana/pull/161)\n- **wallet_standard 0.7 lands the browser bridge fixes.** Bumps `wallet_standard` from `^0.6` (0.6.0) to `^0.7` (0.7.1). The release lands the pina-rs/wallet_standard#55 fixes: the browser bridge's infinite recursion in `connect_with_options`/`disconnect`, the corrected `sign_transactions` wire format, and the `solana` feature compiling standalone — the wasm-compatibility work this client's browser story depends on. The workspace's own usage of the core crate compiles unchanged on both native (ssr) and wasm32 (`js`); the breaking changes in the release are confined to `wallet_standard_browser` 0.7.0, which this workspace does not depend on.\n  _Packages:_ 🟢 _memory_wallet_, 🟢 _wasm_client_solana_\n  _Owner:_ Ifiok Jr. · _Introduced in:_ [8639311](https://github.com/pina-rs/wasm_solana/commit/86393119f02fefffd42de1541c9b8214ac8f0f35)\n- **Pay CI only for what each job uses.** The changeset-policy job no longer installs the five workspace cargo binaries it never runs (the devenv action grows an opt-out), the build job compiles the all-features build once instead of twice, and markdown-only changes skip the compile jobs entirely — the separate changeset-policy workflow still gates changeset-only pull requests. The browser wasm test becomes blocking and version-safe: chromium and chromedriver both come from the pinned nixpkgs revision, so a runner Chrome auto-update can no longer break the session handshake invisibly. Benchmarks get a `workflow_dispatch` job so the criterion suites are runnable without a local environment. Also prunes dead workspace dependencies (heck, paste, regex), untracks the machine-specific `.video_agent` path, deduplicates and repairs `.gitignore`, removes a zizmor entry for a workflow that never existed, and slims the toolchain profile CI hosts download.\n  _Packages:_ 🟢 _wasm_client_solana_\n  _Owner:_ [@ifiokjr](https://github.com/ifiokjr) · _Review:_ [PR #174](https://github.com/pina-rs/wasm_solana/pull/174)\n#### Docs match the shipped API\n\n_Packages:_ 🟢 _wasm_client_solana_\n\n_Owner:_ [@ifiokjr](https://github.com/ifiokjr) · _Review:_ [PR #172](https://github.com/pina-rs/wasm_solana/pull/172)\n\nThe book taught a different library: seven subscription methods that never existed, `response.value` on a `get_balance` call that returns `u64`, and a `wss://` URL handed to a constructor that takes HTTP. Every page now matches the real API — including the finished pubsub surface (`slots_updates_subscribe`, `vote_subscribe`), the hardened `decode_account_data` decoder, the two-fork story after the client-types retirement, and a migration note for the breaking 0.13 changes (`UiAccount.owner: String`, the `Eq` removals). Both browser examples are un-broken: their `wasm-bindgen` pins move to 0.2.129 to match the workspace CLI, so the documented build works again, and the crate readme stops claiming 0.10.0. New `no_run` doctests cover the pubsub additions and a running doctest covers `decode_account_data`.\n\n#### Harden the HTTP response path and `get_multiple_accounts`\n\n_Packages:_ 🟢 _wasm_client_solana_\n\n_Owner:_ [@ifiokjr](https://github.com/ifiokjr) · _Review:_ [PR #154](https://github.com/pina-rs/wasm_solana/pull/154) · _Related issues:_ [#149](https://github.com/pina-rs/wasm_solana/issues/149)\n\n- `get_multiple_accounts_with_config` filtered `None` accounts out of the response, so results no longer aligned index-wise with the requested pubkeys — a caller could attribute one account's data to another pubkey. `None` positions are now preserved, the encoding defaults to `base64` (the server's `jsonParsed` default made `UiAccountData::decode` silently return `None`), and the response is consumed instead of deep-cloning every account.\n- The generic `send` deserializer deep-cloned the entire response `Value` on every successful call — for `getProgramAccounts`-scale payloads that is a multi-megabyte copy per request, discarded on success. The error shape is now only attempted when the envelope carries a JSON-RPC `error` member.\n- Removed the leftover `println!(\"endpoint: …\")` in `SolanaRpcClient::new_with_commitment`: RPC URLs commonly embed provider API keys, and the print leaked them to stdout/logs on every construction.\n- Removed the `DEBUG` endpoint constant: it pointed at a third-party plaintext HTTP IP, inviting users to submit signed transactions over an unauthenticated connection.\n\n- **Surface HTTP status and JSON-RPC error data.** A rate-limited 429 or a gateway 502 used to surface as \"error decoding response body\" — the status check now happens before the body parse, so the failure names the HTTP code on both transports (native reqwest and the browser fetch). `RpcError` also keeps the JSON-RPC `error.data` payload, where a rejected sendTransaction puts the instruction error and the full simulation logs: it is readable via `RpcError::data()` and included in the `Display` output (with the error code) so it survives string logging. Two panic vectors on hostile input close as well: `confirm_transaction` no longer indexes the status array out of bounds, and the pubsub port rewrite refuses to wrap past `u16::MAX` instead of pointing pubsub at an unrelated low port. A bare dependency without the `js` or `ssr` feature now fails with one clear `compile_error!` instead of confusing web-sys errors, and `spawn_local` documents its `LocalSet` panic under `ssr`.\n  _Packages:_ 🟢 _wasm_client_solana_\n  _Owner:_ [@ifiokjr](https://github.com/ifiokjr) · _Review:_ [PR #173](https://github.com/pina-rs/wasm_solana/pull/173)\n#### Make the zstd feature decode base64+zstd accounts\n\n_Packages:_ 🟢 _wasm_client_solana_\n\n_Owner:_ [@ifiokjr](https://github.com/ifiokjr) · _Review:_ [PR #154](https://github.com/pina-rs/wasm_solana/pull/154) · _Related issues:_ [#149](https://github.com/pina-rs/wasm_solana/issues/149)\n\n`wasm_client_solana/zstd` enabled the crate's own unused `zstd` dependency but never armed the decoder, so `base64+zstd` account data kept hitting the non-zstd arm and returned `None` — accounts silently \"disappeared\" (surfacing as `AccountNotFound`) with no error. The feature now forwards to the upstream `solana-account-decoder-client-types/zstd` and the `solana-account-decoder-wasm/zstd` fork, which matches how the encoder side is gated.\n\nDecompression is also capped: `decode_account_data` (the hardened replacement this crate recommends over the upstream `UiAccountData::decode`) rejects `base64+zstd` payloads that expand past 10 MiB — the cluster's own maximum account data size — so a tiny compressed blob from a hostile RPC can no longer expand without bound and OOM the process."
+		},
+		{
+			"owner_id": "forks",
+			"owner_kind": "group",
+			"output": "default",
+			"stream": "default",
+			"path": "forks/changelog.md",
+			"format": "keep_a_changelog",
+			"notes": {
+				"title": "forks [5.0.0](https://github.com/pina-rs/wasm_solana/releases/tag/forks/v5.0.0) (2026-10-07)",
+				"summary": [
+					"Grouped release for `forks`."
+				],
+				"sections": [
+					{
+						"title": "Breaking Changes",
+						"collapsed": false,
+						"entries": [
+							"#### Document the public API and make the modules public\n\n_Owner:_ [@ifiokjr](https://github.com/ifiokjr) · _Review:_ [PR #150](https://github.com/pina-rs/wasm_solana/pull/150)\n\nMarked `breaking` because the internal modules of `wasm_client_solana` and `test_utils_solana` become `pub mod` — the lint only enforces documentation inside public module trees, so without this the flat `pub use` re-exports would let hundreds of items escape it. The flat re-exports remain the supported import style, but every item is now also reachable by module path, which is new public API surface.\n\nEnable the `missing_docs` lint across the workspace and document every public item in `wasm_client_solana`, `memory_wallet`, the `test_utils_*` crates and the vendored Agave forks. Add `mdt` templates for documentation that appears in more than one place, so the shared wording cannot drift, and gate it in CI with a new `lint:docs` task. `rustdoc` now builds with no warnings.",
+							"#### Upstream client-types and the finished pubsub surface\n\n_Packages:_ 🔴 _solana-account-decoder-wasm_, 🔴 _solana-transaction-status-wasm_\n\n_Owner:_ Ifiok Jr. · _Introduced in:_ [8639311](https://github.com/pina-rs/wasm_solana/commit/86393119f02fefffd42de1541c9b8214ac8f0f35)\n\nAdopt the crates.io `solana-account-decoder-client-types` and `solana-transaction-status-client-types` — upstream 4.2.2 made `zstd` optional in the account one and keeps nothing native-only in either — and retire the two `-client-types-wasm` forks that existed only to provide that. Two published crates disappear from every Agave upgrade cycle; only the full decoder forks remain, because upstream still forces `zstd`, `Inflector`, and (for transaction-status) `solana-entry` on those.\n\nBreaking: the forks re-export the client-types surface, so their public API shifts with the swap (`UiAccount.owner` is now the upstream `String`, the `Eq` impls are gone) — the decoder forks take a major bump even though their own parse logic is untouched. `TestValidatorRunnerProps` also gains the `enable_vote_subscription` field, which is major for exhaustive struct construction.\n\nFor `wasm_client_solana`: `UiAccount.owner` is now the upstream `String` rather than the fork's `Pubkey`-typed field, and response types that derived `Eq` over decoder types (`GetTokenAccountBalanceResponse`, `GetTokenSupplyResponse`, `GetTransactionResponse`) keep `PartialEq` only. In exchange the wire types share identity with every other `solana-*` crate in the dependency graph, including the native test stack. The fork's decompression-bomb cap survives as `decode_account_data` in this crate — a hardened replacement for `UiAccountData::decode` that rejects `base64+zstd` payloads expanding past the cluster's own 10 MiB account-data cap.\n\nThe native tests also caught a latent ssr pubsub bug: the lazily-connected reqwest websocket polled its handshake future again after it completed (both split halves share it), so any refused connection panicked the provider with `async fn resumed after completion`. The handshake is now latched — a failed connection surfaces as one error frame followed by a permanent end of stream.\n\n`slotsUpdatesSubscribe` and `voteSubscribe` complete the websocket surface: the slot-lifecycle feed arrives as a typed `SlotUpdate` enum tagged by pipeline stage, and the raw vote feed carries `Pubkey`/`Hash`/`Signature` fields instead of base-58 strings. Both are pinned by wire-format tests plus a native integration test driving an in-process validator — which is also why `TestValidatorRunnerProps` gains `enable_vote_subscription`, mirroring the `--rpc-pubsub-enable-vote-subscription` flag production validators keep disabled by default."
+						]
+					},
+					{
+						"title": "Fixes",
+						"collapsed": false,
+						"entries": [
+							"#### Live-edge subscription forks, benchmarks, leaner deps\n\n_Packages:_ 🟢 _solana-account-decoder-wasm_, 🟢 _solana-transaction-status-wasm_\n\n_Owner:_ [@ifiokjr](https://github.com/ifiokjr) · _Review:_ [PR #159](https://github.com/pina-rs/wasm_solana/pull/159) · _Related issues:_ [#154](https://github.com/pina-rs/wasm_solana/issues/154)\n\nSubscription ack waits and new subscriptions now fork from the live edge of the shared websocket buffer (`fork_stream::Weak` upgrade) instead of cloning the never-read root fork, whose offset pinned them to the buffer's oldest entry. Setup previously replayed and re-parsed the socket's entire history before reaching live traffic. The new `subscription` criterion benchmark measures the ack wait at 73µs / 747µs / 10.1ms for 100 / 1k / 10k buffered frames on the old path, versus 120ns / 317ns / 1.35µs at the live edge — roughly 7,500× at 10k frames, and the gap grows linearly with connection age on busy sockets.\n\nTwo new criterion suites (`cargo bench -p wasm_client_solana -F ssr`) baseline the rest of the hot paths: full mock-provider dispatch (balance 1.4µs, one 256B account 3.0µs, 100×1KiB multi-account 237µs ≈ 413 MiB/s, 1000×256B program-accounts 1.8ms ≈ 136 MiB/s), wire primitives (wincode+base64 v0 encode 149ns, base64 1KiB decode 402ns ≈ 2.4 GiB/s, base58 pubkey 467ns), and per-notification parsing (1.5µs/frame).\n\nAlso drops four unused dependencies from `wasm_client_solana` — `async-tungstenite` (and with it the tungstenite/sha1/httparse tree plus duplicate getrandom 0.2 and thiserror 1 crates), `heck`, `bv`, and `solana-zk-token-sdk` — shrinking the wasm dependency graph from 658 to 575 unique crates (−13%). The remaining `Inflector` call sites in the account-decoder and transaction-status forks are replaced with a hand-rolled kebab-case helper, removing the `regex` stack from the graph; all 149 fork fixture tests pin the converted program names byte-for-byte. Dead-code elimination meant these unused crates were already stripped from the shipped cdylib, so the wins are compile time and supply-chain surface, not binary size; the regex removal additionally benefits apps that invoke the account parsers.\n\nKnown limitation kept for a follow-up: the root fork is retained unread to keep the shared buffer alive, so buffered frames still accumulate for the provider's lifetime; routing notifications through per-subscription-id channels is the remaining fix for buffer retention.",
+							"- **Add monostyle inline annotations.** Style-only pass: adds `monostyle.toml` and inline style annotations across the workspace (no behavior changes), plus a `monostyle check` step in CI so annotations stay in sync with the tool.\n  _Packages:_ 🟢 _solana-account-decoder-wasm_, 🟢 _solana-transaction-status-wasm_\n  _Owner:_ [@ifiokjr](https://github.com/ifiokjr) · _Review:_ [PR #153](https://github.com/pina-rs/wasm_solana/pull/153)",
+							"#### Priority fee estimation and complete pubsub surface\n\n_Packages:_ 🟢 _solana-account-decoder-wasm_, 🟢 _solana-transaction-status-wasm_\n\n_Owner:_ [@ifiokjr](https://github.com/ifiokjr) · _Review:_ [PR #162](https://github.com/pina-rs/wasm_solana/pull/162) · _Related issues:_ [#150](https://github.com/pina-rs/wasm_solana/issues/150), [#154](https://github.com/pina-rs/wasm_solana/issues/154), [#159](https://github.com/pina-rs/wasm_solana/issues/159)\n\n`getPriorityFeeEstimate` is the modern replacement for `getRecentPrioritizationFees`: it prices a specific transaction (or a set of locked accounts) at a chosen urgency percentile instead of reporting raw per-slot fee levels. Three client methods cover transaction-based, configured, and account-based estimation; `get_recent_prioritization_fees*` are now `#[deprecated]` with pointers to the replacements. `getMaxShredInsertSlot` — the highest slot with an inserted shred, leading retransmit — was also missing and is added.\n\nThe pubsub surface now matches the docs: `signatureSubscribe` (with optional `receivedNotification` frames), `slotSubscribe`, and `rootSubscribe` join account/logs/program/block. The signature subscription in particular is the push-based alternative to polling `getSignatureStatuses`, enabling one-round-trip send confirmation.\n\nTwo websocket correctness fixes from review: subscription and acknowledgement forks are now registered _before_ the subscribe request is sent (a frame racing the handshake could previously slip past a fork created after the send), and `Unsubscription` owns its fork rather than holding a weak live-edge handle (retaining a handle past the provider's drop no longer loses the buffer). The fork benchmark now measures the same acknowledgement wait in both variants with the history drain amortized in setup, matching production.\n\nAlso from review: the hardened `decode_account_data` helper rejects `base64+zstd` output beyond the 10 MiB cluster cap instead of silently truncating, the hand-rolled kebab-case helper inserts the hyphen before digit suffixes (`SplToken2022` -> `spl-token-2022`, restoring Inflector parity — regression-tested), and the browser e2e transfer test gets a budget covering both its airdrop and its send."
+						]
+					}
+				]
+			},
+			"rendered": "## forks [5.0.0](https://github.com/pina-rs/wasm_solana/releases/tag/forks/v5.0.0) (2026-10-07)\n\nGrouped release for `forks`.\n\n### Breaking Changes\n\n#### Document the public API and make the modules public\n\n_Owner:_ [@ifiokjr](https://github.com/ifiokjr) · _Review:_ [PR #150](https://github.com/pina-rs/wasm_solana/pull/150)\n\nMarked `breaking` because the internal modules of `wasm_client_solana` and `test_utils_solana` become `pub mod` — the lint only enforces documentation inside public module trees, so without this the flat `pub use` re-exports would let hundreds of items escape it. The flat re-exports remain the supported import style, but every item is now also reachable by module path, which is new public API surface.\n\nEnable the `missing_docs` lint across the workspace and document every public item in `wasm_client_solana`, `memory_wallet`, the `test_utils_*` crates and the vendored Agave forks. Add `mdt` templates for documentation that appears in more than one place, so the shared wording cannot drift, and gate it in CI with a new `lint:docs` task. `rustdoc` now builds with no warnings.\n\n#### Upstream client-types and the finished pubsub surface\n\n_Packages:_ 🔴 _solana-account-decoder-wasm_, 🔴 _solana-transaction-status-wasm_\n\n_Owner:_ Ifiok Jr. · _Introduced in:_ [8639311](https://github.com/pina-rs/wasm_solana/commit/86393119f02fefffd42de1541c9b8214ac8f0f35)\n\nAdopt the crates.io `solana-account-decoder-client-types` and `solana-transaction-status-client-types` — upstream 4.2.2 made `zstd` optional in the account one and keeps nothing native-only in either — and retire the two `-client-types-wasm` forks that existed only to provide that. Two published crates disappear from every Agave upgrade cycle; only the full decoder forks remain, because upstream still forces `zstd`, `Inflector`, and (for transaction-status) `solana-entry` on those.\n\nBreaking: the forks re-export the client-types surface, so their public API shifts with the swap (`UiAccount.owner` is now the upstream `String`, the `Eq` impls are gone) — the decoder forks take a major bump even though their own parse logic is untouched. `TestValidatorRunnerProps` also gains the `enable_vote_subscription` field, which is major for exhaustive struct construction.\n\nFor `wasm_client_solana`: `UiAccount.owner` is now the upstream `String` rather than the fork's `Pubkey`-typed field, and response types that derived `Eq` over decoder types (`GetTokenAccountBalanceResponse`, `GetTokenSupplyResponse`, `GetTransactionResponse`) keep `PartialEq` only. In exchange the wire types share identity with every other `solana-*` crate in the dependency graph, including the native test stack. The fork's decompression-bomb cap survives as `decode_account_data` in this crate — a hardened replacement for `UiAccountData::decode` that rejects `base64+zstd` payloads expanding past the cluster's own 10 MiB account-data cap.\n\nThe native tests also caught a latent ssr pubsub bug: the lazily-connected reqwest websocket polled its handshake future again after it completed (both split halves share it), so any refused connection panicked the provider with `async fn resumed after completion`. The handshake is now latched — a failed connection surfaces as one error frame followed by a permanent end of stream.\n\n`slotsUpdatesSubscribe` and `voteSubscribe` complete the websocket surface: the slot-lifecycle feed arrives as a typed `SlotUpdate` enum tagged by pipeline stage, and the raw vote feed carries `Pubkey`/`Hash`/`Signature` fields instead of base-58 strings. Both are pinned by wire-format tests plus a native integration test driving an in-process validator — which is also why `TestValidatorRunnerProps` gains `enable_vote_subscription`, mirroring the `--rpc-pubsub-enable-vote-subscription` flag production validators keep disabled by default.\n\n### Fixes\n\n#### Live-edge subscription forks, benchmarks, leaner deps\n\n_Packages:_ 🟢 _solana-account-decoder-wasm_, 🟢 _solana-transaction-status-wasm_\n\n_Owner:_ [@ifiokjr](https://github.com/ifiokjr) · _Review:_ [PR #159](https://github.com/pina-rs/wasm_solana/pull/159) · _Related issues:_ [#154](https://github.com/pina-rs/wasm_solana/issues/154)\n\nSubscription ack waits and new subscriptions now fork from the live edge of the shared websocket buffer (`fork_stream::Weak` upgrade) instead of cloning the never-read root fork, whose offset pinned them to the buffer's oldest entry. Setup previously replayed and re-parsed the socket's entire history before reaching live traffic. The new `subscription` criterion benchmark measures the ack wait at 73µs / 747µs / 10.1ms for 100 / 1k / 10k buffered frames on the old path, versus 120ns / 317ns / 1.35µs at the live edge — roughly 7,500× at 10k frames, and the gap grows linearly with connection age on busy sockets.\n\nTwo new criterion suites (`cargo bench -p wasm_client_solana -F ssr`) baseline the rest of the hot paths: full mock-provider dispatch (balance 1.4µs, one 256B account 3.0µs, 100×1KiB multi-account 237µs ≈ 413 MiB/s, 1000×256B program-accounts 1.8ms ≈ 136 MiB/s), wire primitives (wincode+base64 v0 encode 149ns, base64 1KiB decode 402ns ≈ 2.4 GiB/s, base58 pubkey 467ns), and per-notification parsing (1.5µs/frame).\n\nAlso drops four unused dependencies from `wasm_client_solana` — `async-tungstenite` (and with it the tungstenite/sha1/httparse tree plus duplicate getrandom 0.2 and thiserror 1 crates), `heck`, `bv`, and `solana-zk-token-sdk` — shrinking the wasm dependency graph from 658 to 575 unique crates (−13%). The remaining `Inflector` call sites in the account-decoder and transaction-status forks are replaced with a hand-rolled kebab-case helper, removing the `regex` stack from the graph; all 149 fork fixture tests pin the converted program names byte-for-byte. Dead-code elimination meant these unused crates were already stripped from the shipped cdylib, so the wins are compile time and supply-chain surface, not binary size; the regex removal additionally benefits apps that invoke the account parsers.\n\nKnown limitation kept for a follow-up: the root fork is retained unread to keep the shared buffer alive, so buffered frames still accumulate for the provider's lifetime; routing notifications through per-subscription-id channels is the remaining fix for buffer retention.\n\n- **Add monostyle inline annotations.** Style-only pass: adds `monostyle.toml` and inline style annotations across the workspace (no behavior changes), plus a `monostyle check` step in CI so annotations stay in sync with the tool.\n  _Packages:_ 🟢 _solana-account-decoder-wasm_, 🟢 _solana-transaction-status-wasm_\n  _Owner:_ [@ifiokjr](https://github.com/ifiokjr) · _Review:_ [PR #153](https://github.com/pina-rs/wasm_solana/pull/153)\n#### Priority fee estimation and complete pubsub surface\n\n_Packages:_ 🟢 _solana-account-decoder-wasm_, 🟢 _solana-transaction-status-wasm_\n\n_Owner:_ [@ifiokjr](https://github.com/ifiokjr) · _Review:_ [PR #162](https://github.com/pina-rs/wasm_solana/pull/162) · _Related issues:_ [#150](https://github.com/pina-rs/wasm_solana/issues/150), [#154](https://github.com/pina-rs/wasm_solana/issues/154), [#159](https://github.com/pina-rs/wasm_solana/issues/159)\n\n`getPriorityFeeEstimate` is the modern replacement for `getRecentPrioritizationFees`: it prices a specific transaction (or a set of locked accounts) at a chosen urgency percentile instead of reporting raw per-slot fee levels. Three client methods cover transaction-based, configured, and account-based estimation; `get_recent_prioritization_fees*` are now `#[deprecated]` with pointers to the replacements. `getMaxShredInsertSlot` — the highest slot with an inserted shred, leading retransmit — was also missing and is added.\n\nThe pubsub surface now matches the docs: `signatureSubscribe` (with optional `receivedNotification` frames), `slotSubscribe`, and `rootSubscribe` join account/logs/program/block. The signature subscription in particular is the push-based alternative to polling `getSignatureStatuses`, enabling one-round-trip send confirmation.\n\nTwo websocket correctness fixes from review: subscription and acknowledgement forks are now registered _before_ the subscribe request is sent (a frame racing the handshake could previously slip past a fork created after the send), and `Unsubscription` owns its fork rather than holding a weak live-edge handle (retaining a handle past the provider's drop no longer loses the buffer). The fork benchmark now measures the same acknowledgement wait in both variants with the history drain amortized in setup, matching production.\n\nAlso from review: the hardened `decode_account_data` helper rejects `base64+zstd` output beyond the 10 MiB cluster cap instead of silently truncating, the hand-rolled kebab-case helper inserts the hyphen before digit suffixes (`SplToken2022` -> `spl-token-2022`, restoring Inflector parity — regression-tested), and the browser e2e transfer test gets a budget covering both its airdrop and its send."
+		}
+	],
+	"provider": {
+		"kind": "github",
+		"owner": "pina-rs",
+		"repo": "wasm_solana",
+		"host": null
+	}
+}
