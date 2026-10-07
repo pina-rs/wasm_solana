@@ -3,7 +3,10 @@
 // Both transports default off so browser and native builds never pull the
 // other's dependency tree; a bare dependency therefore has neither and would
 // otherwise fail deep inside web-sys or reqwest with confusing errors.
-#[cfg(not(any(feature = "js", feature = "ssr")))]
+// The guard is wasm-only because `cargo publish` verifies the tarball with
+// default features on the native host, where a bare build is empty rather than
+// broken; the confusing-failure mode the guard exists for is the browser one.
+#[cfg(all(target_arch = "wasm32", not(any(feature = "js", feature = "ssr"))))]
 compile_error!(
 	"wasm_client_solana needs exactly one transport feature: `js` for browser/wasm targets or \
 	 `ssr` for native targets"
