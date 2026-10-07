@@ -4,8 +4,8 @@
 
 ```toml
 [dependencies]
-wasm_client_solana = "0.10"
-memory_wallet = "0.2" # optional: wallet-standard signing (great for tests)
+wasm_client_solana = "0.12"
+memory_wallet = "0.12" # optional: wallet-standard signing (great for tests)
 ```
 
 ### Feature flags of `wasm_client_solana`
@@ -14,13 +14,13 @@ memory_wallet = "0.2" # optional: wallet-standard signing (great for tests)
 | ---------------- | ---------------------------------------------------------------------------------- |
 | `js` _(wasm)_    | Browser transport: `fetch` for HTTP and the `WebSocket` API for pubsub. No tokio.  |
 | `ssr` _(native)_ | Server transport: reqwest HTTP and reqwest-websocket, for desktop/server binaries. |
-| `zstd`           | Server-side zstd support for validator snapshots (pulls native C zstd).            |
+| `zstd`           | Native decoding for `base64+zstd` account data (pulls in the C zstd library).      |
 
 ```toml
 # Browser (wasm32) target
-wasm_client_solana = { version = "0.10", features = ["js"] }
+wasm_client_solana = { version = "0.12", features = ["js"] }
 # Native target
-wasm_client_solana = { version = "0.10", features = ["ssr"] }
+wasm_client_solana = { version = "0.12", features = ["ssr"] }
 ```
 
 ## getrandom on wasm32-unknown-unknown
@@ -48,8 +48,8 @@ use solana_pubkey::Pubkey;
 let client = SolanaRpcClient::new("https://api.devnet.solana.com");
 let pubkey = "So11111111111111111111111111111111111111112".parse()?;
 
-let response = client.get_balance(&pubkey).await?;
-println!("lamports: {}", response.value);
+let lamports = client.get_balance(&pubkey).await?;
+println!("lamports: {lamports}");
 ```
 
 `SolanaRpcClient` is the one constructor for every environment — it selects the `HttpProvider` for `ssr` builds and the browser transport for wasm builds behind the same API.
@@ -76,13 +76,16 @@ let signed = wallet
 
 ```rust,ignore
 use wasm_client_solana::SolanaRpcClient;
+use wasm_client_solana::prelude::*;
 
-let client = SolanaRpcClient::new("wss://api.devnet.solana.com");
-let mut stream = client.account_notifications(&pubkey).await?;
+let client = SolanaRpcClient::new("https://api.devnet.solana.com");
+let subscription = client.account_subscribe(pubkey).await?;
+let mut stream = subscription.take(10);
 
 while let Some(notification) = stream.next().await {
     log::info!("account changed: {notification:?}");
 }
+// The last handle's drop unsubscribes.
 ```
 
 See [Pubsub and Streams](./pubsub.md) for the full subscription model.

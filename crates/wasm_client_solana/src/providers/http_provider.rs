@@ -62,6 +62,10 @@ mod ssr_http_provider {
 				.json(&client_request)
 				.send()
 				.await?
+				// A rate-limited or gateway-error response carries a non-JSON
+				// body; failing on the status turns it into a typed error
+				// instead of a confusing decode error one step later.
+				.error_for_status()?
 				.json()
 				.await?;
 
@@ -105,7 +109,11 @@ mod ssr_http_provider {
 		fn from(error: reqwest::Error) -> Self {
 			let message = error.to_string();
 			let code = i32::from(error.status().map_or(DEFAULT_ERROR_CODE, |s| s.as_u16()));
-			let error = RpcErrorDetails { code, message };
+			let error = RpcErrorDetails {
+				code,
+				message,
+				data: Value::Null,
+			};
 
 			RpcError {
 				error,
@@ -212,6 +220,12 @@ mod wasm_http_provider {
 					.abort_signal(Some(&signal))
 					.json(&client_request)?;
 				let response = AbortableRequest::new(request.send(), controller).await?;
+				if !response.ok() {
+					return Err(ClientError::Other(format!(
+						"HTTP {}: the RPC endpoint rejected the request",
+						response.status(),
+					)));
+				}
 				let value = response.json().await?;
 
 				Ok::<Value, ClientError>(value)
@@ -260,3 +274,50 @@ pub const TESTNET: &str = "https://api.testnet.solana.com";
 pub const MAINNET: &str = "https://api.mainnet-beta.solana.com";
 /// Default endpoint of a locally running `solana-test-validator`.
 pub const LOCALNET: &str = "http://127.0.0.1:8899";
+
+#[cfg(all(test, feature = "ssr"))]
+mod ssr_tests {
+
+	use assert2::check;
+	use futures::FutureExt;
+
+	use super::ssr_http_provider::HttpProvider;
+	use crate::ClientError;
+	use crate::RpcProvider;
+
+	/// A rate-limited or gateway-error response must surface as a typed
+	/// error carrying the HTTP status, not as a body-decode failure one
+	/// step later.
+	#[tokio::test]
+	async fn http_status_surfaces_as_rpc_error() {
+		use std::io::Write as _;
+
+		let listener = std::net::TcpListener::bind("127.0.0.1:0").unwrap();
+		let port = listener.local_addr().unwrap().port();
+		let server = std::thread::spawn(move || {
+			let (mut socket, _) = listener.accept().unwrap();
+			let mut buffer = [0_u8; 1024];
+			let _ = std::io::Read::read(&mut socket, &mut buffer).unwrap();
+			let _ = socket
+				.write_all(
+					b"HTTP/1.1 429 Too Many Requests
+content-length: 0
+connection: close
+
+",
+				)
+				.unwrap();
+		});
+
+		let provider = HttpProvider::new(format!("http://127.0.0.1:{port}"));
+		let params = serde_json::json!(["11111111111111111111111111111111"]);
+		let error = provider.send("getBalance", params).await.unwrap_err();
+		server.join().unwrap();
+
+		let ClientError::Rpc(rpc) = error else {
+			panic!("expected an rpc error for a 429, got {error:?}");
+		};
+		check!(rpc.error.code == 429);
+		check!(rpc.error.message.contains("429"));
+	}
+}

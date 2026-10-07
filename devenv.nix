@@ -22,6 +22,7 @@ in
       cargo-nextest
       cargo-run-bin
       chromedriver
+      chromium
       cmake
       curl
       custom.agave
@@ -259,6 +260,15 @@ in
         sleep 5
 
         echo "running tests in chrome..."
+        # Both halves of the browser pair must come from the same nixpkgs
+        # revision: pin the browser binary to the profile's chromium so a
+        # runner-provided (auto-updating) Chrome can never mismatch the
+        # pinned chromedriver. The capabilities file is generated at runtime
+        # because the profile path is a nix store hash.
+        webdriver_json="$(mktemp)"
+        printf '{"goog:chromeOptions": {"binary": "%s/bin/chromium", "args": ["--headless", "--no-sandbox", "--disable-dev-shm-usage", "--disable-gpu"]}}' \
+          "$DEVENV_PROFILE" > "$webdriver_json"
+        export WASM_BINDGEN_TEST_WEBDRIVER_JSON="$webdriver_json"
         CHROMEDRIVER=$DEVENV_PROFILE/bin/chromedriver cargo test_wasm
 
         # echo "running tests in firefox..."
@@ -298,6 +308,13 @@ in
         # published client API surface. RUSTSEC-2026-0097 hits rand 0.7.3,
         # which enters only through ed25519-dalek 1.x in agave-precompiles
         # (the client's own rand 0.8.8/0.9.x pins are patched ranges).
+        # RUSTSEC-2025-0141: bincode 1.3.3 is unmaintained; it arrives
+        # transitively through the agave snapshot crates, which still target
+        # the 1.x API. Mirrors the deny.toml ignore.
+        # (the client's own rand 0.8.8/0.9.x pins are patched ranges), and
+        # solana-genesis-config 4.0.0 inside the validator harness only.
+        # Comments stay above the command: a `#` after a line continuation
+        # swallows every remaining argument.
         cargo-audit audit \
           --db "$DEVENV_ROOT/target/advisory-db-audit" \
           --url "https://github.com/RustSec/advisory-db.git" \
@@ -308,7 +325,9 @@ in
           --ignore RUSTSEC-2026-0173 \
           --ignore RUSTSEC-2026-0097 \
           --ignore RUSTSEC-2026-0292 \
-          --file "$DEVENV_ROOT/Cargo.lock"
+                  --ignore RUSTSEC-2025-0141 \
+          --ignore RUSTSEC-2026-0186 \
+                  --file "$DEVENV_ROOT/Cargo.lock"
       '';
       description = "Run RustSec advisory audit for Cargo.lock (ignores validator-stack advisories).";
     };

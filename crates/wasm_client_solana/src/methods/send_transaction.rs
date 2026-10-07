@@ -50,6 +50,7 @@ impl Serialize for SendTransactionRequest {
 		} else {
 			let mut tuple = serializer.serialize_tuple(1)?;
 			tuple.serialize_element(&serialized_encoded)?;
+
 			tuple
 		};
 

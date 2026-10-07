@@ -1,0 +1,30 @@
+name: "bench"
+
+permissions:
+  contents: read
+
+# Benchmarks run on demand: criterion numbers are machine-sensitive, so they
+# are compared informally rather than gating changes.
+on:
+  workflow_dispatch:
+
+jobs:
+  bench:
+    timeout-minutes: 60
+    runs-on: ubuntu-24.04
+    steps:
+      - name: checkout repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: setup
+        uses: ./.github/actions/devenv
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: run benchmarks
+        run: |
+          export PATH="$DEVENV_PROFILE/bin:$PATH"
+          cargo bench -p wasm_client_solana -F ssr --bench client --bench subscription
+        shell: devenv shell -c -- bash -e {0}

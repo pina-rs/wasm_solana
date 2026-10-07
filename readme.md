@@ -9,8 +9,8 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/ifiokjr/wasm_solana/actions?query=workflow:ci">
-    <img src="https://github.com/ifiokjr/wasm_solana/workflows/ci/badge.svg" alt="Continuous integration badge for github actions" title="CI Badge" />
+  <a href="https://github.com/pina-rs/wasm_solana/actions?query=workflow:ci">
+    <img src="https://github.com/pina-rs/wasm_solana/workflows/ci/badge.svg" alt="Continuous integration badge for github actions" title="CI Badge" />
   </a>
 </p>
 
@@ -160,3 +160,7 @@ setup:helix
 ## License
 
 Unlicense, see the [LICENSE](./license) file.
+
+## Examples
+
+The [`examples/`](./examples/readme.md) directory carries Leptos and Dioxus browser apps, driven end-to-end by Playwright against a local surfpool node — the fastest way to see the client working in a real browser.

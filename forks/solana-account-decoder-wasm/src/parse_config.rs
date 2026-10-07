@@ -40,11 +40,9 @@ where
 	let config_data: T = deserialize(get_config_data(data).ok()?).ok()?;
 	let keys = keys
 		.iter()
-		.map(|key| {
-			UiConfigKey {
-				pubkey: key.0.to_string(),
-				signer: key.1,
-			}
+		.map(|key| UiConfigKey {
+			pubkey: key.0.to_string(),
+			signer: key.1,
 		})
 		.collect();
 	Some(UiConfig { keys, config_data })

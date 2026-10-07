@@ -10,8 +10,11 @@ Signing is modeled through the [Wallet Standard](https://github.com/pina-rs/wall
 // sign a transaction with any wallet-standard Solana wallet
 let signed = unsigned_transaction.sign_with_wallet(&wallet, options).await?;
 
-// or sign and broadcast in one step
-let signature = transaction.sign_and_send_with_wallet(&wallet).await?;
+// or sign and broadcast in one step through the wallet-standard capability
+let props = SolanaSignAndSendTransactionProps::builder()
+    .transaction(unsigned_transaction)
+    .build();
+let signature = wallet.sign_and_send_transaction(props).await?;
 ```
 
 `W: WalletSolanaSignTransaction` and `W: WalletSolanaSignAndSendTransaction` bounds mean any compliant wallet works — `memory_wallet` in tests, an injected browser wallet through `wallet_standard_browser` in production.
