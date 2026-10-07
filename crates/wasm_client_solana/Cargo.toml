@@ -114,7 +114,13 @@ wasm-bindgen-test = { workspace = true, default-features = true }
 # exists natively; the browser test target must never build the validator
 # stack, so the dependency is scoped to non-wasm targets.
 [target.'cfg(not(target_arch = "wasm32"))'.dev-dependencies]
-test_utils_solana = { workspace = true, features = ["test_validator"] }
+# Inlined rather than workspace-shared, with a floor instead of an exact version:
+# publishing this crate resolves dev-dependencies against crates.io, where
+# test_utils_solana's new version lands in the same publish wave, and an exact
+# requirement deadlocks the wave (its regular dependency on this crate runs the
+# other way). A floor lets this crate publish first; nothing but this crate's
+# own test runs ever sees it.
+test_utils_solana = { path = "../test_utils_solana", version = ">=0.12.0", features = ["test_validator"] }
 
 [features]
 js = ["futures-timer/wasm-bindgen", "getrandom/wasm_js"]
