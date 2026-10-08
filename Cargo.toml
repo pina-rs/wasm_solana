@@ -26,7 +26,7 @@ rust-version = "1.89.0"
 [workspace.dependencies]
 agave-reserved-account-keys = { default-features = false, features = ["agave-unstable-api"], version = "^4.2" }
 anyhow = { default-features = false, version = "^1" }
-assert2 = { default-features = false, version = "^0.3" }
+assert2 = { default-features = false, version = "^0.4" }
 assert_matches = { default-features = false, version = "^1" }
 async-trait = { default-features = false, version = "^0.1" }
 async-tungstenite = { default-features = false, version = "^0.28.1" }
