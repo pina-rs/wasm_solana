@@ -54,7 +54,7 @@ log = { default-features = false, version = "^0.4" }
 nacl = { default-features = false, version = "^0.5" }
 pin-project = { default-features = false, version = "^1" }
 port_check = { default-features = false, version = "^0.3" }
-rand = { default-features = false, version = "^0.9" }
+rand = { default-features = false, version = "^0.10" }
 reqwest = { default-features = false, version = "^0.13" }
 reqwest-websocket = { default-features = false, version = "^0.5" }
 semver = { default-features = false, version = "^1" }
