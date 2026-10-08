@@ -114,7 +114,7 @@ solana-sysvar = { default-features = false, features = ["bincode", "bytemuck", "
 solana-test-validator = { features = ["agave-unstable-api"], default-features = false, version = "^4.2" }
 solana-transaction = { default-features = false, features = ["serde", "wincode"], version = ">=4.1.4, <4.2.0" }
 solana-transaction-context = { default-features = false, features = ["agave-unstable-api", "bincode", "serde"], version = "^4.2" }
-solana-transaction-error = { default-features = false, features = ["serde"], version = ">=3.3.1, <3.4.0" }
+solana-transaction-error = { default-features = false, features = ["serde"], version = ">=3.3.1, <4.2.0" }
 # Same upstream split as `solana-account-decoder-client-types`; the whole
 # crate hides behind `agave-unstable-api`, which is only a stability label
 # for the type surface, not a validator feature.
