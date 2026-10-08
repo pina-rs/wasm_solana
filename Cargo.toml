@@ -45,7 +45,7 @@ fork_stream = { default-features = false, version = "^0.1" }
 futures = { default-features = false, version = "^0.3" }
 futures-timeout = { default-features = false, version = "^0.2" }
 futures-timer = { default-features = false, version = "^3" }
-getrandom = { default-features = false, version = "^0.3" }
+getrandom = { default-features = false, version = "^0.4" }
 gloo-net = { default-features = false, version = "^0.7" }
 indexmap = { default-features = false, version = "^2" }
 insta = { default-features = false, version = "^1" }
