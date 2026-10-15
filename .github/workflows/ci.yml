@@ -32,7 +32,7 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
-      - uses: ifiokjr/monostyle@be483a75d05cdc6d64493a3dd67025e3ecd79551 # v0.3.25
+      - uses: ifiokjr/monostyle@c320d9c0bd2d85e8c939e8ac74c2b4e40ea2da5f # v0.3.26
         if: always()
         with:
           version: 0.3.25
