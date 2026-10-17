@@ -16,6 +16,7 @@ use solana_pubkey::Pubkey;
 use solana_signature::Signature;
 use solana_transaction::versioned::VersionedTransaction;
 
+use crate::CallbackSubscription;
 use crate::ClientError;
 use crate::ClientResponse;
 use crate::ClientResult;
@@ -25,6 +26,9 @@ use crate::RpcError;
 use crate::RpcProvider;
 use crate::SLEEP_MS;
 use crate::Subscription;
+use crate::SubscriptionCallback;
+use crate::WebSocketMethod;
+use crate::WebSocketNotification;
 use crate::WebSocketProvider;
 use crate::methods::*;
 use crate::rpc_config::BlockSubscribeRequest;
@@ -42,6 +46,7 @@ use crate::rpc_config::RpcLargestAccountsConfig;
 use crate::rpc_config::RpcLeaderScheduleConfig;
 use crate::rpc_config::RpcProgramAccountsConfig;
 use crate::rpc_config::RpcSendTransactionConfig;
+use crate::rpc_config::RpcSignatureSubscribeConfig;
 use crate::rpc_config::RpcSignaturesForAddressConfig;
 use crate::rpc_config::RpcSimulateTransactionConfig;
 use crate::rpc_config::RpcSupplyConfig;
@@ -251,6 +256,23 @@ impl SolanaRpcClient {
 			Ok(response) => Ok(response),
 			Err(error) => Err(ClientError::Other(error.to_string())),
 		}
+	}
+
+	/// Create a typed subscription through the shared pubsub socket, the
+	/// common body of every public `*_subscribe` method.
+	async fn subscribe<R, N>(&self, request: R) -> ClientResult<Subscription<N>>
+	where
+		R: WebSocketMethod,
+		N: DeserializeOwned + WebSocketNotification,
+	{
+		let (id, subscription_id, stream) = self.ws.create_subscription(request).await?;
+
+		Ok(Subscription::from_parts(
+			&self.ws,
+			id,
+			subscription_id,
+			stream,
+		))
 	}
 
 	/// Return the account stored at `pubkey`, or `None` when the node knows
@@ -510,9 +532,95 @@ impl SolanaRpcClient {
 	/// Poll the signature status until the transaction reaches
 	/// `commitment_config`, returning whether it succeeded.
 	///
-	/// Returns `false` if the status is still unknown after
-	/// `MAX_RETRIES` polls, so a `false` result does not prove failure.
+	/// Confirmation prefers the pubsub endpoint: a `signatureSubscribe`
+	/// notification delivers the status the moment the node reaches the
+	/// target commitment, without waiting out the polling interval. A single
+	/// status poll after subscribing covers a transaction that already
+	/// reached the target before the subscription existed. When pubsub
+	/// cannot deliver — no endpoint, a failed subscription, or silence past
+	/// the budget the polling loop also gets — confirmation falls back to
+	/// polling `getSignatureStatuses` every [`SLEEP_MS`] milliseconds up to
+	/// [`MAX_RETRIES`] times, so a transaction that never lands may take both
+	/// budgets before this returns.
+	///
+	/// Returns `false` if the status is still unknown after both paths are
+	/// exhausted, so a `false` result does not prove failure.
 	pub async fn confirm_transaction_with_commitment(
+		&self,
+		signature: &Signature,
+		commitment_config: CommitmentConfig,
+	) -> ClientResult<bool> {
+		if let Some(confirmed) = self
+			.confirm_with_signature_subscription(signature, commitment_config)
+			.await
+		{
+			return Ok(confirmed);
+		}
+
+		self.poll_signature_status(signature, commitment_config)
+			.await
+	}
+
+	/// Confirm `signature` through a `signatureSubscribe` notification,
+	/// bounded by the polling loop's total budget.
+	///
+	/// Returns `None` when the pubsub path cannot deliver a status — no
+	/// pubsub endpoint, a subscription failure, or silence past the budget —
+	/// so the caller falls back to polling. Errors from the one covering
+	/// status poll are deliberately swallowed: while the websocket is
+	/// healthy the notification still arrives, and when it is not, the
+	/// polling fallback resurfaces them.
+	async fn confirm_with_signature_subscription(
+		&self,
+		signature: &Signature,
+		commitment_config: CommitmentConfig,
+	) -> Option<bool> {
+		use futures::StreamExt as _;
+		use futures::future::FutureExt as _;
+
+		let request = SignatureSubscribeRequest::builder()
+			.signature(*signature)
+			.config(RpcSignatureSubscribeConfig {
+				commitment: Some(commitment_config),
+				enable_received_notification: None,
+			})
+			.build();
+
+		let mut attempt = Box::pin(async {
+			let mut subscription = self.signature_subscribe(request).await.ok()?;
+
+			// One status poll after subscribing closes the race with a
+			// transaction that reached the target before the subscription
+			// existed; anything later is covered by the notification.
+			if let Ok(signature_statuses) = self.get_signature_statuses(&[*signature]).await
+				&& let Some(signature_status) = signature_statuses.first().and_then(Option::as_ref)
+				&& signature_status_reached(signature_status, commitment_config.commitment)
+			{
+				let _ = subscription.unsubscribe().await;
+
+				return Some(signature_status.err.is_none());
+			}
+
+			let notification = subscription.next().await?;
+			let succeeded = notification.params.result.value.err.is_none();
+
+			let _ = subscription.unsubscribe().await;
+
+			Some(succeeded)
+		})
+		.fuse();
+
+		let mut budget = Delay::new(Duration::from_millis(SLEEP_MS * MAX_RETRIES as u64)).fuse();
+
+		futures::select! {
+			result = &mut attempt => result,
+			() = &mut budget => None,
+		}
+	}
+
+	/// Confirm `signature` by polling `getSignatureStatuses` every
+	/// [`SLEEP_MS`] milliseconds, up to [`MAX_RETRIES`] times.
+	async fn poll_signature_status(
 		&self,
 		signature: &Signature,
 		commitment_config: CommitmentConfig,
@@ -525,28 +633,10 @@ impl SolanaRpcClient {
 			// `first()` rather than indexing: a misbehaving node returning a
 			// short array must not panic the client.
 			if let Some(signature_status) = signature_statuses.first().and_then(Option::as_ref)
-				&& signature_status.confirmation_status.is_some()
+				&& signature_status_reached(signature_status, commitment_config.commitment)
 			{
-				let current_commitment = signature_status.confirmation_status.as_ref().unwrap();
-
-				let commitment_matches = match commitment_config.commitment {
-					CommitmentLevel::Finalized => {
-						matches!(current_commitment, TransactionConfirmationStatus::Finalized)
-					}
-					CommitmentLevel::Confirmed => {
-						matches!(
-							current_commitment,
-							TransactionConfirmationStatus::Finalized
-								| TransactionConfirmationStatus::Confirmed
-						)
-					}
-					CommitmentLevel::Processed => true,
-				};
-
-				if commitment_matches {
-					is_success = signature_status.err.is_none();
-					break;
-				}
+				is_success = signature_status.err.is_none();
+				break;
 			}
 
 			Delay::new(Duration::from_millis(SLEEP_MS)).await;
@@ -564,6 +654,12 @@ impl SolanaRpcClient {
 
 	/// Send a signed transaction with `config` and wait for it to reach
 	/// `commitment_config` before returning its signature.
+	///
+	/// Errors when the transaction does not confirm at `commitment_config`
+	/// within the retry budget, or when it landed with an error; a `false`
+	/// confirmation is never silently reported as success. An unconfirmed
+	/// transaction may still land later — the returned error carries the
+	/// signature so the caller can check its status again.
 	pub async fn send_and_confirm_transaction_with_config(
 		&self,
 		transaction: &VersionedTransaction,
@@ -574,10 +670,19 @@ impl SolanaRpcClient {
 			.send_transaction_with_config(transaction, config)
 			.await?;
 
-		self.confirm_transaction_with_commitment(&tx_hash, commitment_config)
+		let confirmed = self
+			.confirm_transaction_with_commitment(&tx_hash, commitment_config)
 			.await?;
 
-		Ok(tx_hash)
+		if confirmed {
+			Ok(tx_hash)
+		} else {
+			Err(RpcError::new(format!(
+				"Transaction {tx_hash} did not confirm at {} within the retry budget.",
+				commitment_config.commitment
+			))
+			.into())
+		}
 	}
 
 	/// Send a signed transaction and wait for it to reach
@@ -1695,11 +1800,7 @@ impl SolanaRpcClient {
 		&self,
 		request: impl Into<GetAccountInfoRequest>,
 	) -> ClientResult<Subscription<GetAccountInfoResponse>> {
-		let request: GetAccountInfoRequest = request.into();
-		let (id, subscription_id, stream) = self.ws.create_subscription(request).await?;
-		let subscription = Subscription::from_parts(&self.ws, id, subscription_id, stream);
-
-		Ok(subscription)
+		self.subscribe(request.into()).await
 	}
 
 	/// Subscribe to block events.
@@ -1719,10 +1820,7 @@ impl SolanaRpcClient {
 		&self,
 		request: BlockSubscribeRequest,
 	) -> ClientResult<Subscription<BlockNotificationResponse>> {
-		let (id, subscription_id, stream) = self.ws.create_subscription(request).await?;
-		let subscription = Subscription::from_parts(&self.ws, id, subscription_id, stream);
-
-		Ok(subscription)
+		self.subscribe(request).await
 	}
 
 	/// Subscribe to transaction log events.
@@ -1739,10 +1837,7 @@ impl SolanaRpcClient {
 		&self,
 		request: LogsSubscribeRequest,
 	) -> ClientResult<Subscription<LogsNotificationResponse>> {
-		let (id, subscription_id, stream) = self.ws.create_subscription(request).await?;
-		let subscription = Subscription::from_parts(&self.ws, id, subscription_id, stream);
-
-		Ok(subscription)
+		self.subscribe(request).await
 	}
 
 	/// Subscribe to program account events.
@@ -1759,10 +1854,7 @@ impl SolanaRpcClient {
 		&self,
 		request: ProgramSubscribeRequest,
 	) -> ClientResult<Subscription<GetProgramAccountsResponse>> {
-		let (id, subscription_id, stream) = self.ws.create_subscription(request).await?;
-		let subscription = Subscription::from_parts(&self.ws, id, subscription_id, stream);
-
-		Ok(subscription)
+		self.subscribe(request).await
 	}
 
 	/// Subscribe to a transaction's confirmation status by signature.
@@ -1775,10 +1867,7 @@ impl SolanaRpcClient {
 		&self,
 		request: SignatureSubscribeRequest,
 	) -> ClientResult<Subscription<SignatureNotificationResponse>> {
-		let (id, subscription_id, stream) = self.ws.create_subscription(request).await?;
-		let subscription = Subscription::from_parts(&self.ws, id, subscription_id, stream);
-
-		Ok(subscription)
+		self.subscribe(request).await
 	}
 
 	/// Subscribe to every slot the node processes.
@@ -1790,10 +1879,7 @@ impl SolanaRpcClient {
 		&self,
 		request: SlotSubscribeRequest,
 	) -> ClientResult<Subscription<SlotInfo>> {
-		let (id, subscription_id, stream) = self.ws.create_subscription(request).await?;
-		let subscription = Subscription::from_parts(&self.ws, id, subscription_id, stream);
-
-		Ok(subscription)
+		self.subscribe(request).await
 	}
 
 	/// Subscribe to new roots — slots that can no longer be rolled back.
@@ -1805,10 +1891,7 @@ impl SolanaRpcClient {
 		&self,
 		request: RootSubscribeRequest,
 	) -> ClientResult<Subscription<RootNotificationResponse>> {
-		let (id, subscription_id, stream) = self.ws.create_subscription(request).await?;
-		let subscription = Subscription::from_parts(&self.ws, id, subscription_id, stream);
-
-		Ok(subscription)
+		self.subscribe(request).await
 	}
 
 	/// Subscribe to the full slot lifecycle: shreds arriving, banks being
@@ -1836,13 +1919,7 @@ impl SolanaRpcClient {
 	/// # }
 	/// ```
 	pub async fn slots_updates_subscribe(&self) -> ClientResult<Subscription<SlotUpdate>> {
-		let (id, subscription_id, stream) = self
-			.ws
-			.create_subscription(SlotsUpdatesSubscribeRequest)
-			.await?;
-		let subscription = Subscription::from_parts(&self.ws, id, subscription_id, stream);
-
-		Ok(subscription)
+		self.subscribe(SlotsUpdatesSubscribeRequest).await
 	}
 
 	/// Subscribe to every vote the node observes on gossip: the voting
@@ -1867,10 +1944,200 @@ impl SolanaRpcClient {
 	/// # }
 	/// ```
 	pub async fn vote_subscribe(&self) -> ClientResult<Subscription<VoteNotification>> {
-		let (id, subscription_id, stream) =
-			self.ws.create_subscription(VoteSubscribeRequest).await?;
-		let subscription = Subscription::from_parts(&self.ws, id, subscription_id, stream);
+		self.subscribe(VoteSubscribeRequest).await
+	}
 
-		Ok(subscription)
+	/// Subscribe with a callback instead of a stream: the crate drives the
+	/// subscription on the target's runtime and invokes `callback` once per
+	/// notification payload — the same value the stream flavor yields from
+	/// `params.result`.
+	///
+	/// The generic escape hatch behind the typed `on_*` methods, for feeds
+	/// without a dedicated wrapper. The notification type is chosen by the
+	/// caller; prefer the typed methods unless one is missing.
+	///
+	/// Under `ssr` the pump runs on `tokio::spawn`, so this must be called
+	/// inside a tokio runtime and the callback must be `Send`; in the browser
+	/// there is no such requirement.
+	pub async fn subscribe_with_callback<R, N, F>(
+		&self,
+		request: R,
+		callback: F,
+	) -> ClientResult<CallbackSubscription>
+	where
+		R: WebSocketMethod,
+		N: DeserializeOwned + WebSocketNotification + Send + Sync + 'static,
+		F: SubscriptionCallback<N>,
+	{
+		let subscription = self.subscribe::<R, N>(request).await?;
+
+		Ok(CallbackSubscription::new(subscription, callback))
+	}
+
+	/// Subscribe to account changes with a callback, the push-based
+	/// counterpart of [`account_subscribe`](Self::account_subscribe).
+	///
+	/// The callback receives the
+	/// [`GetAccountInfoResponse`](methods::GetAccountInfoResponse) payload
+	/// each time the account changes; see
+	/// [`CallbackSubscription`] for the handle's lifetime semantics.
+	pub async fn on_account_change<F>(
+		&self,
+		request: impl Into<GetAccountInfoRequest>,
+		callback: F,
+	) -> ClientResult<CallbackSubscription>
+	where
+		F: SubscriptionCallback<GetAccountInfoResponse>,
+	{
+		self.subscribe_with_callback::<GetAccountInfoRequest, GetAccountInfoResponse, _>(
+			request.into(),
+			callback,
+		)
+		.await
+	}
+
+	/// Subscribe to block events with a callback, the push-based counterpart
+	/// of [`block_subscribe`](Self::block_subscribe).
+	///
+	/// Disabled by default on validators; see the stream flavor for the
+	/// enabling flag.
+	pub async fn on_block<F>(
+		&self,
+		request: BlockSubscribeRequest,
+		callback: F,
+	) -> ClientResult<CallbackSubscription>
+	where
+		F: SubscriptionCallback<BlockNotificationResponse>,
+	{
+		self.subscribe_with_callback::<BlockSubscribeRequest, BlockNotificationResponse, _>(
+			request, callback,
+		)
+		.await
+	}
+
+	/// Subscribe to transaction logs with a callback, the push-based
+	/// counterpart of [`logs_subscribe`](Self::logs_subscribe).
+	pub async fn on_logs<F>(
+		&self,
+		request: LogsSubscribeRequest,
+		callback: F,
+	) -> ClientResult<CallbackSubscription>
+	where
+		F: SubscriptionCallback<LogsNotificationResponse>,
+	{
+		self.subscribe_with_callback::<LogsSubscribeRequest, LogsNotificationResponse, _>(
+			request, callback,
+		)
+		.await
+	}
+
+	/// Subscribe to program account changes with a callback, the push-based
+	/// counterpart of [`program_subscribe`](Self::program_subscribe).
+	pub async fn on_program_change<F>(
+		&self,
+		request: ProgramSubscribeRequest,
+		callback: F,
+	) -> ClientResult<CallbackSubscription>
+	where
+		F: SubscriptionCallback<GetProgramAccountsResponse>,
+	{
+		self.subscribe_with_callback::<ProgramSubscribeRequest, GetProgramAccountsResponse, _>(
+			request, callback,
+		)
+		.await
+	}
+
+	/// Subscribe to a transaction's confirmation with a callback, the
+	/// push-based counterpart of
+	/// [`signature_subscribe`](Self::signature_subscribe).
+	pub async fn on_signature<F>(
+		&self,
+		request: SignatureSubscribeRequest,
+		callback: F,
+	) -> ClientResult<CallbackSubscription>
+	where
+		F: SubscriptionCallback<SignatureNotificationResponse>,
+	{
+		self.subscribe_with_callback::<SignatureSubscribeRequest, SignatureNotificationResponse, _>(
+			request, callback,
+		)
+		.await
+	}
+
+	/// Subscribe to processed slots with a callback, the push-based
+	/// counterpart of [`slot_subscribe`](Self::slot_subscribe).
+	pub async fn on_slot_change<F>(
+		&self,
+		request: SlotSubscribeRequest,
+		callback: F,
+	) -> ClientResult<CallbackSubscription>
+	where
+		F: SubscriptionCallback<SlotInfo>,
+	{
+		self.subscribe_with_callback::<SlotSubscribeRequest, SlotInfo, _>(request, callback)
+			.await
+	}
+
+	/// Subscribe to new roots with a callback, the push-based counterpart of
+	/// [`root_subscribe`](Self::root_subscribe).
+	pub async fn on_root_change<F>(
+		&self,
+		request: RootSubscribeRequest,
+		callback: F,
+	) -> ClientResult<CallbackSubscription>
+	where
+		F: SubscriptionCallback<RootNotificationResponse>,
+	{
+		self.subscribe_with_callback::<RootSubscribeRequest, RootNotificationResponse, _>(
+			request, callback,
+		)
+		.await
+	}
+
+	/// Subscribe to the full slot lifecycle with a callback, the push-based
+	/// counterpart of
+	/// [`slots_updates_subscribe`](Self::slots_updates_subscribe).
+	pub async fn on_slots_updates<F>(&self, callback: F) -> ClientResult<CallbackSubscription>
+	where
+		F: SubscriptionCallback<SlotUpdate>,
+	{
+		self.subscribe_with_callback::<SlotsUpdatesSubscribeRequest, SlotUpdate, _>(
+			SlotsUpdatesSubscribeRequest,
+			callback,
+		)
+		.await
+	}
+
+	/// Subscribe to gossiped votes with a callback, the push-based
+	/// counterpart of [`vote_subscribe`](Self::vote_subscribe).
+	pub async fn on_vote<F>(&self, callback: F) -> ClientResult<CallbackSubscription>
+	where
+		F: SubscriptionCallback<VoteNotification>,
+	{
+		self.subscribe_with_callback::<VoteSubscribeRequest, VoteNotification, _>(
+			VoteSubscribeRequest,
+			callback,
+		)
+		.await
+	}
+}
+
+/// Whether `status` reports the signature at or past `target` commitment.
+///
+/// A status without a `confirmation_status` — some nodes omit it for very
+/// old transactions — counts as not reached, so confirmation keeps waiting.
+fn signature_status_reached(status: &TransactionStatus, target: CommitmentLevel) -> bool {
+	let Some(current) = status.confirmation_status.as_ref() else {
+		return false;
+	};
+
+	match target {
+		CommitmentLevel::Finalized => matches!(current, TransactionConfirmationStatus::Finalized),
+		CommitmentLevel::Confirmed => {
+			*current == TransactionConfirmationStatus::Finalized
+				|| *current == TransactionConfirmationStatus::Confirmed
+		}
+		// `Processed` is the lowest level, so any reported status satisfies it.
+		CommitmentLevel::Processed => true,
 	}
 }

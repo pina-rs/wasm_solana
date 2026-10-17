@@ -13,7 +13,7 @@ use std::future::Future;
 /// The `ssr` branch calls [`tokio::task::spawn_local`], which panics outside a
 /// [`tokio::task::LocalSet`] context. Run the reactor inside
 /// `LocalSet::run_until` (or `#[tokio::main(flavor = "current_thread")]` with
-/// a LocalSet), or require `Send` futures and use `tokio::task::spawn`
+/// a `LocalSet`), or require `Send` futures and use `tokio::task::spawn`
 /// directly — as the pubsub provider's own reader does.
 pub fn spawn_local<F>(fut: F)
 where

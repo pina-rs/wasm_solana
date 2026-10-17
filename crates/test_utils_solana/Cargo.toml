@@ -57,6 +57,7 @@ solana-test-validator = { workspace = true, optional = true, default-features = 
 solana-transaction = { workspace = true, default-features = true }
 spl-associated-token-account-interface = { workspace = true, default-features = true }
 spl-token-2022-interface = { workspace = true, default-features = true }
+surfpool-sdk = { workspace = true, optional = true, default-features = true }
 tarpc = { workspace = true, default-features = true }
 tempfile = { workspace = true, default-features = true, optional = true }
 typed-builder = { workspace = true, default-features = true }
@@ -70,6 +71,7 @@ solana-keccak-hasher = { workspace = true, default-features = true }
 
 [dev-dependencies]
 assert2 = { workspace = true, default-features = true }
+futures = { workspace = true, default-features = true }
 insta = { workspace = true, features = ["redactions", "json"], default-features = true }
 test-log = { workspace = true, features = ["trace"], default-features = true }
 test_utils_insta = { workspace = true }
@@ -83,3 +85,8 @@ test_validator = [
 	"dep:solana-test-validator",
 	"dep:tempfile",
 ]
+# Embed a surfpool node in-process via `surfpool-sdk`. The dependency pulls
+# its own agave-4.2-era crate graph (including a second `solana-pubkey`
+# major), which is why it stays out of the default feature set: the runner
+# only exchanges URLs and base58 strings with it, never types.
+surfpool = ["dep:surfpool-sdk"]

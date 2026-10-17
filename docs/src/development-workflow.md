@@ -33,6 +33,19 @@ Provided by the environment: the pinned Rust toolchain (from `rust-toolchain.tom
 
 The devenv git-hooks integration installs gitleaks secret scanning, dprint formatting and nixfmt for Nix files.
 
+## Benchmarking
+
+The `benchmark` workflow runs the criterion suites (`subscription`, `client`) on every pull request: once at the merge-base and once at the PR head, so the numbers isolate exactly what the PR changed. The comparison lands as a PR comment — one per PR, updated in place on every push — and the `benchmark` check fails when any benchmark's median regressed more than ten percent.
+
+A regression is still mergeable when the PR description carries a `## Benchmark Justification` section explaining the tradeoff: the check passes with the section present, and the comment makes the decision visible to reviewers. Make `benchmark` a required status check to enforce that on merge.
+
+Locally, the suites run with:
+
+```sh
+cargo bench -p wasm_client_solana -F ssr --bench subscription
+cargo bench -p wasm_client_solana -F ssr --bench client
+```
+
 ## Conventions
 
 - Branch names use Conventional Commit prefixes: `feat/`, `fix/`, `build/`, `ci/`, `docs/`, `chore/`, `test/`.

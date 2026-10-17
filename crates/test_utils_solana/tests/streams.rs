@@ -1,16 +1,17 @@
-#![cfg(feature = "test_validator")]
-
 //! Tests for the `solana_client_wasm` crate are placed here since this depends
 //! on `wasm_client_solana`.
+#![cfg(feature = "test_validator")]
 use std::time::Duration;
 
 use assert2::check;
+use solana_commitment_config::CommitmentConfig;
 use solana_keypair::Keypair;
 use test_utils_keypairs::get_wallet_keypair;
 use test_utils_solana::TestValidatorRunner;
 use test_utils_solana::TestValidatorRunnerProps;
 use test_utils_solana::prelude::*;
 use tokio::time::timeout;
+use wasm_client_solana::SolanaRpcClient;
 use wasm_client_solana::rpc_config::LogsSubscribeRequest;
 use wasm_client_solana::rpc_config::RpcTransactionLogsFilter;
 
@@ -42,7 +43,13 @@ async fn log_stream_subscription() -> anyhow::Result<()> {
 #[test_log::test(tokio::test(flavor = "multi_thread"))]
 async fn account_stream_subscription() -> anyhow::Result<()> {
 	let runner = create_runner().await;
-	let rpc = runner.rpc().clone();
+	// Confirmed, not finalized: on a loaded CI runner the finalized wait can
+	// exceed the send-and-confirm budget, and finality adds nothing here.
+	let rpc = SolanaRpcClient::new_with_ws_and_commitment(
+		&runner.rpc_url(),
+		&runner.pubsub_url(),
+		CommitmentConfig::confirmed(),
+	);
 	let new_account = Keypair::new();
 	let pubkey = new_account.pubkey();
 	let mut subscription = rpc.account_subscribe(pubkey).await?;

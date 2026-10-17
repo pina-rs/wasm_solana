@@ -41,7 +41,6 @@ chrono-humanize = { default-features = false, version = "^0.2" }
 criterion = { default-features = false, version = "^0.8" }
 crossbeam-channel = { default-features = false, version = "^0.5" }
 derive_more = { default-features = false, version = "^2" }
-fork_stream = { default-features = false, version = "^0.1" }
 futures = { default-features = false, version = "^0.3" }
 futures-timeout = { default-features = false, version = "^0.2" }
 futures-timer = { default-features = false, version = "^3" }
@@ -132,12 +131,17 @@ spl-token-confidential-transfer-proof-extraction = { default-features = false, v
 spl-token-group-interface = { default-features = false, version = "^0.7" }
 spl-token-interface = { default-features = false, version = "^3" }
 spl-token-metadata-interface = { default-features = false, version = "^1" }
+# Surfpool pins its own agave-4.2-era graph (including `solana-pubkey` 3),
+# so it is only ever a test-only dependency; see the `surfpool` feature on
+# `test_utils_solana`.
+surfpool-sdk = { default-features = false, version = "^1.6" }
 tarpc = { default-features = false, version = "^0.29" }
 tempfile = { default-features = false, version = "^3" }
 test-case = { default-features = false, version = "^3" }
 test-log = { default-features = false, version = "^0.2" }
 thiserror = { default-features = false, version = "^2" }
 tokio = { default-features = false, version = "^1" }
+tokio-tungstenite = { default-features = false, features = ["handshake"], version = "^0.28" }
 typed-builder = { default-features = false, version = "^0.23" }
 wallet_standard = { default-features = false, version = "^0.7" }
 wasm-bindgen = { default-features = false, version = "^0.2" }
@@ -182,6 +186,7 @@ incremental = false
 codegen-units = 1
 
 [profile.release]
+codegen-units = 1
 lto = "fat"
 overflow-checks = true
 

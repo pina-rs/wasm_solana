@@ -25,7 +25,6 @@ base64 = { workspace = true, default-features = true }
 bs58 = { workspace = true, default-features = true }
 cfg-if = { workspace = true, default-features = true }
 derive_more = { workspace = true, features = ["debug", "deref", "deref_mut", "into", "into_iterator", "from"], default-features = true }
-fork_stream = { workspace = true, default-features = true }
 futures = { workspace = true, default-features = true }
 futures-timer = { workspace = true, default-features = true }
 getrandom = { workspace = true, default-features = true }
@@ -100,6 +99,7 @@ required-features = ["ssr"]
 anyhow = { workspace = true, default-features = true }
 assert2 = { workspace = true, default-features = true }
 criterion = { workspace = true, default-features = false }
+futures = { workspace = true, default-features = true }
 futures-timeout = { workspace = true, default-features = true }
 insta = { workspace = true, features = ["redactions", "json"], default-features = true }
 solana-keypair = { workspace = true, default-features = true }
@@ -107,7 +107,7 @@ spl-pod = { workspace = true, default-features = true }
 test-log = { workspace = true, features = ["trace"], default-features = true }
 test_utils_insta = { workspace = true }
 test_utils_keypairs = { workspace = true }
-tokio = { workspace = true, features = ["test-util", "time"], default-features = true }
+tokio = { workspace = true, features = ["test-util", "time", "macros"], default-features = true }
 wasm-bindgen-test = { workspace = true, default-features = true }
 
 # The pubsub integration tests drive a real in-process validator, which only
@@ -121,6 +121,9 @@ wasm-bindgen-test = { workspace = true, default-features = true }
 # other way). A floor lets this crate publish first; nothing but this crate's
 # own test runs ever sees it.
 test_utils_solana = { path = "../test_utils_solana", version = ">=0.12.0", features = ["test_validator"] }
+# The mock pubsub node in `tests/pubsub_mock.rs`; tokio's net stack does not
+# build for wasm32, and the browser target never runs these tests.
+tokio-tungstenite = { workspace = true, default-features = true }
 
 [features]
 js = ["futures-timer/wasm-bindgen", "getrandom/wasm_js"]

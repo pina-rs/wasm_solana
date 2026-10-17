@@ -26,11 +26,17 @@ impl Serialize for RootSubscribeRequest {
 	where
 		S: serde::Serializer,
 	{
+		// A config left at its default serializes as `null`, which the
+		// request envelope then omits entirely: the node accepts
+		// `rootSubscribe` with no parameters at all and rejects a
+		// present-but-empty config object.
+		let config = (self.config != RpcRootSubscribeConfig::default()).then_some(&self.config);
+
 		#[derive(Serialize)]
 		#[serde(rename = "RootSubscribeRequest")]
-		struct Inner<'serde_tuple_inner>(&'serde_tuple_inner RpcRootSubscribeConfig);
+		struct Inner<'serde_tuple_inner>(Option<&'serde_tuple_inner RpcRootSubscribeConfig>);
 
-		let inner = Inner(&self.config);
+		let inner = Inner(config);
 		Serialize::serialize(&inner, serde_tuple::Serializer(serializer))
 	}
 }
@@ -62,7 +68,7 @@ mod tests {
 			.params(RootSubscribeRequest::builder().build())
 			.build();
 
-		insta::assert_compact_json_snapshot!(request, @r###"{"jsonrpc": "2.0", "id": 1, "method": "rootSubscribe", "params": [{}]}"###);
+		insta::assert_compact_json_snapshot!(request, @r###"{"jsonrpc": "2.0", "id": 1, "method": "rootSubscribe"}"###);
 	}
 
 	#[test]

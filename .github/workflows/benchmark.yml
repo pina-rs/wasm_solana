@@ -1,0 +1,208 @@
+name: benchmark
+
+# Benchmarks every pull request with criterion against the commit it branched
+# from, posts the comparison as a PR comment, and gates the merge when a
+# benchmark regressed.
+#
+# Base is the merge-base rather than the tip of main, so the numbers isolate
+# what this PR changed. The gate is the escape hatch the comment explains: a
+# regression fails this check unless the PR description carries a
+# "## Benchmark Justification" section acknowledging the tradeoff, which turns
+# the failure into a visible, reviewable decision instead of a silent one.
+# Make this job a required status check to enforce it on merge.
+
+on:
+  pull_request:
+    branches: [main]
+    paths-ignore:
+      - "**/*.md"
+      - "docs/**"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: benchmark-${{ github.event.pull_request.number || github.run_id }}
+  cancel-in-progress: true
+
+env:
+  # Shared runners only ever make a benchmark slower, so a generous relative
+  # threshold keeps noise from gating merges.
+  BENCH_THRESHOLD_PCT: "10"
+
+jobs:
+  compare:
+    name: criterion vs merge-base
+    runs-on: blacksmith-2vcpu-ubuntu-2404
+    timeout-minutes: 90
+    # Writing one PR comment is the only access this job needs beyond reading
+    # the repository, and the grant sits on this job alone.
+    permissions:
+      contents: read
+      pull-requests: write # posting the benchmark comparison comment and nothing else
+    steps:
+      - name: checkout repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          # The full history is needed to find the merge-base.
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: setup
+        uses: ./.github/actions/devenv
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: resolve the compared refs
+        id: refs
+        env:
+          HEAD_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+        run: |
+          set -euo pipefail
+          git fetch --no-tags --prune origin main
+          BASE_SHA="$(git merge-base "$HEAD_SHA" origin/main)"
+
+          # The refs are also written to files: the benchmark steps run
+          # inside the devenv shell, which does not pass the job environment
+          # through, and reading them from disk keeps shell interpolation out
+          # of the workflow entirely.
+          mkdir -p .benchmark
+          printf '%s' "$BASE_SHA" > .benchmark/base-sha
+          printf '%s' "$HEAD_SHA" > .benchmark/head-sha
+
+          echo "base=$BASE_SHA" >> "$GITHUB_OUTPUT"
+          echo "head=$HEAD_SHA" >> "$GITHUB_OUTPUT"
+
+      - name: benchmark the base
+        run: |
+          set -euo pipefail
+          export CRITERION_HOME="$(pwd)/.benchmark/criterion-base"
+          git checkout --detach "$(cat .benchmark/base-sha)"
+          cargo bench --locked --package wasm_client_solana --features ssr
+        shell: devenv shell -c -- bash -e {0}
+
+      - name: benchmark the head
+        run: |
+          set -euo pipefail
+          export CRITERION_HOME="$(pwd)/.benchmark/criterion-head"
+          git checkout --detach "$(cat .benchmark/head-sha)"
+          cargo bench --locked --package wasm_client_solana --features ssr
+        shell: devenv shell -c -- bash -e {0}
+
+      - name: compare the runs
+        env:
+          BASE_SHA: ${{ steps.refs.outputs.base }}
+          HEAD_SHA: ${{ steps.refs.outputs.head }}
+          THRESHOLD: ${{ env.BENCH_THRESHOLD_PCT }}
+        run: |
+          set -euo pipefail
+          python3 setup/scripts/benchmark_compare.py \
+            --base .benchmark/criterion-base \
+            --head .benchmark/criterion-head \
+            --threshold-pct "$THRESHOLD" \
+            --markdown benchmark-report.md \
+            --status benchmark-status.json
+
+          {
+            echo "# Benchmark comparison"
+            echo
+            echo "Base \`${BASE_SHA}\` vs head \`${HEAD_SHA}\` (median, threshold ${THRESHOLD}%)."
+            echo
+            cat benchmark-report.md
+            echo
+            echo "Regressions gate this check. To merge despite one, describe the tradeoff in a \`## Benchmark Justification\` section of the PR description."
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: comment the report on the PR
+        # A pull request from a fork gives this job a read-only token, so
+        # commenting is skipped rather than failed: the table is in the step
+        # summary either way.
+        if: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.repo.fork == false }}
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
+        with:
+          script: |
+            const fs = require('fs');
+
+            const marker = '<!-- wasm-solana-benchmark -->';
+            const report = fs.readFileSync('benchmark-report.md', 'utf8');
+            const status = JSON.parse(fs.readFileSync('benchmark-status.json', 'utf8'));
+            const verdict = status.regressions > 0
+              ? `**${status.regressions} benchmark regression${status.regressions === 1 ? '' : 's'}** — merge needs a justification`
+              : 'No regressions above threshold';
+
+            const body = [
+              marker,
+              '## Benchmark comparison',
+              '',
+              `${verdict} (median, threshold ${status.threshold_pct}%).`,
+              '',
+              report,
+              '',
+              'Regressions gate the `benchmark` check. To merge despite one, describe the tradeoff in a `## Benchmark Justification` section of the PR description.',
+            ].join('\n');
+
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              per_page: 100,
+            });
+
+            // The comment is updated in place when one already exists, so a PR
+            // carries exactly one benchmark comment that tracks its latest push.
+            const existing = comments.find((comment) => comment.body?.includes(marker));
+
+            if (existing) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: existing.id,
+                body,
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body,
+              });
+            }
+
+      - name: enforce the benchmark policy
+        env:
+          EVENT_PATH: ${{ github.event_path }}
+        run: |
+          set -euo pipefail
+
+          regressions=$(jq -r '.regressions' benchmark-status.json)
+
+          if [ "$regressions" -eq 0 ]; then
+            echo "No benchmark regressions above the ${BENCH_THRESHOLD_PCT}% threshold."
+            exit 0
+          fi
+
+          if [ "$GITHUB_EVENT_NAME" != "pull_request" ]; then
+            echo "::error::Detected ${regressions} benchmark regressions above the threshold."
+            exit 1
+          fi
+
+          pr_body="$(jq -r '.pull_request.body // ""' "$EVENT_PATH")"
+
+          justification_text="$(
+            printf '%s\n' "${pr_body}" | awk '
+              BEGIN { capture = 0 }
+              /^##[[:space:]]+Benchmark Justification[[:space:]]*$/ { capture = 1; next }
+              /^##[[:space:]]+/ && capture == 1 { capture = 0 }
+              capture == 1 { print }
+            '
+          )"
+
+          justification_text="$(printf '%s\n' "${justification_text}" | sed '/^[[:space:]]*$/d')"
+
+          if [ -z "${justification_text}" ]; then
+            echo "::error::Detected ${regressions} benchmark regressions above the ${BENCH_THRESHOLD_PCT}% threshold. Add a '## Benchmark Justification' section to the PR description explaining the tradeoff."
+            exit 1
+          fi
+
+          echo "Benchmark regressions detected, and the PR description carries a justification section."

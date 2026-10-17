@@ -23,11 +23,12 @@ use base64::Engine;
 use criterion::Criterion;
 use criterion::criterion_group;
 use criterion::criterion_main;
-use fork_stream::StreamExt as ForkStreamExt;
 use futures::StreamExt;
 use serde_json::json;
+use wasm_client_solana::ForkStreamExt as _;
 use wasm_client_solana::GetAccountInfoResponse;
 use wasm_client_solana::SubscriptionResponse;
+use wasm_client_solana::is_notification_for;
 use wasm_client_solana::solana_account_decoder::UiAccount;
 use wasm_client_solana::solana_account_decoder::UiAccountData;
 use wasm_client_solana::solana_account_decoder::UiAccountEncoding;
@@ -75,6 +76,56 @@ fn bench_frame_parse(c: &mut Criterion) {
 			}
 		})
 	});
+}
+
+/// Slot notifications on subscription 7 — foreign frames for an account
+/// subscription on subscription 0, the shape of a socket carrying both feeds.
+fn slot_notification_frames(count: usize) -> Vec<serde_json::Value> {
+	(0..count)
+		.map(|slot| {
+			json!({
+				"jsonrpc": "2.0",
+				"method": "slotNotification",
+				"params": {
+					"result": { "parent": slot.saturating_sub(1), "slot": slot, "timestamp": 0 },
+					"subscription": 7
+				}
+			})
+		})
+		.collect()
+}
+
+/// The cost of rejecting a frame that belongs to another subscription: the
+/// pointer probe `Subscription::poll_next` runs before typed
+/// deserialization, against the pre-fix shape of deserializing every frame
+/// into `SubscriptionResponse<T>` and only then comparing method and id.
+fn bench_foreign_frame_rejection(c: &mut Criterion) {
+	let frames = slot_notification_frames(1_000);
+
+	let mut group = c.benchmark_group("subscription/reject_1000_foreign_frames");
+	group.bench_function("pointer_probe", |b| {
+		b.iter(|| {
+			let frames = std::hint::black_box(&frames);
+			for frame in frames {
+				std::hint::black_box(is_notification_for(
+					std::hint::black_box(frame),
+					"accountNotification",
+					0,
+				));
+			}
+		})
+	});
+	group.bench_function("full_parse", |b| {
+		b.iter(|| {
+			let frames = std::hint::black_box(&frames);
+			for frame in frames {
+				let parsed: Result<SubscriptionResponse<GetAccountInfoResponse>, _> =
+					serde_json::from_value(std::hint::black_box(frame.clone()));
+				std::hint::black_box(&parsed);
+			}
+		})
+	});
+	group.finish();
 }
 
 /// A stream fed from a shared queue, so the benchmark controls exactly when
@@ -173,5 +224,10 @@ fn bench_fork_replay(c: &mut Criterion) {
 	}
 }
 
-criterion_group!(benches, bench_frame_parse, bench_fork_replay);
+criterion_group!(
+	benches,
+	bench_frame_parse,
+	bench_foreign_frame_rejection,
+	bench_fork_replay
+);
 criterion_main!(benches);

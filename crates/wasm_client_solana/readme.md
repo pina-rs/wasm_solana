@@ -37,7 +37,7 @@ Alternatively you can add this to your `./.cargo/config.toml` file.
 [target.wasm32-unknown-unknown]
 rustflags = [
 	"--cfg",
-	"get_random_backend=\"wasm_js\"",
+	"getrandom_backend=\"wasm_js\"",
 ]
 ```
 
@@ -72,6 +72,39 @@ async fn run() -> ClientResult<()> {
 	let account = client.get_account(&address).await?;
 
 	log::info!("account: {account:#?}");
+
+	Ok(())
+}
+```
+
+### Subscriptions
+
+Every pubsub feed is available as a stream and as a callback — both share one websocket. The `on_*` methods drive the subscription for you and invoke the callback on the target's runtime, so no spawned consumer task is needed:
+
+```rust
+use wasm_client_solana::ClientResult;
+use wasm_client_solana::DEVNET;
+use wasm_client_solana::SlotSubscribeRequest;
+use wasm_client_solana::SolanaRpcClient;
+
+async fn run() -> ClientResult<()> {
+	let client = SolanaRpcClient::new(DEVNET);
+
+	// Callback style: `slot` arrives on each processed slot.
+	let slots = client
+		.on_slot_change(SlotSubscribeRequest::builder().build(), |slot| {
+			log::info!("new slot {}", slot.slot);
+		})
+		.await?;
+
+	// Stream style: drive the notifications yourself.
+	let subscription = client
+		.slot_subscribe(SlotSubscribeRequest::builder().build())
+		.await?;
+
+	// Stop the callback and unsubscribe on the server, waiting for the ack.
+	slots.unsubscribe().await?;
+	subscription.unsubscribe().await?;
 
 	Ok(())
 }

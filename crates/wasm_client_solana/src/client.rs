@@ -30,6 +30,20 @@ pub struct ClientRequest {
 }
 
 impl ClientRequest {
+	/// Assemble an envelope from an already-encoded `params` value.
+	///
+	/// The transports use this instead of the builder when the params are
+	/// already a [`Value`]: the builder setter converts any `Serialize` input,
+	/// which would deep-copy an existing `Value` just to re-serialize it.
+	pub fn from_params(method: impl Into<String>, id: u32, params: Value) -> Self {
+		Self {
+			jsonrpc: "2.0",
+			id,
+			method: method.into(),
+			params,
+		}
+	}
+
 	/// Serialize the request into a JSON value for the websocket transport.
 	pub fn try_to_value(&self) -> Result<Value, ClientWebSocketError> {
 		serde_json::to_value(self).map_err(|_| ClientWebSocketError::InvalidMessage)

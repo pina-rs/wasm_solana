@@ -1,9 +1,11 @@
 //! Testing utilities for Solana programs and clients.
 //!
 //! Provides a `TestValidatorRunner` (behind the `test_validator` feature) that
-//! boots a local validator, a [`ProgramTest`]/[`ProgramTestContext`] wrapper
-//! with helpers for funding accounts and adding programs, and a
-//! [`TestRpcProvider`] that serves a [`ProgramTestContext`] over the
+//! boots a local agave validator, a `SurfpoolRunner` (behind the `surfpool`
+//! feature) that embeds a surfpool node in-process, a
+//! [`ProgramTest`]/[`ProgramTestContext`] wrapper with helpers for funding
+//! accounts and adding programs, and a [`TestRpcProvider`] that serves a
+//! [`ProgramTestContext`] over the
 //! [`RpcProvider`](wasm_client_solana::RpcProvider) trait.
 
 pub use solana_banks_client::BanksClientExt;
@@ -17,12 +19,16 @@ pub use solana_program_test::ProgramTestBanksClientExt;
 pub use solana_program_test::ProgramTestContext;
 pub use solana_program_test::ProgramTestError;
 pub use solana_program_test::processor;
+#[cfg(feature = "surfpool")]
+pub use surfpool_runner::*;
 pub use test_rpc_provider::*;
 #[cfg(feature = "test_validator")]
 pub use test_validator_runner::*;
 pub use utils::*;
 
 mod macros;
+#[cfg(feature = "surfpool")]
+mod surfpool_runner;
 mod test_rpc_provider;
 #[cfg(feature = "test_validator")]
 mod test_validator_runner;

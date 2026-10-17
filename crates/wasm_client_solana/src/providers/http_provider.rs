@@ -49,11 +49,7 @@ mod ssr_http_provider {
 		}
 
 		async fn send(&self, method: &'static str, request: Value) -> ClientResult<Value> {
-			let client_request = ClientRequest::builder()
-				.method(method)
-				.id(1)
-				.params(request)
-				.build();
+			let client_request = ClientRequest::from_params(method, 1, request);
 			#[cfg(not(target_arch = "wasm32"))]
 			let result: Value = self
 				.client
@@ -207,11 +203,7 @@ mod wasm_http_provider {
 		}
 
 		async fn send(&self, method: &'static str, request: Value) -> ClientResult<Value> {
-			let client_request = ClientRequest::builder()
-				.method(method)
-				.id(0)
-				.params(request)
-				.build();
+			let client_request = ClientRequest::from_params(method, 0, request);
 
 			let future = async move {
 				let controller = AbortController::new().unwrap_throw();
@@ -279,7 +271,6 @@ pub const LOCALNET: &str = "http://127.0.0.1:8899";
 mod ssr_tests {
 
 	use assert2::check;
-	use futures::FutureExt;
 
 	use super::ssr_http_provider::HttpProvider;
 	use crate::ClientError;
