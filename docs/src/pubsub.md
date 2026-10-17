@@ -29,32 +29,76 @@ while let Some(update) = updates.next().await {
 }
 ```
 
-Dropping the last handle unsubscribes: a fire-and-forget request is sent so the node stops delivering frames. Call `subscription.unsubscribe().await` (or run the handle from `get_unsubscription()`) when the acknowledgement matters.
+Dropping a `Subscription` stops its consumption but does **not** unsubscribe on the node: async work cannot run from `Drop`, so the server keeps delivering frames until the socket closes. Call `subscription.unsubscribe().await` — or stash the handle from `get_unsubscription()` and run it later — when the subscription should actually end.
 
-Each subscription has its own bounded channel (`SUBSCRIPTION_CHANNEL_CAPACITY` frames). A consumer that cannot keep up lags — the stream keeps going and the skipped count is available on `missed_notifications()` — instead of blocking the socket's other subscribers or growing without bound.
+Frames are matched to their subscription by notification method and subscription id _before_ any typed deserialization, so a subscription only pays the full parse for frames that belong to it. On a noisy socket (for example a `slotsUpdates` feed alongside an account subscription) each fork skips foreign frames with two cheap JSON pointer probes.
+
+## Callback subscriptions
+
+Every stream subscribe method has an `on_*` callback counterpart for code that prefers push over polling a stream:
+
+| Method              | Callback receives                                |
+| ------------------- | ------------------------------------------------ |
+| `on_account_change` | the account payload of `account_subscribe`       |
+| `on_program_change` | the keyed account payload of `program_subscribe` |
+| `on_logs`           | the logs payload of `logs_subscribe`             |
+| `on_signature`      | the final status of the watched signature        |
+| `on_slot_change`    | each processed `SlotInfo`                        |
+| `on_slots_updates`  | each `SlotUpdate` lifecycle event                |
+| `on_root_change`    | each new root slot                               |
+| `on_vote`           | each gossiped vote                               |
+| `on_block`          | each confirmed/finalized block                   |
+
+```rust,ignore
+use wasm_client_solana::SlotSubscribeRequest;
+use wasm_client_solana::SolanaRpcClient;
+
+let client = SolanaRpcClient::new("https://api.devnet.solana.com");
+let slots = client
+    .on_slot_change(SlotSubscribeRequest::builder().build(), |slot| {
+        log::info!("new slot {}", slot.slot);
+    })
+    .await?;
+```
+
+The crate drives the subscription and invokes the closure on the target's runtime — `wasm-bindgen-futures` in the browser, `tokio::spawn` under `ssr` (so the closure must be `Send` there; in the browser it may capture `Rc` or JavaScript handles freely). No spawned consumer task is needed on the caller's side.
+
+The returned `CallbackSubscription` handle controls the pump's lifetime:
+
+- **`unsubscribe().await`** stops the callback, sends the server unsubscribe and waits for its ack.
+- **Dropping the handle** stops the callback and asks the server to unsubscribe in the background — the fire-and-forget teardown a stream's `Drop` cannot offer, because the pump task sends the request as it exits. Nothing waits for the ack.
+- **`detach()`** keeps the pump running after the handle is dropped, for subscriptions that should live as long as the connection; no unsubscription is ever sent.
+- **`is_stopped()`** reports whether the pump has ended, through either path above or a dead socket.
+
+A generic `subscribe_with_callback(request, callback)` covers feeds without a dedicated wrapper. A node that rejects a subscription request fails the `on_*` call immediately with a `ClientWebSocketError` (the node's reason is logged) instead of waiting for an acknowledgement that will never come.
 
 ## The provider split
 
 `WebSocketProvider` has two implementations selected by feature flags:
 
-- **`js`** — the browser `WebSocket` API through web-sys; notifications arrive as `web_sys::MessageEvent` and are converted with the `ToWebSocketValue` trait.
+- **`js`** — the browser `WebSocket` API through gloo; notifications arrive as text or binary frames and are converted with the `ToWebSocketValue` trait.
 - **`ssr`** — `reqwest-websocket` over tokio, for native binaries that still want pubsub.
 
-Both speak the same JSON-RPC notification protocol, so app code is transport agnostic. One reader task per socket routes frames to the subscription they belong to; clones of a `Subscription` join at the channel's live edge.
+Both speak the same JSON-RPC notification protocol, so app code is transport agnostic. There is no reader task routing frames: the socket's stream is split and fanned out through `fork_stream`, and each `Subscription` (and callback pump) reads its own fork of the shared buffer, positioned at the live edge when the subscription was created.
 
-## Streams utilities
+## Integration testing feeds
 
-`test_utils_solana` provides higher-level stream helpers for integration tests against a live validator:
+`test_utils_solana` runs pubsub tests against a real validator (`test_validator` feature) or an embedded surfpool node (`surfpool` feature):
 
 ```rust,ignore
-use test_utils_solana::account_stream_subscription;
-use test_utils_solana::log_stream_subscription;
+use test_utils_keypairs::get_wallet_keypair;
+use test_utils_solana::TestValidatorRunner;
+use test_utils_solana::TestValidatorRunnerProps;
+
+let runner = TestValidatorRunnerProps::builder()
+    .pubkeys(vec![get_wallet_keypair().pubkey()])
+    .build()
+    .run()
+    .await?;
+let subscription = runner.rpc().logs_subscribe(/* ... */).await?;
 ```
 
-- `log_stream_subscription` — subscribe to program logs and collect them until a condition matches (used to assert on-chain events).
-- `account_stream_subscription` — watch account updates until a predicate fires.
-
-These helpers make pubsub deterministic in tests: await the event instead of sleeping. `TestValidatorRunnerProps::enable_vote_subscription` opts a test validator into `voteSubscribe`, mirroring the production flag.
+The crate's own test suites (`tests/streams.rs`, `tests/callbacks.rs`, `tests/confirm.rs`) are worked examples of asserting on stream and callback deliveries; `TestValidatorRunnerProps::enable_vote_subscription` opts a test validator into `voteSubscribe`, mirroring the production flag.
 
 ## Timeouts
 

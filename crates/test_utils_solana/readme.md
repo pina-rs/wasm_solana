@@ -25,9 +25,10 @@ test_utils_solana = "0.8.0"
 
 ### Features
 
-| Feature          | Description                                                                 |
-| ---------------- | --------------------------------------------------------------------------- |
-| `test_validator` | Enables the `test_validator` feature for the `solana_test_validator` crate. |
+| Feature          | Description                                                                                      |
+| ---------------- | ------------------------------------------------------------------------------------------------ |
+| `test_validator` | Enables the `test_validator` feature for the `solana_test_validator` crate.                      |
+| `surfpool`       | Embeds an in-process surfpool node via `surfpool-sdk` for millisecond-startup integration tests. |
 
 ## Usage
 
@@ -43,7 +44,6 @@ async fn run() -> TestValidatorRunner {
 	let props = TestValidatorRunnerProps::builder()
 		.pubkeys(vec![pubkey]) // pubkeys to fund with an amount of sol each
 		.initial_lamports(1_000_000_000) // initial lamports to add to each pubkey account
-		.namespace("tests") // namespace to use for the validator client rpc
 		.build();
 
 	TestValidatorRunner::run(props).await
@@ -69,7 +69,6 @@ async fn my_integration_test() {
 	let props = TestValidatorRunnerProps::builder()
 		.pubkeys(vec![pubkey]) // Pubkeys to fund
 		.initial_lamports(1_000_000_000) // Lamports to fund each pubkey with
-		.namespace("my_test") // Namespace for the validator's RPC client
 		.build();
 
 	let validator = TestValidatorRunner::run(props).await;
@@ -79,6 +78,33 @@ async fn my_integration_test() {
 	// You can use the rpc_client to interact with the test validator
 }
 ```
+
+### Using `SurfpoolRunner` for Fast Integration Tests
+
+Where `TestValidatorRunner` boots a full agave validator, `SurfpoolRunner` (behind the `surfpool` feature) embeds a [surfpool](https://surfpool.run) node in-process: no genesis wait, no on-disk ledger, dynamic ports, and slots that advance per transaction. The props mirror the validator runner where the backends agree.
+
+```rust
+use solana_pubkey::pubkey;
+use test_utils_solana::SurfpoolRunner;
+use test_utils_solana::SurfpoolRunnerProps;
+
+#[tokio::test(flavor = "multi_thread")]
+async fn my_surfpool_test() {
+	let user = pubkey!("99P8ZgtJYe1buSK8JXkvpLh8xPsCFuLYhz9hQFNw93WJ");
+	let runner = SurfpoolRunnerProps::builder()
+		.pubkeys(vec![user]) // funded at startup, like the validator runner
+		.initial_lamports(1_000_000_000)
+		.build()
+		.run()
+		.await;
+
+	let rpc_client = runner.rpc();
+
+	// Your test logic here...
+}
+```
+
+Ports are dynamic, so use `runner.rpc_url()` / `runner.pubsub_url()` instead of assuming 8899/8900, and prefer the `Confirmed` commitment (the runner's default): surfpool's per-transaction block mode does not finalize roots. Tests that need validator internals — vote accounts, rewards, full `getBlock` fidelity — should stay on `TestValidatorRunner`.
 
 ### Using `ProgramTest` for Unit Tests
 

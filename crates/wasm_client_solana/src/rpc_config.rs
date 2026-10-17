@@ -1156,14 +1156,19 @@ impl Serialize for LogsSubscribeRequest {
 	where
 		S: Serializer,
 	{
+		// A config left at its default serializes as `null`: several agave
+		// releases reject a present-but-empty config object ("missing field
+		// `commitment`") while accepting the omitted one.
+		let config = (self.config != RpcTransactionLogsConfig::default()).then_some(&self.config);
+
 		#[derive(Serialize)]
 		#[serde(rename = "LogsSubscribeRequest")]
 		struct Inner<'serde_tuple_inner>(
 			&'serde_tuple_inner RpcTransactionLogsFilter,
-			&'serde_tuple_inner RpcTransactionLogsConfig,
+			Option<&'serde_tuple_inner RpcTransactionLogsConfig>,
 		);
 
-		let inner = Inner(&self.filter, &self.config);
+		let inner = Inner(&self.filter, config);
 		Serialize::serialize(&inner, serde_tuple::Serializer(serializer))
 	}
 }

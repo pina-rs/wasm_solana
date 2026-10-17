@@ -6,9 +6,6 @@ use std::task::Context;
 use std::task::Poll;
 use std::task::ready;
 
-use fork_stream::Forked;
-use fork_stream::StreamExt as _;
-use fork_stream::Weak;
 use futures::SinkExt;
 use futures::Stream;
 use futures::StreamExt;
@@ -24,6 +21,9 @@ use typed_builder::TypedBuilder;
 use self::websocket_provider_reqwest::*;
 #[cfg(not(feature = "ssr"))]
 use self::websocket_provider_wasm::*;
+use super::Weak;
+use super::forked_stream::ForkStreamExt as _;
+use super::forked_stream::Forked;
 use crate::ClientRequest;
 use crate::ClientWebSocketError;
 use crate::SubscriptionId;
@@ -35,7 +35,7 @@ use crate::WebSocketNotification;
 use crate::utils::get_ws_url;
 
 /// A cloneable handle to the live edge of the shared websocket buffer.
-/// `fork_stream::Weak` itself is not `Clone`, so it is shared behind an
+/// [`Weak`](crate::Weak) itself is not `Clone`, so it is shared behind an
 /// `Arc`; upgrading yields a fork positioned at the next frame to arrive.
 type LiveEdge = Arc<Weak<SplitStream<WebSocketStream>>>;
 
@@ -47,6 +47,31 @@ pub trait ToWebSocketValue {
 	/// [`ClientWebSocketError::InvalidMessage`] when it is neither text nor
 	/// binary, or is not valid JSON.
 	fn to_websocket_value(&self) -> Result<Value, ClientWebSocketError>;
+}
+
+/// Whether `value` is a notification for `method` carrying `subscription`.
+///
+/// Two JSON pointer probes — no string allocation, no typed
+/// deserialization. The subscription poll path uses this to skip frames
+/// belonging to other subscriptions before paying the full parse, and
+/// hand-rolled dispatch over a raw [`Value`] stream can reuse the same
+/// matching rule.
+pub fn is_notification_for(value: &Value, method: &str, subscription: SubscriptionId) -> bool {
+	value.get("method").and_then(Value::as_str) == Some(method)
+		&& value
+			.pointer("/params/subscription")
+			.and_then(Value::as_u64)
+			== Some(subscription)
+}
+
+/// Whether `value` is a JSON-RPC response answering request `id`.
+///
+/// The same cheap probe as [`is_notification_for`], for the acknowledge
+/// waits: responses echo the request `id`, notifications carry a `method`
+/// instead, so the probe also skips notification frames without parsing
+/// them.
+fn is_response_for(value: &Value, id: u32) -> bool {
+	value.get("id").and_then(Value::as_u64) == Some(u64::from(id))
 }
 
 impl<T, E> ToWebSocketValue for Result<T, E>
@@ -77,7 +102,7 @@ pub struct WebSocketProvider {
 	/// The client ID which identifies current client ID.
 	id: Arc<std::sync::Mutex<u32>>,
 	#[debug(skip)]
-	sender: Arc<Mutex<SplitSink<WebSocketStream, Value>>>,
+	sender: Arc<Mutex<SplitSink<WebSocketStream, ClientRequest>>>,
 	/// The root fork of the shared buffer. It is never read: it only keeps
 	/// the shared stream alive for as long as the provider exists, so that
 	/// [`Self::live_edge`] upgrades cannot fail while the provider lives.
@@ -95,10 +120,14 @@ pub struct WebSocketProvider {
 }
 
 impl WebSocketProvider {
-	/// Open a pubsub connection, deriving the websocket endpoint from an RPC
-	/// URL: the scheme is rewritten from `http(s)` to `ws(s)` and any explicit
-	/// port is bumped by one, matching the agave convention of serving pubsub
-	/// one port above RPC.
+	/// Prepare a pubsub connection, deriving the websocket endpoint from an
+	/// RPC URL: the scheme is rewritten from `http(s)` to `ws(s)` and any
+	/// explicit port is bumped by one, matching the agave convention of
+	/// serving pubsub one port above RPC.
+	///
+	/// The socket itself opens lazily on first use, so constructing a client
+	/// — and every HTTP-only interaction afterwards — never touches the
+	/// pubsub endpoint.
 	pub fn new(url: impl Into<String>) -> Self {
 		let url = get_ws_url(url);
 		let stream = WebSocketStream::new(&url);
@@ -147,12 +176,9 @@ impl WebSocketProvider {
 	) -> Result<(u32, SubscriptionId, Forked<SplitStream<WebSocketStream>>), ClientWebSocketError>
 	{
 		let id = self.next_id()?;
-		let request = ClientRequest::builder()
-			.method(T::SUBSCRIBE)
-			.params(params)
-			.id(id)
-			.build()
-			.try_to_value()?;
+		let params =
+			serde_json::to_value(params).map_err(|_| ClientWebSocketError::InvalidMessage)?;
+		let request = ClientRequest::from_params(T::SUBSCRIBE, id, params);
 
 		// Register both forks BEFORE sending: a live-edge fork created after
 		// the send would skip any frame that lands in between — including the
@@ -176,7 +202,8 @@ impl WebSocketProvider {
 		// caller's waker with the websocket once its buffer runs dry — so a
 		// `Pending` returned while replayed frames remain would park this
 		// future forever. Re-polling drains the buffer and re-arms the socket
-		// waker in the same poll.
+		// waker in the same poll. The id probe skips foreign frames before
+		// any typed deserialization.
 		loop {
 			let Some(result) = ack_stream.next().await else {
 				return Err(ClientWebSocketError::Subscription);
@@ -186,9 +213,21 @@ impl WebSocketProvider {
 				continue;
 			};
 
-			if let Ok(response) = serde_json::from_value::<SubscriptionResult>(value)
-				&& response.id == id
-			{
+			if !is_response_for(&value, id) {
+				continue;
+			}
+
+			// An error envelope answering this request means the node
+			// rejected the subscription; waiting for an ack that will never
+			// come would park this future forever. The reason is logged —
+			// the error enum carries no payload.
+			if let Some(error) = value.get("error") {
+				log::error!("pubsub subscription rejected by the node: {error}");
+
+				return Err(ClientWebSocketError::Subscription);
+			}
+
+			if let Ok(response) = serde_json::from_value::<SubscriptionResult>(value) {
 				return Ok((id, response.result, subscription_stream));
 			}
 		}
@@ -212,7 +251,7 @@ pub struct Unsubscription {
 	/// The name of the method used to unsubscribe.
 	pub(crate) method: &'static str,
 	/// The shared sink for pushing messages into the websocket stream.
-	pub(crate) sender: Arc<Mutex<SplitSink<WebSocketStream, Value>>>,
+	pub(crate) sender: Arc<Mutex<SplitSink<WebSocketStream, ClientRequest>>>,
 	/// A fork positioned when this handle was created. Owning the fork
 	/// (rather than a weak live-edge handle) keeps the shared buffer alive
 	/// even if the provider is dropped before `run`, and sees every frame
@@ -246,12 +285,11 @@ impl Unsubscription {
 	/// loop. Errors if the request cannot be written or the connection ends
 	/// before the ack arrives.
 	pub async fn run(self) -> Result<(), ClientWebSocketError> {
-		let request = ClientRequest::builder()
-			.id(self.id)
-			.method(self.method)
-			.params(serde_json::json!([self.subscription_id]))
-			.build()
-			.try_to_value()?;
+		let request = ClientRequest::from_params(
+			self.method,
+			self.id,
+			serde_json::json!([self.subscription_id]),
+		);
 
 		// drop the lock immediately after this block
 		{
@@ -266,7 +304,8 @@ impl Unsubscription {
 		// because `Forked` only arms the socket waker once its buffer is
 		// empty. The fork was positioned at handle-creation time, so frames
 		// between creation and `run` — including the request itself being
-		// sent — cannot slip past it.
+		// sent — cannot slip past it, and the id probe skips foreign frames
+		// before any typed deserialization.
 		let mut stream = self.receiver;
 
 		loop {
@@ -277,6 +316,20 @@ impl Unsubscription {
 			let Ok(value) = result else {
 				continue;
 			};
+
+			if !is_response_for(&value, self.id) {
+				continue;
+			}
+
+			// An error envelope answering this request means the node
+			// rejected the unsubscription; the same fail-fast as the
+			// subscribe handshake, so a rejected request cannot park this
+			// future forever.
+			if let Some(error) = value.get("error") {
+				log::error!("pubsub unsubscription rejected by the node: {error}");
+
+				return Err(ClientWebSocketError::Unsubscription);
+			}
 
 			if let Ok(response) = serde_json::from_value::<UnsubscriptionResult>(value)
 				&& response.id == self.id
@@ -295,11 +348,8 @@ pub struct Subscription<T: DeserializeOwned + WebSocketNotification> {
 	/// when the subscription was created.
 	#[pin]
 	pub(crate) receiver: Forked<SplitStream<WebSocketStream>>,
-	/// Live-edge handle handed to [`Unsubscription`] so its ack wait skips
-	/// the frames this subscription has already consumed.
-	pub(crate) live_edge: LiveEdge,
 	/// The shared sink for pushing messages into the websocket stream.
-	pub(crate) sender: Arc<Mutex<SplitSink<WebSocketStream, Value>>>,
+	pub(crate) sender: Arc<Mutex<SplitSink<WebSocketStream, ClientRequest>>>,
 	#[builder(default)]
 	pub(crate) latest: PhantomData<T>,
 	/// The `creator_id` that was originally used to create the parent
@@ -324,7 +374,6 @@ impl<T: DeserializeOwned + WebSocketNotification> Subscription<T> {
 	) -> Result<Self, ClientWebSocketError> {
 		Ok(Self::builder()
 			.receiver(ws.live_fork()?)
-			.live_edge(ws.live_edge.clone())
 			.sender(ws.sender.clone())
 			.creator_id(id)
 			.id(subscription_id)
@@ -347,7 +396,6 @@ impl<T: DeserializeOwned + WebSocketNotification> Subscription<T> {
 	) -> Self {
 		Self::builder()
 			.receiver(receiver)
-			.live_edge(ws.live_edge.clone())
 			.sender(ws.sender.clone())
 			.creator_id(id)
 			.id(subscription_id)
@@ -438,6 +486,9 @@ impl<T: DeserializeOwned + WebSocketNotification> Stream for Subscription<T> {
 		// websocket when its buffer runs dry, so a `Pending` returned while
 		// buffered frames remain would park this task forever. Re-polling
 		// drains the buffer and re-arms the socket waker in the same poll.
+		// The probe skips frames for other subscriptions before any typed
+		// deserialization — on a socket carrying several feeds, that is most
+		// frames.
 		loop {
 			let Some(result) = ready!(this.receiver.as_mut().poll_next(cx)) else {
 				return Poll::Ready(None);
@@ -446,6 +497,10 @@ impl<T: DeserializeOwned + WebSocketNotification> Stream for Subscription<T> {
 			let Ok(value) = result else {
 				continue;
 			};
+
+			if !is_notification_for(&value, T::NOTIFICATION, subscription_id) {
+				continue;
+			}
 
 			let Ok(json) = serde_json::from_value::<SubscriptionResponse<T>>(value) else {
 				continue;
@@ -479,6 +534,7 @@ mod websocket_provider_reqwest {
 	use typed_builder::TypedBuilder;
 
 	use super::ToWebSocketValue;
+	use crate::ClientRequest;
 	use crate::ClientWebSocketError;
 
 	impl ToWebSocketValue for Message {
@@ -587,7 +643,7 @@ mod websocket_provider_reqwest {
 		}
 	}
 
-	impl Sink<Value> for WebSocketStream {
+	impl Sink<ClientRequest> for WebSocketStream {
 		type Error = ClientWebSocketError;
 
 		fn poll_ready(self: Pin<&mut Self>, cx: &mut Context<'_>) -> Poll<Result<(), Self::Error>> {
@@ -613,7 +669,7 @@ mod websocket_provider_reqwest {
 			Poll::Ready(Err(ClientWebSocketError::ConnectionError))
 		}
 
-		fn start_send(mut self: Pin<&mut Self>, item: Value) -> Result<(), Self::Error> {
+		fn start_send(mut self: Pin<&mut Self>, item: ClientRequest) -> Result<(), Self::Error> {
 			let Some(websocket) = self.websocket.as_mut() else {
 				return Err(ClientWebSocketError::ConnectionError);
 			};
@@ -697,35 +753,42 @@ mod websocket_provider_wasm {
 	use pin_project::pin_project;
 	use serde_json::Value;
 	use typed_builder::TypedBuilder;
-	use wasm_bindgen::UnwrapThrowExt;
 
 	use super::ToWebSocketValue;
+	use crate::ClientRequest;
 	use crate::ClientWebSocketError;
 
-	/// An eagerly-connected websocket that is both a [`Stream`] and a [`Sink`]
+	/// A lazily-connected websocket that is both a [`Stream`] and a [`Sink`]
 	/// of JSON [`Value`]s, backed by gloo for browser targets.
 	///
-	/// Unlike the reqwest variant the connection is opened at construction —
-	/// in a browser the JS API is callback-based, so there is no handshake
-	/// future to defer — which is why the browser transports must run inside
-	/// `SendWrapper`.
+	/// The connection is initiated on first use — the first poll of either
+	/// split half — rather than at construction, so a client that only makes
+	/// HTTP requests never opens a socket and construction never panics.
+	/// `WebSocket::open` only creates the JS object and registers the event
+	/// callbacks; the browser completes the handshake asynchronously, the sink
+	/// parks until the open event fires, which is why the browser transports
+	/// must run inside `SendWrapper`.
 	#[derive(TypedBuilder)]
 	#[pin_project]
 	pub struct WebSocketStream {
 		#[builder(setter(into))]
 		url: String,
 		#[pin]
-		websocket: WebSocket,
+		#[builder(default)]
+		websocket: Option<WebSocket>,
+		/// Latched when `WebSocket::open` refuses synchronously (invalid URL,
+		/// blocked port): the refusal surfaces once as an error frame, after
+		/// which the stream stays ended — never retried on every poll.
+		#[builder(default)]
+		failed: bool,
 	}
 
 	impl WebSocketStream {
-		/// Open the connection to `url`; panics if the browser refuses it,
-		/// matching the fail-fast behavior of the JS websocket constructor.
-		pub fn new(url: &str) -> Self {
-			Self::builder()
-				.url(url)
-				.websocket(WebSocket::open(url).unwrap_throw())
-				.build()
+		/// Prepare a connection to `url`; the connection itself starts on first
+		/// use. A refused or invalid endpoint surfaces later as an error frame
+		/// on the stream instead of a panic here.
+		pub fn new(url: impl Into<String>) -> Self {
+			Self::builder().url(url).build()
 		}
 	}
 
@@ -735,7 +798,41 @@ mod websocket_provider_wasm {
 		fn poll_next(self: Pin<&mut Self>, cx: &mut Context<'_>) -> Poll<Option<Self::Item>> {
 			let mut this = self.project();
 
-			let Some(result) = ready!(this.websocket.as_mut().poll_next(cx)) else {
+			// Fast path: an established (or connecting) socket.
+			if let Some(websocket) = this.websocket.as_mut().as_pin_mut() {
+				let Some(result) = ready!(websocket.poll_next(cx)) else {
+					return Poll::Ready(None);
+				};
+
+				return Poll::Ready(Some(result.to_websocket_value()));
+			}
+
+			// A latched failure stays terminal: the poll that observed it
+			// already reported it as an error frame.
+			if *this.failed {
+				return Poll::Ready(None);
+			}
+
+			// First use starts the connection. Polling the socket below
+			// registers this task's waker with the message channel, so the
+			// browser's event callbacks wake it when the first frame lands; a
+			// synchronous refusal is latched and reported exactly once,
+			// mirroring the reqwest variant's failed handshake.
+			match WebSocket::open(this.url.as_str()) {
+				Ok(websocket) => this.websocket.as_mut().set(Some(websocket)),
+				Err(_) => {
+					*this.failed = true;
+
+					return Poll::Ready(Some(Err(ClientWebSocketError::ConnectionError)));
+				}
+			}
+
+			let Some(websocket) = this.websocket.as_mut().as_pin_mut() else {
+				// `WebSocket::open` succeeded above, so a socket exists.
+				return Poll::Ready(None);
+			};
+
+			let Some(result) = ready!(websocket.poll_next(cx)) else {
 				return Poll::Ready(None);
 			};
 
@@ -743,36 +840,74 @@ mod websocket_provider_wasm {
 		}
 	}
 
-	impl Sink<Value> for WebSocketStream {
+	impl Sink<ClientRequest> for WebSocketStream {
 		type Error = ClientWebSocketError;
 
-		fn poll_ready(
-			mut self: Pin<&mut Self>,
-			cx: &mut Context<'_>,
-		) -> Poll<Result<(), Self::Error>> {
-			self.websocket.poll_ready_unpin(cx).map_err(Into::into)
+		fn poll_ready(self: Pin<&mut Self>, cx: &mut Context<'_>) -> Poll<Result<(), Self::Error>> {
+			let mut this = self.project();
+
+			// Fast path: an established (or connecting) socket. `poll_ready`
+			// stays pending until the browser reports the socket open.
+			if let Some(mut websocket) = this.websocket.as_mut().as_pin_mut() {
+				return websocket.poll_ready_unpin(cx).map_err(Into::into);
+			}
+
+			if *this.failed {
+				return Poll::Ready(Err(ClientWebSocketError::ConnectionError));
+			}
+
+			// First use starts the connection; the handshake continues in the
+			// background and the `poll_ready` below parks until the open event
+			// fires the sink waker.
+			match WebSocket::open(this.url.as_str()) {
+				Ok(websocket) => this.websocket.as_mut().set(Some(websocket)),
+				Err(_) => {
+					*this.failed = true;
+
+					return Poll::Ready(Err(ClientWebSocketError::ConnectionError));
+				}
+			}
+
+			let Some(mut websocket) = this.websocket.as_mut().as_pin_mut() else {
+				// `WebSocket::open` succeeded above, so a socket exists.
+				return Poll::Ready(Err(ClientWebSocketError::ConnectionError));
+			};
+
+			websocket.poll_ready_unpin(cx).map_err(Into::into)
 		}
 
-		fn start_send(mut self: Pin<&mut Self>, item: Value) -> Result<(), Self::Error> {
+		fn start_send(mut self: Pin<&mut Self>, item: ClientRequest) -> Result<(), Self::Error> {
 			let string =
 				serde_json::to_string(&item).map_err(|_| ClientWebSocketError::InvalidMessage)?;
 			let text = Message::Text(string);
 
-			self.websocket.start_send_unpin(text).map_err(Into::into)
+			let Some(websocket) = self.websocket.as_mut() else {
+				return Err(ClientWebSocketError::ConnectionError);
+			};
+
+			websocket.start_send_unpin(text).map_err(Into::into)
 		}
 
 		fn poll_flush(
 			mut self: Pin<&mut Self>,
 			cx: &mut Context<'_>,
 		) -> Poll<Result<(), Self::Error>> {
-			self.websocket.poll_flush_unpin(cx).map_err(Into::into)
+			let Some(websocket) = self.websocket.as_mut() else {
+				return Poll::Pending;
+			};
+
+			websocket.poll_flush_unpin(cx).map_err(Into::into)
 		}
 
 		fn poll_close(
 			mut self: Pin<&mut Self>,
 			cx: &mut Context<'_>,
 		) -> Poll<Result<(), Self::Error>> {
-			self.websocket.poll_close_unpin(cx).map_err(Into::into)
+			let Some(websocket) = self.websocket.as_mut() else {
+				return Poll::Pending;
+			};
+
+			websocket.poll_close_unpin(cx).map_err(Into::into)
 		}
 	}
 
@@ -784,6 +919,38 @@ mod websocket_provider_wasm {
 			};
 
 			result.map_err(|_| ClientWebSocketError::InvalidMessage)
+		}
+	}
+
+	#[cfg(test)]
+	mod tests {
+
+		use assert2::check;
+		use futures::StreamExt;
+
+		use super::WebSocketStream;
+		use crate::errors::ClientWebSocketError;
+
+		/// Building a stream against an endpoint the browser refuses
+		/// synchronously (an unparseable URL here) must not panic —
+		/// clients are constructed eagerly, sockets open lazily — and
+		/// the refusal must surface once as an error frame followed by
+		/// a permanent end of stream, matching the reqwest variant's
+		/// failed-handshake contract.
+		#[wasm_bindgen_test::wasm_bindgen_test]
+		async fn refused_connection_errors_once_then_ends() {
+			let mut stream = WebSocketStream::new("invalid url");
+
+			let first = stream.next().await;
+			check!(matches!(
+				first,
+				Some(Err(ClientWebSocketError::ConnectionError))
+			));
+
+			// The latched refusal keeps the stream terminal without retrying
+			// the connection on every poll.
+			check!(stream.next().await.is_none());
+			check!(stream.next().await.is_none());
 		}
 	}
 }

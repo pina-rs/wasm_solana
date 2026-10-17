@@ -145,6 +145,13 @@ jobs:
           cargo test_streams
         shell: devenv shell -- bash -e {0}
 
+      # No validator boot or ledger: surfpool embeds in-process, so this
+      # step only pays for compiling its dependency graph.
+      - name: test `test_utils_solana` with `surfpool`
+        run: |
+          cargo test_surfpool
+        shell: devenv shell -- bash -e {0}
+
       # Both halves of the browser pair (chromium + chromedriver) come from
       # the same pinned nixpkgs revision, so a runner Chrome auto-update can
       # no longer break the session handshake silently.

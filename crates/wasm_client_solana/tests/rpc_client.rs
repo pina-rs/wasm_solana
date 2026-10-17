@@ -56,6 +56,38 @@ pub async fn log_subscription() -> Result<()> {
 	Ok(())
 }
 
+/// The `on_logs` callback receives the same notifications without a spawned
+/// consumer task — the workaround `account_subscription` still needs for its
+/// inline stream.
+#[wasm_bindgen_test]
+pub async fn log_callback_subscription() -> Result<()> {
+	let rpc = SolanaRpcClient::new(LOCALNET);
+	let (sender, receiver) = futures::channel::oneshot::channel();
+	let mut sender = Some(sender);
+
+	let subscription = rpc
+		.on_logs(
+			LogsSubscribeRequest::builder()
+				.filter(RpcTransactionLogsFilter::AllWithVotes)
+				.build(),
+			move |notification| {
+				if let Some(sender) = sender.take() {
+					let _ = sender.send(notification);
+				}
+			},
+		)
+		.await?;
+
+	check!(!subscription.is_stopped());
+
+	let notification = receiver.await?;
+	check!(!notification.value.logs.is_empty());
+
+	subscription.unsubscribe().await?;
+
+	Ok(())
+}
+
 /// Subscribe to an account and drive a create-account transaction through it.
 ///
 /// This test spent a long time "not working for the correct reason": the

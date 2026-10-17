@@ -85,7 +85,7 @@ The path will not be easy. Hiring may be difficult, error messages may be crypti
   println!("Wallet pubkey: {}", wallet_pubkey);
   ```
 
-- **[`test_utils_solana`](./crates/test_utils_solana)**: A suite of utilities for Solana integration testing. It simplifies the process of setting up a `ProgramTest` environment, managing test validators, and creating test accounts, streamlining the entire testing workflow.
+- **[`test_utils_solana`](./crates/test_utils_solana)**: A suite of utilities for Solana integration testing. It simplifies the process of setting up a `ProgramTest` environment, managing test validators (agave or an embedded surfpool node), and creating test accounts, streamlining the entire testing workflow.
 
   ```rust
   use solana_program_test::ProgramTest;

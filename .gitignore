@@ -46,6 +46,7 @@ node_modules/
 /.wallet.json
 /.anchor
 /test-ledger
+/.surfpool
 
 **/*.pem
 
@@ -78,3 +79,6 @@ examples/playwright-report/
 # Example build artifacts must never be committed (7.8k files slipped in
 # via a later PR); the root /target rule does not cover nested workspaces.
 .video_agent/
+
+# criterion homes written by the benchmark workflow
+.benchmark/

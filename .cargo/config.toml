@@ -35,6 +35,14 @@ test_streams = [
 	"-F",
 	"test_validator",
 ]
+test_surfpool = [
+	"nextest",
+	"run",
+	"--package",
+	"test_utils_solana",
+	"-F",
+	"surfpool",
+]
 test_memory_wallet_ssr = [
 	"nextest",
 	"run",

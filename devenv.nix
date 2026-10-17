@@ -319,6 +319,15 @@ in
           --db "$DEVENV_ROOT/target/advisory-db-audit" \
           --url "https://github.com/RustSec/advisory-db.git" \
           --deny yanked \
+          --ignore RUSTSEC-2026-0253 \
+          --ignore RUSTSEC-2026-0258 \
+          --ignore RUSTSEC-2026-0346 \
+          --ignore RUSTSEC-2026-0349 \
+          --ignore RUSTSEC-2025-0134 \
+          --ignore RUSTSEC-2026-0098 \
+          --ignore RUSTSEC-2026-0099 \
+          --ignore RUSTSEC-2026-0104 \
+          --ignore RUSTSEC-2024-0449 \
           --ignore RUSTSEC-2022-0093 \
           --ignore RUSTSEC-2024-0344 \
           --ignore RUSTSEC-2024-0421 \

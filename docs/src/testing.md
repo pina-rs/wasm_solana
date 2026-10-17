@@ -8,6 +8,7 @@
 | `wasm_client_solana` (ssr) | `cargo test_wasm_client_solana_ssr`                                   | nothing (mock transport) |
 | doc tests                  | `cargo test_memory_wallet_docs`, `cargo test_wasm_client_solana_docs` | nothing                  |
 | streams                    | `cargo test_streams`                                                  | a local validator        |
+| surfpool                   | `cargo test_surfpool`                                                 | nothing (embedded node)  |
 | wasm (browser)             | `cargo test_wasm`                                                     | validator + chromedriver |
 
 All aliases live in `.cargo/config.toml` and run through `cargo nextest`.
@@ -18,7 +19,11 @@ Every typed method has a `tests::response` snapshot test that deserializes a rea
 
 ## Validator-driven tests
 
-`cargo test_streams` boots a real `solana-test-validator` (agave, provisioned through nixpkgs) and exercises pubsub subscriptions end to end — logs and account streams. The validator lifecycle is managed by `test_utils_solana::TestValidatorRunner`, which also wires the faucet.
+`cargo test_streams` boots a real `solana-test-validator` (agave, provisioned through nixpkgs) and exercises pubsub subscriptions end to end — logs and account streams (`tests/streams.rs`), the same feeds through the callback API (`tests/callbacks.rs`), and the pubsub-first confirmation path (`tests/confirm.rs`). The validator lifecycle is managed by `test_utils_solana::TestValidatorRunner`, which also wires the faucet.
+
+## Surfpool-driven tests
+
+`cargo test_surfpool` embeds a [surfpool](https://surfpool.run) node in-process through `test_utils_solana::SurfpoolRunner` (behind the crate's `surfpool` feature) — the same backend the browser e2e examples drive as an external process, but as a library. There is no validator boot or on-disk ledger: the whole suite — startup funding, airdrops, `signatureSubscribe` confirmation, transfers — runs in well under a second. Ports are dynamic and the client defaults to the `Confirmed` commitment, because surfpool's per-transaction block production advances transactions to confirmed without finalizing roots; switch the runner's `block_production_mode` to `Clock` when a test needs finality. Validator-internal behavior (vote accounts, rewards, `getBlock` completeness) still belongs on the agave runner.
 
 ## Browser tests
 
