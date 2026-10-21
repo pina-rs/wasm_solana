@@ -313,6 +313,10 @@ in
         # the 1.x API. Mirrors the deny.toml ignore.
         # (the client's own rand 0.8.8/0.9.x pins are patched ranges), and
         # solana-genesis-config 4.0.0 inside the validator harness only.
+        # RUSTSEC-2026-0381/0382 hit webpki-roots 0.25.4 and rustls-webpki
+        # 0.101.7, which arrive only through surfpool's txtx-addon-kit -> reqwest
+        # 0.11 chain in test_utils_solana; both are patched only on the 1.0 and
+        # 0.103 lines, which the workspace carries at 1.0.10 and 0.103.16.
         # Comments stay above the command: a `#` after a line continuation
         # swallows every remaining argument.
         cargo-audit audit \
@@ -336,6 +340,8 @@ in
           --ignore RUSTSEC-2026-0292 \
                   --ignore RUSTSEC-2025-0141 \
           --ignore RUSTSEC-2026-0186 \
+          --ignore RUSTSEC-2026-0381 \
+          --ignore RUSTSEC-2026-0382 \
                   --file "$DEVENV_ROOT/Cargo.lock"
       '';
       description = "Run RustSec advisory audit for Cargo.lock (ignores validator-stack advisories).";

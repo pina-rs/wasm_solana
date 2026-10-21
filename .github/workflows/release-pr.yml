@@ -21,8 +21,13 @@ jobs:
     timeout-minutes: 20
     runs-on: ubuntu-24.04
     permissions:
+      # Upload the release files as git blobs and a tree. This pushes no
+      # branch; the monochange GitHub App writes the release commit and pull
+      # request on monochange.dev, and this run proves its repository with an
+      # OIDC token.
       contents: write
-      pull-requests: write
+      pull-requests: read
+      id-token: write
     steps:
       - name: checkout repository
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -34,13 +39,6 @@ jobs:
         uses: ./.github/actions/devenv
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: configure release git credentials
-        run: |
-          set -euo pipefail
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-        shell: bash
 
       - name: refresh tags from origin
         run: git fetch --force --tags origin
@@ -80,15 +78,15 @@ jobs:
           echo "has_changesets=${has_changesets}" >> "$GITHUB_OUTPUT"
         shell: bash
 
-      - name: configure git authentication
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: gh auth setup-git
-
       - name: refresh release pull request
         if: steps.release_record.outputs.is_release_commit != 'true' && steps.pending_changesets.outputs.has_changesets == 'true'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # monochange.dev's GitHub App creates a verified release commit and
+          # opens the release pull request as the monochange bot, so the pull
+          # request's own workflows run, which a GITHUB_TOKEN push never
+          # triggers.
+          MONOCHANGE_RELEASE_BACKEND: hosted
         run: |
           set -euo pipefail
           # A changeset that only bumps `docs`/`none` produces no releaseable
