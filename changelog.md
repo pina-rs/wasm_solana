@@ -4,6 +4,79 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.14.0](https://github.com/pina-rs/wasm_solana/releases/tag/v0.14.0) (2026-10-23)
+
+Grouped release for `core`.
+
+### Breaking Changes
+
+#### Pubsub reliability: rejections, slot feed, fork wakeups
+
+_Packages:_ 🔴 _wasm_client_solana_
+
+_Owner:_ [@ifiokjr](https://github.com/ifiokjr) · _Review:_ [PR #181](https://github.com/pina-rs/wasm_solana/pull/181)
+
+Breaking: `SlotInfo.timestamp` is now `Option<u64>`, so code reading the field must handle `None`.
+
+Four defects in the pubsub path are fixed, three of them capable of hanging or silencing a healthy subscription:
+
+- **Rejected subscriptions no longer hang.** When a node answered a `*Subscribe` or `*Unsubscribe` request with a JSON-RPC error envelope, the acknowledgement loop treated the reply as "not mine yet" and waited forever. Both loops now fail fast with `ClientWebSocketError::Subscription`/`Unsubscription` and log the node's reason, so an invalid filter or a permission-gated feed surfaces immediately instead of parking the caller.
+- **`slotSubscribe` and `rootSubscribe` sent a config the node rejects.** A default config serialized as `[{}]`, which agave refuses ("No parameters were expected"); `logsSubscribe` sent `["allWithVotes",{}]`, refused by several releases with "missing field `commitment`". A config left at its default now serializes as `null` — which the request envelope then omits entirely for the no-parameter feeds — matching the wire shape every node accepts. `slotSubscribe` and `rootSubscribe` now actually work against agave; previously no test covered them and every call hung on the rejected handshake.
+- **`SlotInfo.timestamp` is now `Option<u64>`.** Agave sends `{parent, slot, root}` with no `timestamp` member, so every `slotNotification` failed to deserialize and was silently dropped — a slot subscription delivered nothing, ever. The field is `None` from nodes that omit it.
+- **Parked subscriptions can no longer starve behind dead wakers.** The pubsub fan-out now uses a vendored, corrected `fork_stream` (the published 0.1.0 remains a dependency of nothing here): its single source-registered waker meant the last task to poll the socket — say a confirmation's unsubscription — left its dying waker with the socket, and parked forks queued behind stale wakers never heard about later frames; an `accountSubscribe` alongside a `send_and_confirm` could silently stop delivering. The vendored fork registers every parked fork through one shared waker and wakes all of them when a frame lands, at the cost of an occasional spurious no-op wake. This is also why the `fork_stream` dependency is gone from the manifest.
+
+### Features
+
+#### Embed a surfpool node for tests
+
+_Packages:_ 🟠 _test_utils_solana_
+
+_Owner:_ [@ifiokjr](https://github.com/ifiokjr) · _Review:_ [PR #181](https://github.com/pina-rs/wasm_solana/pull/181)
+
+`test_utils_solana` grows a `surfpool` feature: `SurfpoolRunner` embeds a surfpool node in-process via the `surfpool-sdk` crate (1.6, published by the Solana Foundation), the same backend the Playwright browser examples already drive externally. Where `TestValidatorRunner` pays for agave genesis, a RocksDB ledger and a faucet thread, a `SurfpoolRunner` starts in milliseconds — its suites boot, airdrop, confirm over pubsub, and send a transfer in under half a second.
+
+The props mirror `TestValidatorRunnerProps` where the backends agree — funded `pubkeys` with `initial_lamports`, seeded `accounts`, deployed `programs`, and the client `commitment` — plus surfpool-specific knobs: `slot_time_ms`, `skip_blockhash_check`, `block_production_mode` and `remote_rpc_url` for lazily forking mainnet state. Ports are always dynamic (`pubsub_url` is _not_ rpc port + 1 on a surfnet), and the client defaults to `Confirmed` because per-transaction block mode advances transactions to confirmed without finalizing roots; the docs on the props call out switching to `Clock` production when a test genuinely needs finality. The agave runner remains the fidelity backend for validator internals.
+
+#### Callback-driven subscriptions and leaner frame dispatch
+
+_Packages:_ 🟠 _wasm_client_solana_
+
+_Owner:_ [@ifiokjr](https://github.com/ifiokjr) · _Review:_ [PR #181](https://github.com/pina-rs/wasm_solana/pull/181)
+
+Every `*_subscribe` method now has an `on_*` callback counterpart: `on_account_change`, `on_block`, `on_logs`, `on_program_change`, `on_signature`, `on_slot_change`, `on_root_change`, `on_slots_updates` and `on_vote`, plus a generic `subscribe_with_callback` escape hatch. The callback receives the notification payload — the same type the stream flavor yields from `params.result` — on the target's runtime (`wasm-bindgen-futures` in the browser, `tokio::spawn` under `ssr`), so callers no longer need to spawn their own consumer task; the browser tests' `spawn_local` workaround for driving streams becomes unnecessary. The returned `CallbackSubscription` handle exposes `id`/`subscription_id`, `is_stopped`, a `detach` that keeps the pump running after the handle is dropped, and an `unsubscribe` that stops the callback first and then sends the server unsubscribe, waiting for its ack. Dropping the handle stops the callback _and_ asks the server to unsubscribe in the background — the fire-and-forget teardown a stream `Drop` cannot offer, since the pump task sends the request as it exits.
+
+Subscription dispatch is also cheaper on busy sockets: incoming frames are now matched against the notification method and subscription id with two JSON pointer probes before any typed deserialization, so a subscription only pays full deserialization for frames that belong to it (previously every frame on the socket was fully deserialized by every fork). Acknowledgement and unsubscription-ack waits apply the same probe against the response `id`. The websocket sink now carries `ClientRequest` envelopes directly — serialized to text exactly once — instead of round-tripping through an intermediate `Value` copy, and the HTTP providers assemble envelopes through the new `ClientRequest::from_params` without re-serializing already-encoded params.
+
+#### Lazy pubsub sockets and push-based confirmation
+
+_Packages:_ 🟠 _wasm_client_solana_
+
+_Owner:_ [@ifiokjr](https://github.com/ifiokjr) · _Review:_ [PR #181](https://github.com/pina-rs/wasm_solana/pull/181)
+
+The browser transport no longer opens a websocket when a client is constructed: `SolanaRpcClient::new` used to open the pubsub socket — and panic through `unwrap_throw` when the endpoint refused it — before the first HTTP call ever ran. The gloo stream now initiates the connection on first use, matching the reqwest backend, so HTTP-only usage never touches pubsub, and a refused or invalid pubsub endpoint surfaces as a single error frame followed by a terminal stream instead of a construction panic.
+
+`confirm_transaction` now confirms through `signatureSubscribe` before falling back to polling: a notification delivers the status the moment the node reaches the target commitment, one covering status poll closes the race with already-confirmed signatures, and the polling loop only runs when pubsub cannot deliver (unavailable endpoint, failed subscription, or silence past the same total budget). `send_and_confirm_transaction*` no longer discards the confirmation result: a transaction that does not confirm — or lands with an on-chain error — now returns an `RpcError` carrying the signature instead of silently reporting success. Callers that treated `Ok` as fire-and-forget acceptance must now check the error, which carries the signature so its status can be re-queried.
+
+### Fixes
+
+#### Correct acknowledgement benchmark measurements
+
+_Owner:_ [@ifiokjr](https://github.com/ifiokjr) · _Review:_ [PR #187](https://github.com/pina-rs/wasm_solana/pull/187)
+
+Buffer replay history before timing, consume it before checking a uniquely identified JSON-RPC acknowledgement, and exclude fixture destruction from both subscription benchmark timings.
+
+The benchmark workflow uses the head subscription harness for both compared revisions, so fixture corrections are not reported as runtime improvements or regressions.
+
+#### Update constant-time dependency to patched ctutils
+
+_Owner:_ [@ifiokjr](https://github.com/ifiokjr) · _Review:_ [PR #187](https://github.com/pina-rs/wasm_solana/pull/187)
+
+Refresh the Cargo lockfile to ctutils 0.4.4, fixing RUSTSEC-2026-0385 in constant-time mask generation and u128 comparisons. Public client APIs are unchanged.
+
+Normalize existing Rust comment wrapping with the current formatter; the forked crates have no behavioral change.
+
+- **Benchmark every pull request and gate regressions.** A `benchmark` workflow now runs the criterion suites (`subscription` and `client`) on every pull request, twice: once at the merge-base and once at the PR head, so the numbers isolate exactly what the PR changed. The comparison is posted as a PR comment — one comment per PR, updated in place on every push — and to the job's step summary, and the `benchmark` check fails when any benchmark's median regressed more than ten percent. A regression is still mergeable when the PR description carries a `## Benchmark Justification` section explaining the tradeoff, which turns "too slow" into a visible, reviewable decision instead of a silent one; make the job a required status check to enforce that on merge. The comparison itself lives in `setup/scripts/benchmark_compare.py`, pairing the two criterion homes by benchmark id over their median estimates. _Packages:_ 🟢 _wasm_client_solana_ _Owner:_ [@ifiokjr](https://github.com/ifiokjr) · _Review:_ [PR #181](https://github.com/pina-rs/wasm_solana/pull/181)
+
 ## [0.13.0](https://github.com/pina-rs/wasm_solana/releases/tag/v0.13.0) (2026-10-07)
 
 Grouped release for `core`.

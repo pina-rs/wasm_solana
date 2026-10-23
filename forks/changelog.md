@@ -4,6 +4,20 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## forks [5.0.1](https://github.com/pina-rs/wasm_solana/releases/tag/forks/v5.0.1) (2026-10-23)
+
+Grouped release for `forks`.
+
+### Fixes
+
+#### Update constant-time dependency to patched ctutils
+
+_Owner:_ [@ifiokjr](https://github.com/ifiokjr) · _Review:_ [PR #187](https://github.com/pina-rs/wasm_solana/pull/187)
+
+Refresh the Cargo lockfile to ctutils 0.4.4, fixing RUSTSEC-2026-0385 in constant-time mask generation and u128 comparisons. Public client APIs are unchanged.
+
+Normalize existing Rust comment wrapping with the current formatter; the forked crates have no behavioral change.
+
 ## forks [4.0.0](https://github.com/pina-rs/wasm_solana/releases/tag/forks/v4.0.0) (2026-09-08)
 
 Grouped release for `forks`.
