@@ -8,22 +8,22 @@ The repository uses [devenv](https://devenv.sh) for a hermetic environment. `dir
 devenv shell   # or: direnv allow
 ```
 
-Provided by the environment: the pinned Rust toolchain (from `rust-toolchain.toml`), agave (validator binaries) and monochange from `ifiokjr/nixpkgs`, mdbook, chromedriver, wasm-bindgen tooling, and all lint/security tools (cargo-deny, cargo-audit, zizmor, gitleaks).
+Provided by the environment: the pinned Rust toolchain (from `rust-toolchain.toml`), agave (validator binaries) and monochange from `ifiokjr/nixpkgs`, mdbook, wasm-bindgen tooling, and all lint/security tools (cargo-deny, cargo-audit, zizmor, gitleaks). Linux also receives the matched Chromium and chromedriver packages used by the browser tests.
 
 ## Daily commands
 
-| Command                           | Description                                          |
-| --------------------------------- | ---------------------------------------------------- |
-| `build:all`                       | Build all crates with all features.                  |
-| `test:all`                        | Run every suite (SSR, docs, streams, browser tests). |
-| `test:validator`                  | Start a local validator and run the browser tests.   |
-| `coverage:all`                    | llvm-cov coverage across the suites.                 |
-| `lint:all`                        | clippy + dprint format check.                        |
-| `fix:all`                         | Apply clippy and dprint fixes.                       |
-| `security:all`                    | cargo-deny + cargo-audit + zizmor.                   |
-| `update:deps`                     | `cargo update` + `devenv update`.                    |
-| `build:docs`                      | Build this book.                                     |
-| `validator:bg` / `validator:kill` | Manage the local validator.                          |
+| Command                           | Description                                               |
+| --------------------------------- | --------------------------------------------------------- |
+| `build:all`                       | Build all crates with all features.                       |
+| `test:all`                        | Run every suite, including browser tests (Linux/CI).      |
+| `test:validator`                  | Start a local validator and run browser tests (Linux/CI). |
+| `coverage:all`                    | llvm-cov coverage across the suites.                      |
+| `lint:all`                        | clippy + dprint format check.                             |
+| `fix:all`                         | Apply clippy and dprint fixes.                            |
+| `security:all`                    | cargo-deny + cargo-audit + zizmor.                        |
+| `update:deps`                     | `cargo update` + `devenv update`.                         |
+| `build:docs`                      | Build this book.                                          |
+| `validator:bg` / `validator:kill` | Manage the local validator.                               |
 
 ## Formatting
 

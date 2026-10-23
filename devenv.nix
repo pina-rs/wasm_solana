@@ -21,8 +21,6 @@ in
       cargo-deny
       cargo-nextest
       cargo-run-bin
-      chromedriver
-      chromium
       cmake
       curl
       custom.agave
@@ -68,6 +66,9 @@ in
       coreutils
     ]
     ++ lib.optionals stdenv.isLinux [
+      # Nix packages the matched Chromium/browser-driver pair only for Linux.
+      chromedriver
+      chromium
       libgcc.lib
       udev
     ];

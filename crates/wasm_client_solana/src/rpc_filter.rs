@@ -290,7 +290,8 @@ enum DataType {
 enum RpcMemcmpEncoding {
 	Base58,
 	Base64,
-	// This variant exists only to preserve backward compatibility with generic `Memcmp` serde
+	// This variant exists only to preserve backward compatibility with generic
+	// `Memcmp` serde
 	#[serde(other)]
 	Binary,
 }

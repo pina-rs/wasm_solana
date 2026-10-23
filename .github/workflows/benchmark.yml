@@ -74,18 +74,23 @@ jobs:
           echo "base=$BASE_SHA" >> "$GITHUB_OUTPUT"
           echo "head=$HEAD_SHA" >> "$GITHUB_OUTPUT"
 
-      - name: benchmark the base
+      - name: benchmark the base and head in one shell
         run: |
           set -euo pipefail
+          # Initialize devenv on the head once. Re-entering it while the base
+          # is checked out can format historical sources and prevent the
+          # checkout back to the head. Both runs share one shell environment.
+          # Use the same benchmark harness for both revisions so changes to
+          # fixture setup or timing cannot masquerade as runtime changes.
+          benchmark_source=crates/wasm_client_solana/benches/subscription.rs
+          git show "$(cat .benchmark/head-sha):$benchmark_source" > .benchmark/subscription.rs
           export CRITERION_HOME="$(pwd)/.benchmark/criterion-base"
           git checkout --detach "$(cat .benchmark/base-sha)"
+          cp .benchmark/subscription.rs "$benchmark_source"
           cargo bench --locked --package wasm_client_solana --features ssr
-        shell: devenv shell -c -- bash -e {0}
 
-      - name: benchmark the head
-        run: |
-          set -euo pipefail
           export CRITERION_HOME="$(pwd)/.benchmark/criterion-head"
+          git restore -- "$benchmark_source"
           git checkout --detach "$(cat .benchmark/head-sha)"
           cargo bench --locked --package wasm_client_solana --features ssr
         shell: devenv shell -c -- bash -e {0}

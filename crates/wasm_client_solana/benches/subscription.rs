@@ -69,9 +69,10 @@ fn bench_frame_parse(c: &mut Criterion) {
 		b.iter(|| {
 			let frames = std::hint::black_box(&frames);
 			for frame in frames {
-				let parsed: SubscriptionResponse<GetAccountInfoResponse> =
-					serde_json::from_value(std::hint::black_box(frame.clone()))
-						.expect("notification parses");
+				let parsed = serde_json::from_value::<SubscriptionResponse<GetAccountInfoResponse>>(
+					std::hint::black_box(frame.clone()),
+				);
+				assert!(parsed.is_ok(), "notification parsing failed: {parsed:?}");
 				std::hint::black_box(&parsed);
 			}
 		})
@@ -154,32 +155,44 @@ impl futures::Stream for QueuedStream {
 fn bench_fork_replay(c: &mut Criterion) {
 	for history in [100_usize, 1_000, 10_000] {
 		let frames = notification_frames(history);
-		let ack = notification_frames(1).pop().unwrap();
+		let ack = json!({ "jsonrpc": "2.0", "id": 17, "result": 0 });
 
 		c.bench_function(
 			&format!("subscription/ack_wait/replaying_root/history_{history}"),
 			|b| {
-				b.iter(|| {
-					// The pre-fix shape: the root fork is never advanced, so
-					// a fork cloned from it starts at the buffer's oldest
-					// entry and must replay (and clone) every buffered frame
-					// before the ack — which sits behind the whole history —
-					// is visible.
-					let queue = std::sync::Arc::new(std::sync::Mutex::new(
-						frames
-							.iter()
-							.cloned()
-							.chain(std::iter::once(ack.clone()))
-							.collect::<VecDeque<_>>(),
-					));
-					let root = QueuedStream {
-						queue: std::sync::Arc::clone(&queue),
-					}
-					.fork();
-					let mut fork = root.clone();
-					let found = futures::executor::block_on(fork.next());
-					assert!(found.is_some());
-				})
+				b.iter_batched_ref(
+					|| {
+						// The pre-fix shape: the root fork is never advanced,
+						// so a fork cloned from it starts at the buffer's
+						// oldest entry and must replay (and clone) every
+						// buffered frame before the ack — which sits behind the
+						// whole history — is visible.
+						let queue = std::sync::Arc::new(std::sync::Mutex::new(
+							frames.iter().cloned().collect::<VecDeque<_>>(),
+						));
+						let root = QueuedStream {
+							queue: std::sync::Arc::clone(&queue),
+						}
+						.fork();
+						let mut reader = root.clone();
+						for _ in 0..history {
+							let frame = futures::executor::block_on(reader.next());
+							assert!(
+								matches!(&frame, Some(Ok(_))),
+								"invalid history frame: {frame:?}"
+							);
+						}
+
+						(root, queue)
+					},
+					|(root, queue)| {
+						let mut fork = root.clone();
+						queue.lock().unwrap().push_back(ack.clone());
+						let found = futures::executor::block_on(fork.by_ref().skip(history).next());
+						assert_eq!(found.as_ref().map(Result::as_ref), Some(Ok(&ack)));
+					},
+					criterion::BatchSize::LargeInput,
+				)
 			},
 		);
 
@@ -194,7 +207,9 @@ fn bench_fork_replay(c: &mut Criterion) {
 		c.bench_function(
 			&format!("subscription/ack_wait/pre_registered_fork/history_{history}"),
 			|b| {
-				b.iter_batched(
+				// Borrowing keeps fixture destruction outside the timed ack
+				// wait.
+				b.iter_batched_ref(
 					|| {
 						let queue = std::sync::Arc::new(std::sync::Mutex::new(
 							frames.iter().cloned().collect::<VecDeque<_>>(),
@@ -209,13 +224,12 @@ fn bench_fork_replay(c: &mut Criterion) {
 
 						(root, queue)
 					},
-					|(mut root, queue)| {
+					|(root, queue)| {
 						let mut fork = root.clone();
 						queue.lock().unwrap().push_back(ack.clone());
 
 						let found = futures::executor::block_on(fork.next());
-						assert!(found.is_some());
-						let _ = &mut root;
+						assert_eq!(found.as_ref().map(Result::as_ref), Some(Ok(&ack)));
 					},
 					criterion::BatchSize::LargeInput,
 				)
