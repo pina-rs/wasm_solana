@@ -1,6 +1,6 @@
 ---
 core: fix
-forks: none
+forks: fix
 ---
 
 # Update constant-time dependency to patched ctutils
