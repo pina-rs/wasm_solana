@@ -84,7 +84,7 @@ jobs:
       # also compares each attached changeset bump with the classified change
       # type, so a changeset that understates a high-confidence break fails.
       - name: enforce changeset policy
-        uses: monochange/actions/changeset-policy@6866cbbd35932bdfb496f5b144578c9274d36ca0 # v0.10.0
+        uses: monochange/actions/changeset-policy@77fe97c0119e8c16e429d6f5cf94859b097cdcf8 # v0.10.1
         with:
           setup-monochange: false
           github-token: ${{ secrets.GITHUB_TOKEN }}
@@ -101,7 +101,7 @@ jobs:
       # for this condition and arrives in a later monochange release.
       - name: classify changes
         if: ${{ !contains(github.event.pull_request.labels.*.name, 'release') }}
-        uses: monochange/actions/change-classification@6866cbbd35932bdfb496f5b144578c9274d36ca0 # v0.10.0
+        uses: monochange/actions/change-classification@77fe97c0119e8c16e429d6f5cf94859b097cdcf8 # v0.10.1
         with:
           setup-monochange: false
           github-token: ${{ secrets.GITHUB_TOKEN }}
