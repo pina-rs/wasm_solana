@@ -1,0 +1,1004 @@
+{
+	"schema_version": "0.10",
+	"kind": "monochange.releaseRecord",
+	"created_at": "2026-10-23T15:26:00Z",
+	"command": "release",
+	"version": null,
+	"versions": {
+		"core": "0.14.0",
+		"forks": "5.0.1"
+	},
+	"release_targets": [
+		{
+			"id": "core",
+			"kind": "group",
+			"version": "0.14.0",
+			"version_format": "primary",
+			"tag": true,
+			"release": true,
+			"tag_name": "v0.14.0",
+			"rendered_title": "v0.14.0 (2026-10-23)",
+			"rendered_changelog_title": "[0.14.0](https://github.com/pina-rs/wasm_solana/releases/tag/v0.14.0) (2026-10-23)",
+			"members": [
+				"memory_wallet",
+				"test_utils_insta",
+				"test_utils_keypairs",
+				"test_utils_solana",
+				"wasm_client_solana"
+			]
+		},
+		{
+			"id": "forks",
+			"kind": "group",
+			"version": "5.0.1",
+			"version_format": "namespaced",
+			"tag": false,
+			"release": true,
+			"tag_name": "forks/v5.0.1",
+			"rendered_title": "forks v5.0.1 (2026-10-23)",
+			"rendered_changelog_title": "forks [5.0.1](https://github.com/pina-rs/wasm_solana/releases/tag/forks/v5.0.1) (2026-10-23)",
+			"members": [
+				"solana-account-decoder-wasm",
+				"solana-transaction-status-wasm"
+			]
+		}
+	],
+	"released_packages": [
+		"memory_wallet",
+		"solana-account-decoder-wasm",
+		"solana-transaction-status-wasm",
+		"test_utils_insta",
+		"test_utils_keypairs",
+		"test_utils_solana",
+		"wasm_client_solana"
+	],
+	"changed_files": [
+		"Cargo.lock",
+		"Cargo.toml",
+		"changelog.md",
+		"crates/memory_wallet/Cargo.toml",
+		"crates/test_utils_insta/Cargo.toml",
+		"crates/test_utils_keypairs/Cargo.toml",
+		"crates/test_utils_solana/Cargo.toml",
+		"crates/wasm_client_solana/Cargo.toml",
+		"forks/changelog.md",
+		"forks/solana-account-decoder-wasm/Cargo.toml",
+		"forks/solana-transaction-status-wasm/Cargo.toml"
+	],
+	"package_publications": [
+		{
+			"package": "memory_wallet",
+			"ecosystem": "cargo",
+			"registry": "crates_io",
+			"version": "0.14.0",
+			"mode": "builtin",
+			"trusted_publishing": {
+				"enabled": true,
+				"mode": "required",
+				"repository": "pina-rs/wasm_solana",
+				"workflow": "publish.yml",
+				"environment": "publisher"
+			}
+		},
+		{
+			"package": "solana-account-decoder-wasm",
+			"ecosystem": "cargo",
+			"registry": "crates_io",
+			"version": "5.0.1",
+			"mode": "builtin",
+			"trusted_publishing": {
+				"enabled": true,
+				"mode": "required",
+				"repository": "pina-rs/wasm_solana",
+				"workflow": "publish.yml",
+				"environment": "publisher"
+			}
+		},
+		{
+			"package": "solana-transaction-status-wasm",
+			"ecosystem": "cargo",
+			"registry": "crates_io",
+			"version": "5.0.1",
+			"mode": "builtin",
+			"trusted_publishing": {
+				"enabled": true,
+				"mode": "required",
+				"repository": "pina-rs/wasm_solana",
+				"workflow": "publish.yml",
+				"environment": "publisher"
+			}
+		},
+		{
+			"package": "test_utils_insta",
+			"ecosystem": "cargo",
+			"registry": "crates_io",
+			"version": "0.14.0",
+			"mode": "builtin",
+			"trusted_publishing": {
+				"enabled": true,
+				"mode": "required",
+				"repository": "pina-rs/wasm_solana",
+				"workflow": "publish.yml",
+				"environment": "publisher"
+			}
+		},
+		{
+			"package": "test_utils_keypairs",
+			"ecosystem": "cargo",
+			"registry": "crates_io",
+			"version": "0.14.0",
+			"mode": "builtin",
+			"trusted_publishing": {
+				"enabled": true,
+				"mode": "required",
+				"repository": "pina-rs/wasm_solana",
+				"workflow": "publish.yml",
+				"environment": "publisher"
+			}
+		},
+		{
+			"package": "test_utils_solana",
+			"ecosystem": "cargo",
+			"registry": "crates_io",
+			"version": "0.14.0",
+			"mode": "builtin",
+			"trusted_publishing": {
+				"enabled": true,
+				"mode": "required",
+				"repository": "pina-rs/wasm_solana",
+				"workflow": "publish.yml",
+				"environment": "publisher"
+			},
+			"timeout": {
+				"timeout_seconds": 900,
+				"retries": 2
+			}
+		},
+		{
+			"package": "wasm_client_solana",
+			"ecosystem": "cargo",
+			"registry": "crates_io",
+			"version": "0.14.0",
+			"mode": "builtin",
+			"trusted_publishing": {
+				"enabled": true,
+				"mode": "required",
+				"repository": "pina-rs/wasm_solana",
+				"workflow": "publish.yml",
+				"environment": "publisher"
+			}
+		}
+	],
+	"updated_changelogs": [
+		"changelog.md",
+		"forks/changelog.md"
+	],
+	"deleted_changesets": [
+		".changeset/ack-benchmark-measurement.md",
+		".changeset/benchmark-gate-on-every-pr.md",
+		".changeset/callback-subscriptions-and-leaner-frame-dispatch.md",
+		".changeset/ctutils-security-update.md",
+		".changeset/lazy-websocket-and-pubsub-confirmation.md",
+		".changeset/pubsub-reliability-fixes.md",
+		".changeset/surfpool-test-runner.md"
+	],
+	"changesets": [
+		{
+			"path": ".changeset/ack-benchmark-measurement.md",
+			"summary": "Correct acknowledgement benchmark measurements",
+			"details": "Buffer replay history before timing, consume it before checking a uniquely identified JSON-RPC acknowledgement, and exclude fixture destruction from both subscription benchmark timings.\n\nThe benchmark workflow uses the head subscription harness for both compared revisions, so fixture corrections are not reported as runtime improvements or regressions.",
+			"targets": [
+				{
+					"id": "core",
+					"kind": "group",
+					"bump": "patch",
+					"origin": "direct-change",
+					"evidence_refs": [],
+					"change_type": "fix"
+				}
+			],
+			"context": {
+				"provider": "github",
+				"host": "github.com",
+				"capabilities": {
+					"commit_web_urls": true,
+					"actor_profiles": true,
+					"review_request_lookup": true,
+					"related_issues": true,
+					"issue_comments": true
+				},
+				"introduced": {
+					"actor": {
+						"provider": "github",
+						"host": "github.com",
+						"id": null,
+						"login": "ifiokjr",
+						"display_name": "ifiokjr",
+						"url": "https://github.com/ifiokjr",
+						"source": "review_request_author"
+					},
+					"commit": {
+						"provider": "github",
+						"host": "github.com",
+						"sha": "78b7140581752d394198dc5558b15e78fde1c579",
+						"short_sha": "78b7140",
+						"url": "https://github.com/pina-rs/wasm_solana/commit/78b7140581752d394198dc5558b15e78fde1c579",
+						"authored_at": "2026-10-23T15:25:22+01:00",
+						"committed_at": "2026-10-23T15:25:22+01:00",
+						"author_name": "Ifiok Jr.",
+						"author_email": "1160934+ifiokjr@users.noreply.github.com"
+					},
+					"review_request": {
+						"provider": "github",
+						"host": "github.com",
+						"kind": "pull_request",
+						"id": "#187",
+						"title": "fix(tooling): update monochange and correct subscription benchmarks",
+						"url": "https://github.com/pina-rs/wasm_solana/pull/187",
+						"author": {
+							"provider": "github",
+							"host": "github.com",
+							"id": null,
+							"login": "ifiokjr",
+							"display_name": "ifiokjr",
+							"url": "https://github.com/ifiokjr",
+							"source": "review_request_author"
+						}
+					}
+				},
+				"last_updated": {
+					"actor": {
+						"provider": "github",
+						"host": "github.com",
+						"id": null,
+						"login": "ifiokjr",
+						"display_name": "ifiokjr",
+						"url": "https://github.com/ifiokjr",
+						"source": "review_request_author"
+					},
+					"commit": {
+						"provider": "github",
+						"host": "github.com",
+						"sha": "78b7140581752d394198dc5558b15e78fde1c579",
+						"short_sha": "78b7140",
+						"url": "https://github.com/pina-rs/wasm_solana/commit/78b7140581752d394198dc5558b15e78fde1c579",
+						"authored_at": "2026-10-23T15:25:22+01:00",
+						"committed_at": "2026-10-23T15:25:22+01:00",
+						"author_name": "Ifiok Jr.",
+						"author_email": "1160934+ifiokjr@users.noreply.github.com"
+					},
+					"review_request": {
+						"provider": "github",
+						"host": "github.com",
+						"kind": "pull_request",
+						"id": "#187",
+						"title": "fix(tooling): update monochange and correct subscription benchmarks",
+						"url": "https://github.com/pina-rs/wasm_solana/pull/187",
+						"author": {
+							"provider": "github",
+							"host": "github.com",
+							"id": null,
+							"login": "ifiokjr",
+							"display_name": "ifiokjr",
+							"url": "https://github.com/ifiokjr",
+							"source": "review_request_author"
+						}
+					}
+				},
+				"related_issues": []
+			}
+		},
+		{
+			"path": ".changeset/benchmark-gate-on-every-pr.md",
+			"summary": "Benchmark every pull request and gate regressions",
+			"details": "A `benchmark` workflow now runs the criterion suites (`subscription` and `client`) on every pull request, twice: once at the merge-base and once at the PR head, so the numbers isolate exactly what the PR changed. The comparison is posted as a PR comment — one comment per PR, updated in place on every push — and to the job's step summary, and the `benchmark` check fails when any benchmark's median regressed more than ten percent. A regression is still mergeable when the PR description carries a `## Benchmark Justification` section explaining the tradeoff, which turns \"too slow\" into a visible, reviewable decision instead of a silent one; make the job a required status check to enforce that on merge. The comparison itself lives in `setup/scripts/benchmark_compare.py`, pairing the two criterion homes by benchmark id over their median estimates.",
+			"targets": [
+				{
+					"id": "wasm_client_solana",
+					"kind": "package",
+					"bump": "patch",
+					"origin": "direct-change",
+					"evidence_refs": [],
+					"change_type": "fix"
+				}
+			],
+			"context": {
+				"provider": "github",
+				"host": "github.com",
+				"capabilities": {
+					"commit_web_urls": true,
+					"actor_profiles": true,
+					"review_request_lookup": true,
+					"related_issues": true,
+					"issue_comments": true
+				},
+				"introduced": {
+					"actor": {
+						"provider": "github",
+						"host": "github.com",
+						"id": null,
+						"login": "ifiokjr",
+						"display_name": "ifiokjr",
+						"url": "https://github.com/ifiokjr",
+						"source": "review_request_author"
+					},
+					"commit": {
+						"provider": "github",
+						"host": "github.com",
+						"sha": "875145a5946fc474b79c6e0a44e520ee10769880",
+						"short_sha": "875145a",
+						"url": "https://github.com/pina-rs/wasm_solana/commit/875145a5946fc474b79c6e0a44e520ee10769880",
+						"authored_at": "2026-10-17T22:27:10+01:00",
+						"committed_at": "2026-10-17T22:27:10+01:00",
+						"author_name": "Ifiok Jr.",
+						"author_email": "1160934+ifiokjr@users.noreply.github.com"
+					},
+					"review_request": {
+						"provider": "github",
+						"host": "github.com",
+						"kind": "pull_request",
+						"id": "#181",
+						"title": "feat!: callbacks, reliable pubsub, and a benchmark gate",
+						"url": "https://github.com/pina-rs/wasm_solana/pull/181",
+						"author": {
+							"provider": "github",
+							"host": "github.com",
+							"id": null,
+							"login": "ifiokjr",
+							"display_name": "ifiokjr",
+							"url": "https://github.com/ifiokjr",
+							"source": "review_request_author"
+						}
+					}
+				},
+				"last_updated": {
+					"actor": {
+						"provider": "github",
+						"host": "github.com",
+						"id": null,
+						"login": "ifiokjr",
+						"display_name": "ifiokjr",
+						"url": "https://github.com/ifiokjr",
+						"source": "review_request_author"
+					},
+					"commit": {
+						"provider": "github",
+						"host": "github.com",
+						"sha": "875145a5946fc474b79c6e0a44e520ee10769880",
+						"short_sha": "875145a",
+						"url": "https://github.com/pina-rs/wasm_solana/commit/875145a5946fc474b79c6e0a44e520ee10769880",
+						"authored_at": "2026-10-17T22:27:10+01:00",
+						"committed_at": "2026-10-17T22:27:10+01:00",
+						"author_name": "Ifiok Jr.",
+						"author_email": "1160934+ifiokjr@users.noreply.github.com"
+					},
+					"review_request": {
+						"provider": "github",
+						"host": "github.com",
+						"kind": "pull_request",
+						"id": "#181",
+						"title": "feat!: callbacks, reliable pubsub, and a benchmark gate",
+						"url": "https://github.com/pina-rs/wasm_solana/pull/181",
+						"author": {
+							"provider": "github",
+							"host": "github.com",
+							"id": null,
+							"login": "ifiokjr",
+							"display_name": "ifiokjr",
+							"url": "https://github.com/ifiokjr",
+							"source": "review_request_author"
+						}
+					}
+				},
+				"related_issues": []
+			}
+		},
+		{
+			"path": ".changeset/callback-subscriptions-and-leaner-frame-dispatch.md",
+			"summary": "Callback-driven subscriptions and leaner frame dispatch",
+			"details": "Every `*_subscribe` method now has an `on_*` callback counterpart: `on_account_change`, `on_block`, `on_logs`, `on_program_change`, `on_signature`, `on_slot_change`, `on_root_change`, `on_slots_updates` and `on_vote`, plus a generic `subscribe_with_callback` escape hatch. The callback receives the notification payload — the same type the stream flavor yields from `params.result` — on the target's runtime (`wasm-bindgen-futures` in the browser, `tokio::spawn` under `ssr`), so callers no longer need to spawn their own consumer task; the browser tests' `spawn_local` workaround for driving streams becomes unnecessary. The returned `CallbackSubscription` handle exposes `id`/`subscription_id`, `is_stopped`, a `detach` that keeps the pump running after the handle is dropped, and an `unsubscribe` that stops the callback first and then sends the server unsubscribe, waiting for its ack. Dropping the handle stops the callback _and_ asks the server to unsubscribe in the background — the fire-and-forget teardown a stream `Drop` cannot offer, since the pump task sends the request as it exits.\n\nSubscription dispatch is also cheaper on busy sockets: incoming frames are now matched against the notification method and subscription id with two JSON pointer probes before any typed deserialization, so a subscription only pays full deserialization for frames that belong to it (previously every frame on the socket was fully deserialized by every fork). Acknowledgement and unsubscription-ack waits apply the same probe against the response `id`. The websocket sink now carries `ClientRequest` envelopes directly — serialized to text exactly once — instead of round-tripping through an intermediate `Value` copy, and the HTTP providers assemble envelopes through the new `ClientRequest::from_params` without re-serializing already-encoded params.",
+			"targets": [
+				{
+					"id": "wasm_client_solana",
+					"kind": "package",
+					"bump": "minor",
+					"origin": "direct-change",
+					"evidence_refs": [],
+					"change_type": "minor"
+				}
+			],
+			"context": {
+				"provider": "github",
+				"host": "github.com",
+				"capabilities": {
+					"commit_web_urls": true,
+					"actor_profiles": true,
+					"review_request_lookup": true,
+					"related_issues": true,
+					"issue_comments": true
+				},
+				"introduced": {
+					"actor": {
+						"provider": "github",
+						"host": "github.com",
+						"id": null,
+						"login": "ifiokjr",
+						"display_name": "ifiokjr",
+						"url": "https://github.com/ifiokjr",
+						"source": "review_request_author"
+					},
+					"commit": {
+						"provider": "github",
+						"host": "github.com",
+						"sha": "875145a5946fc474b79c6e0a44e520ee10769880",
+						"short_sha": "875145a",
+						"url": "https://github.com/pina-rs/wasm_solana/commit/875145a5946fc474b79c6e0a44e520ee10769880",
+						"authored_at": "2026-10-17T22:27:10+01:00",
+						"committed_at": "2026-10-17T22:27:10+01:00",
+						"author_name": "Ifiok Jr.",
+						"author_email": "1160934+ifiokjr@users.noreply.github.com"
+					},
+					"review_request": {
+						"provider": "github",
+						"host": "github.com",
+						"kind": "pull_request",
+						"id": "#181",
+						"title": "feat!: callbacks, reliable pubsub, and a benchmark gate",
+						"url": "https://github.com/pina-rs/wasm_solana/pull/181",
+						"author": {
+							"provider": "github",
+							"host": "github.com",
+							"id": null,
+							"login": "ifiokjr",
+							"display_name": "ifiokjr",
+							"url": "https://github.com/ifiokjr",
+							"source": "review_request_author"
+						}
+					}
+				},
+				"last_updated": {
+					"actor": {
+						"provider": "github",
+						"host": "github.com",
+						"id": null,
+						"login": "ifiokjr",
+						"display_name": "ifiokjr",
+						"url": "https://github.com/ifiokjr",
+						"source": "review_request_author"
+					},
+					"commit": {
+						"provider": "github",
+						"host": "github.com",
+						"sha": "875145a5946fc474b79c6e0a44e520ee10769880",
+						"short_sha": "875145a",
+						"url": "https://github.com/pina-rs/wasm_solana/commit/875145a5946fc474b79c6e0a44e520ee10769880",
+						"authored_at": "2026-10-17T22:27:10+01:00",
+						"committed_at": "2026-10-17T22:27:10+01:00",
+						"author_name": "Ifiok Jr.",
+						"author_email": "1160934+ifiokjr@users.noreply.github.com"
+					},
+					"review_request": {
+						"provider": "github",
+						"host": "github.com",
+						"kind": "pull_request",
+						"id": "#181",
+						"title": "feat!: callbacks, reliable pubsub, and a benchmark gate",
+						"url": "https://github.com/pina-rs/wasm_solana/pull/181",
+						"author": {
+							"provider": "github",
+							"host": "github.com",
+							"id": null,
+							"login": "ifiokjr",
+							"display_name": "ifiokjr",
+							"url": "https://github.com/ifiokjr",
+							"source": "review_request_author"
+						}
+					}
+				},
+				"related_issues": []
+			}
+		},
+		{
+			"path": ".changeset/ctutils-security-update.md",
+			"summary": "Update constant-time dependency to patched ctutils",
+			"details": "Refresh the Cargo lockfile to ctutils 0.4.4, fixing RUSTSEC-2026-0385 in constant-time mask generation and u128 comparisons. Public client APIs are unchanged.\n\nNormalize existing Rust comment wrapping with the current formatter; the forked crates have no behavioral change.",
+			"targets": [
+				{
+					"id": "core",
+					"kind": "group",
+					"bump": "patch",
+					"origin": "direct-change",
+					"evidence_refs": [],
+					"change_type": "fix"
+				},
+				{
+					"id": "forks",
+					"kind": "group",
+					"bump": "patch",
+					"origin": "direct-change",
+					"evidence_refs": [],
+					"change_type": "fix"
+				}
+			],
+			"context": {
+				"provider": "github",
+				"host": "github.com",
+				"capabilities": {
+					"commit_web_urls": true,
+					"actor_profiles": true,
+					"review_request_lookup": true,
+					"related_issues": true,
+					"issue_comments": true
+				},
+				"introduced": {
+					"actor": {
+						"provider": "github",
+						"host": "github.com",
+						"id": null,
+						"login": "ifiokjr",
+						"display_name": "ifiokjr",
+						"url": "https://github.com/ifiokjr",
+						"source": "review_request_author"
+					},
+					"commit": {
+						"provider": "github",
+						"host": "github.com",
+						"sha": "78b7140581752d394198dc5558b15e78fde1c579",
+						"short_sha": "78b7140",
+						"url": "https://github.com/pina-rs/wasm_solana/commit/78b7140581752d394198dc5558b15e78fde1c579",
+						"authored_at": "2026-10-23T15:25:22+01:00",
+						"committed_at": "2026-10-23T15:25:22+01:00",
+						"author_name": "Ifiok Jr.",
+						"author_email": "1160934+ifiokjr@users.noreply.github.com"
+					},
+					"review_request": {
+						"provider": "github",
+						"host": "github.com",
+						"kind": "pull_request",
+						"id": "#187",
+						"title": "fix(tooling): update monochange and correct subscription benchmarks",
+						"url": "https://github.com/pina-rs/wasm_solana/pull/187",
+						"author": {
+							"provider": "github",
+							"host": "github.com",
+							"id": null,
+							"login": "ifiokjr",
+							"display_name": "ifiokjr",
+							"url": "https://github.com/ifiokjr",
+							"source": "review_request_author"
+						}
+					}
+				},
+				"last_updated": {
+					"actor": {
+						"provider": "github",
+						"host": "github.com",
+						"id": null,
+						"login": "ifiokjr",
+						"display_name": "ifiokjr",
+						"url": "https://github.com/ifiokjr",
+						"source": "review_request_author"
+					},
+					"commit": {
+						"provider": "github",
+						"host": "github.com",
+						"sha": "78b7140581752d394198dc5558b15e78fde1c579",
+						"short_sha": "78b7140",
+						"url": "https://github.com/pina-rs/wasm_solana/commit/78b7140581752d394198dc5558b15e78fde1c579",
+						"authored_at": "2026-10-23T15:25:22+01:00",
+						"committed_at": "2026-10-23T15:25:22+01:00",
+						"author_name": "Ifiok Jr.",
+						"author_email": "1160934+ifiokjr@users.noreply.github.com"
+					},
+					"review_request": {
+						"provider": "github",
+						"host": "github.com",
+						"kind": "pull_request",
+						"id": "#187",
+						"title": "fix(tooling): update monochange and correct subscription benchmarks",
+						"url": "https://github.com/pina-rs/wasm_solana/pull/187",
+						"author": {
+							"provider": "github",
+							"host": "github.com",
+							"id": null,
+							"login": "ifiokjr",
+							"display_name": "ifiokjr",
+							"url": "https://github.com/ifiokjr",
+							"source": "review_request_author"
+						}
+					}
+				},
+				"related_issues": []
+			}
+		},
+		{
+			"path": ".changeset/lazy-websocket-and-pubsub-confirmation.md",
+			"summary": "Lazy pubsub sockets and push-based confirmation",
+			"details": "The browser transport no longer opens a websocket when a client is constructed: `SolanaRpcClient::new` used to open the pubsub socket — and panic through `unwrap_throw` when the endpoint refused it — before the first HTTP call ever ran. The gloo stream now initiates the connection on first use, matching the reqwest backend, so HTTP-only usage never touches pubsub, and a refused or invalid pubsub endpoint surfaces as a single error frame followed by a terminal stream instead of a construction panic.\n\n`confirm_transaction` now confirms through `signatureSubscribe` before falling back to polling: a notification delivers the status the moment the node reaches the target commitment, one covering status poll closes the race with already-confirmed signatures, and the polling loop only runs when pubsub cannot deliver (unavailable endpoint, failed subscription, or silence past the same total budget). `send_and_confirm_transaction*` no longer discards the confirmation result: a transaction that does not confirm — or lands with an on-chain error — now returns an `RpcError` carrying the signature instead of silently reporting success. Callers that treated `Ok` as fire-and-forget acceptance must now check the error, which carries the signature so its status can be re-queried.",
+			"targets": [
+				{
+					"id": "wasm_client_solana",
+					"kind": "package",
+					"bump": "minor",
+					"origin": "direct-change",
+					"evidence_refs": [],
+					"change_type": "minor"
+				}
+			],
+			"context": {
+				"provider": "github",
+				"host": "github.com",
+				"capabilities": {
+					"commit_web_urls": true,
+					"actor_profiles": true,
+					"review_request_lookup": true,
+					"related_issues": true,
+					"issue_comments": true
+				},
+				"introduced": {
+					"actor": {
+						"provider": "github",
+						"host": "github.com",
+						"id": null,
+						"login": "ifiokjr",
+						"display_name": "ifiokjr",
+						"url": "https://github.com/ifiokjr",
+						"source": "review_request_author"
+					},
+					"commit": {
+						"provider": "github",
+						"host": "github.com",
+						"sha": "875145a5946fc474b79c6e0a44e520ee10769880",
+						"short_sha": "875145a",
+						"url": "https://github.com/pina-rs/wasm_solana/commit/875145a5946fc474b79c6e0a44e520ee10769880",
+						"authored_at": "2026-10-17T22:27:10+01:00",
+						"committed_at": "2026-10-17T22:27:10+01:00",
+						"author_name": "Ifiok Jr.",
+						"author_email": "1160934+ifiokjr@users.noreply.github.com"
+					},
+					"review_request": {
+						"provider": "github",
+						"host": "github.com",
+						"kind": "pull_request",
+						"id": "#181",
+						"title": "feat!: callbacks, reliable pubsub, and a benchmark gate",
+						"url": "https://github.com/pina-rs/wasm_solana/pull/181",
+						"author": {
+							"provider": "github",
+							"host": "github.com",
+							"id": null,
+							"login": "ifiokjr",
+							"display_name": "ifiokjr",
+							"url": "https://github.com/ifiokjr",
+							"source": "review_request_author"
+						}
+					}
+				},
+				"last_updated": {
+					"actor": {
+						"provider": "github",
+						"host": "github.com",
+						"id": null,
+						"login": "ifiokjr",
+						"display_name": "ifiokjr",
+						"url": "https://github.com/ifiokjr",
+						"source": "review_request_author"
+					},
+					"commit": {
+						"provider": "github",
+						"host": "github.com",
+						"sha": "875145a5946fc474b79c6e0a44e520ee10769880",
+						"short_sha": "875145a",
+						"url": "https://github.com/pina-rs/wasm_solana/commit/875145a5946fc474b79c6e0a44e520ee10769880",
+						"authored_at": "2026-10-17T22:27:10+01:00",
+						"committed_at": "2026-10-17T22:27:10+01:00",
+						"author_name": "Ifiok Jr.",
+						"author_email": "1160934+ifiokjr@users.noreply.github.com"
+					},
+					"review_request": {
+						"provider": "github",
+						"host": "github.com",
+						"kind": "pull_request",
+						"id": "#181",
+						"title": "feat!: callbacks, reliable pubsub, and a benchmark gate",
+						"url": "https://github.com/pina-rs/wasm_solana/pull/181",
+						"author": {
+							"provider": "github",
+							"host": "github.com",
+							"id": null,
+							"login": "ifiokjr",
+							"display_name": "ifiokjr",
+							"url": "https://github.com/ifiokjr",
+							"source": "review_request_author"
+						}
+					}
+				},
+				"related_issues": []
+			}
+		},
+		{
+			"path": ".changeset/pubsub-reliability-fixes.md",
+			"summary": "Pubsub reliability: rejections, slot feed, fork wakeups",
+			"details": "Breaking: `SlotInfo.timestamp` is now `Option<u64>`, so code reading the field must handle `None`.\n\nFour defects in the pubsub path are fixed, three of them capable of hanging or silencing a healthy subscription:\n\n- **Rejected subscriptions no longer hang.** When a node answered a `*Subscribe` or `*Unsubscribe` request with a JSON-RPC error envelope, the acknowledgement loop treated the reply as \"not mine yet\" and waited forever. Both loops now fail fast with `ClientWebSocketError::Subscription`/`Unsubscription` and log the node's reason, so an invalid filter or a permission-gated feed surfaces immediately instead of parking the caller.\n- **`slotSubscribe` and `rootSubscribe` sent a config the node rejects.** A default config serialized as `[{}]`, which agave refuses (\"No parameters were expected\"); `logsSubscribe` sent `[\"allWithVotes\",{}]`, refused by several releases with \"missing field `commitment`\". A config left at its default now serializes as `null` — which the request envelope then omits entirely for the no-parameter feeds — matching the wire shape every node accepts. `slotSubscribe` and `rootSubscribe` now actually work against agave; previously no test covered them and every call hung on the rejected handshake.\n- **`SlotInfo.timestamp` is now `Option<u64>`.** Agave sends `{parent, slot, root}` with no `timestamp` member, so every `slotNotification` failed to deserialize and was silently dropped — a slot subscription delivered nothing, ever. The field is `None` from nodes that omit it.\n- **Parked subscriptions can no longer starve behind dead wakers.** The pubsub fan-out now uses a vendored, corrected `fork_stream` (the published 0.1.0 remains a dependency of nothing here): its single source-registered waker meant the last task to poll the socket — say a confirmation's unsubscription — left its dying waker with the socket, and parked forks queued behind stale wakers never heard about later frames; an `accountSubscribe` alongside a `send_and_confirm` could silently stop delivering. The vendored fork registers every parked fork through one shared waker and wakes all of them when a frame lands, at the cost of an occasional spurious no-op wake. This is also why the `fork_stream` dependency is gone from the manifest.",
+			"targets": [
+				{
+					"id": "wasm_client_solana",
+					"kind": "package",
+					"bump": "major",
+					"origin": "direct-change",
+					"evidence_refs": [],
+					"change_type": "major"
+				}
+			],
+			"context": {
+				"provider": "github",
+				"host": "github.com",
+				"capabilities": {
+					"commit_web_urls": true,
+					"actor_profiles": true,
+					"review_request_lookup": true,
+					"related_issues": true,
+					"issue_comments": true
+				},
+				"introduced": {
+					"actor": {
+						"provider": "github",
+						"host": "github.com",
+						"id": null,
+						"login": "ifiokjr",
+						"display_name": "ifiokjr",
+						"url": "https://github.com/ifiokjr",
+						"source": "review_request_author"
+					},
+					"commit": {
+						"provider": "github",
+						"host": "github.com",
+						"sha": "875145a5946fc474b79c6e0a44e520ee10769880",
+						"short_sha": "875145a",
+						"url": "https://github.com/pina-rs/wasm_solana/commit/875145a5946fc474b79c6e0a44e520ee10769880",
+						"authored_at": "2026-10-17T22:27:10+01:00",
+						"committed_at": "2026-10-17T22:27:10+01:00",
+						"author_name": "Ifiok Jr.",
+						"author_email": "1160934+ifiokjr@users.noreply.github.com"
+					},
+					"review_request": {
+						"provider": "github",
+						"host": "github.com",
+						"kind": "pull_request",
+						"id": "#181",
+						"title": "feat!: callbacks, reliable pubsub, and a benchmark gate",
+						"url": "https://github.com/pina-rs/wasm_solana/pull/181",
+						"author": {
+							"provider": "github",
+							"host": "github.com",
+							"id": null,
+							"login": "ifiokjr",
+							"display_name": "ifiokjr",
+							"url": "https://github.com/ifiokjr",
+							"source": "review_request_author"
+						}
+					}
+				},
+				"last_updated": {
+					"actor": {
+						"provider": "github",
+						"host": "github.com",
+						"id": null,
+						"login": "ifiokjr",
+						"display_name": "ifiokjr",
+						"url": "https://github.com/ifiokjr",
+						"source": "review_request_author"
+					},
+					"commit": {
+						"provider": "github",
+						"host": "github.com",
+						"sha": "875145a5946fc474b79c6e0a44e520ee10769880",
+						"short_sha": "875145a",
+						"url": "https://github.com/pina-rs/wasm_solana/commit/875145a5946fc474b79c6e0a44e520ee10769880",
+						"authored_at": "2026-10-17T22:27:10+01:00",
+						"committed_at": "2026-10-17T22:27:10+01:00",
+						"author_name": "Ifiok Jr.",
+						"author_email": "1160934+ifiokjr@users.noreply.github.com"
+					},
+					"review_request": {
+						"provider": "github",
+						"host": "github.com",
+						"kind": "pull_request",
+						"id": "#181",
+						"title": "feat!: callbacks, reliable pubsub, and a benchmark gate",
+						"url": "https://github.com/pina-rs/wasm_solana/pull/181",
+						"author": {
+							"provider": "github",
+							"host": "github.com",
+							"id": null,
+							"login": "ifiokjr",
+							"display_name": "ifiokjr",
+							"url": "https://github.com/ifiokjr",
+							"source": "review_request_author"
+						}
+					}
+				},
+				"related_issues": []
+			}
+		},
+		{
+			"path": ".changeset/surfpool-test-runner.md",
+			"summary": "Embed a surfpool node for tests",
+			"details": "`test_utils_solana` grows a `surfpool` feature: `SurfpoolRunner` embeds a surfpool node in-process via the `surfpool-sdk` crate (1.6, published by the Solana Foundation), the same backend the Playwright browser examples already drive externally. Where `TestValidatorRunner` pays for agave genesis, a RocksDB ledger and a faucet thread, a `SurfpoolRunner` starts in milliseconds — its suites boot, airdrop, confirm over pubsub, and send a transfer in under half a second.\n\nThe props mirror `TestValidatorRunnerProps` where the backends agree — funded `pubkeys` with `initial_lamports`, seeded `accounts`, deployed `programs`, and the client `commitment` — plus surfpool-specific knobs: `slot_time_ms`, `skip_blockhash_check`, `block_production_mode` and `remote_rpc_url` for lazily forking mainnet state. Ports are always dynamic (`pubsub_url` is _not_ rpc port + 1 on a surfnet), and the client defaults to `Confirmed` because per-transaction block mode advances transactions to confirmed without finalizing roots; the docs on the props call out switching to `Clock` production when a test genuinely needs finality. The agave runner remains the fidelity backend for validator internals.",
+			"targets": [
+				{
+					"id": "test_utils_solana",
+					"kind": "package",
+					"bump": "minor",
+					"origin": "direct-change",
+					"evidence_refs": [],
+					"change_type": "minor"
+				}
+			],
+			"context": {
+				"provider": "github",
+				"host": "github.com",
+				"capabilities": {
+					"commit_web_urls": true,
+					"actor_profiles": true,
+					"review_request_lookup": true,
+					"related_issues": true,
+					"issue_comments": true
+				},
+				"introduced": {
+					"actor": {
+						"provider": "github",
+						"host": "github.com",
+						"id": null,
+						"login": "ifiokjr",
+						"display_name": "ifiokjr",
+						"url": "https://github.com/ifiokjr",
+						"source": "review_request_author"
+					},
+					"commit": {
+						"provider": "github",
+						"host": "github.com",
+						"sha": "875145a5946fc474b79c6e0a44e520ee10769880",
+						"short_sha": "875145a",
+						"url": "https://github.com/pina-rs/wasm_solana/commit/875145a5946fc474b79c6e0a44e520ee10769880",
+						"authored_at": "2026-10-17T22:27:10+01:00",
+						"committed_at": "2026-10-17T22:27:10+01:00",
+						"author_name": "Ifiok Jr.",
+						"author_email": "1160934+ifiokjr@users.noreply.github.com"
+					},
+					"review_request": {
+						"provider": "github",
+						"host": "github.com",
+						"kind": "pull_request",
+						"id": "#181",
+						"title": "feat!: callbacks, reliable pubsub, and a benchmark gate",
+						"url": "https://github.com/pina-rs/wasm_solana/pull/181",
+						"author": {
+							"provider": "github",
+							"host": "github.com",
+							"id": null,
+							"login": "ifiokjr",
+							"display_name": "ifiokjr",
+							"url": "https://github.com/ifiokjr",
+							"source": "review_request_author"
+						}
+					}
+				},
+				"last_updated": {
+					"actor": {
+						"provider": "github",
+						"host": "github.com",
+						"id": null,
+						"login": "ifiokjr",
+						"display_name": "ifiokjr",
+						"url": "https://github.com/ifiokjr",
+						"source": "review_request_author"
+					},
+					"commit": {
+						"provider": "github",
+						"host": "github.com",
+						"sha": "875145a5946fc474b79c6e0a44e520ee10769880",
+						"short_sha": "875145a",
+						"url": "https://github.com/pina-rs/wasm_solana/commit/875145a5946fc474b79c6e0a44e520ee10769880",
+						"authored_at": "2026-10-17T22:27:10+01:00",
+						"committed_at": "2026-10-17T22:27:10+01:00",
+						"author_name": "Ifiok Jr.",
+						"author_email": "1160934+ifiokjr@users.noreply.github.com"
+					},
+					"review_request": {
+						"provider": "github",
+						"host": "github.com",
+						"kind": "pull_request",
+						"id": "#181",
+						"title": "feat!: callbacks, reliable pubsub, and a benchmark gate",
+						"url": "https://github.com/pina-rs/wasm_solana/pull/181",
+						"author": {
+							"provider": "github",
+							"host": "github.com",
+							"id": null,
+							"login": "ifiokjr",
+							"display_name": "ifiokjr",
+							"url": "https://github.com/ifiokjr",
+							"source": "review_request_author"
+						}
+					}
+				},
+				"related_issues": []
+			}
+		}
+	],
+	"changelogs": [
+		{
+			"owner_id": "core",
+			"owner_kind": "group",
+			"output": "default",
+			"stream": "default",
+			"path": "changelog.md",
+			"format": "keep_a_changelog",
+			"notes": {
+				"title": "[0.14.0](https://github.com/pina-rs/wasm_solana/releases/tag/v0.14.0) (2026-10-23)",
+				"summary": [
+					"Grouped release for `core`."
+				],
+				"sections": [
+					{
+						"title": "Breaking Changes",
+						"collapsed": false,
+						"entries": [
+							"#### Pubsub reliability: rejections, slot feed, fork wakeups\n\n_Packages:_ 🔴 _wasm_client_solana_\n\n_Owner:_ [@ifiokjr](https://github.com/ifiokjr) · _Review:_ [PR #181](https://github.com/pina-rs/wasm_solana/pull/181)\n\nBreaking: `SlotInfo.timestamp` is now `Option<u64>`, so code reading the field must handle `None`.\n\nFour defects in the pubsub path are fixed, three of them capable of hanging or silencing a healthy subscription:\n\n- **Rejected subscriptions no longer hang.** When a node answered a `*Subscribe` or `*Unsubscribe` request with a JSON-RPC error envelope, the acknowledgement loop treated the reply as \"not mine yet\" and waited forever. Both loops now fail fast with `ClientWebSocketError::Subscription`/`Unsubscription` and log the node's reason, so an invalid filter or a permission-gated feed surfaces immediately instead of parking the caller.\n- **`slotSubscribe` and `rootSubscribe` sent a config the node rejects.** A default config serialized as `[{}]`, which agave refuses (\"No parameters were expected\"); `logsSubscribe` sent `[\"allWithVotes\",{}]`, refused by several releases with \"missing field `commitment`\". A config left at its default now serializes as `null` — which the request envelope then omits entirely for the no-parameter feeds — matching the wire shape every node accepts. `slotSubscribe` and `rootSubscribe` now actually work against agave; previously no test covered them and every call hung on the rejected handshake.\n- **`SlotInfo.timestamp` is now `Option<u64>`.** Agave sends `{parent, slot, root}` with no `timestamp` member, so every `slotNotification` failed to deserialize and was silently dropped — a slot subscription delivered nothing, ever. The field is `None` from nodes that omit it.\n- **Parked subscriptions can no longer starve behind dead wakers.** The pubsub fan-out now uses a vendored, corrected `fork_stream` (the published 0.1.0 remains a dependency of nothing here): its single source-registered waker meant the last task to poll the socket — say a confirmation's unsubscription — left its dying waker with the socket, and parked forks queued behind stale wakers never heard about later frames; an `accountSubscribe` alongside a `send_and_confirm` could silently stop delivering. The vendored fork registers every parked fork through one shared waker and wakes all of them when a frame lands, at the cost of an occasional spurious no-op wake. This is also why the `fork_stream` dependency is gone from the manifest."
+						]
+					},
+					{
+						"title": "Features",
+						"collapsed": false,
+						"entries": [
+							"#### Embed a surfpool node for tests\n\n_Packages:_ 🟠 _test_utils_solana_\n\n_Owner:_ [@ifiokjr](https://github.com/ifiokjr) · _Review:_ [PR #181](https://github.com/pina-rs/wasm_solana/pull/181)\n\n`test_utils_solana` grows a `surfpool` feature: `SurfpoolRunner` embeds a surfpool node in-process via the `surfpool-sdk` crate (1.6, published by the Solana Foundation), the same backend the Playwright browser examples already drive externally. Where `TestValidatorRunner` pays for agave genesis, a RocksDB ledger and a faucet thread, a `SurfpoolRunner` starts in milliseconds — its suites boot, airdrop, confirm over pubsub, and send a transfer in under half a second.\n\nThe props mirror `TestValidatorRunnerProps` where the backends agree — funded `pubkeys` with `initial_lamports`, seeded `accounts`, deployed `programs`, and the client `commitment` — plus surfpool-specific knobs: `slot_time_ms`, `skip_blockhash_check`, `block_production_mode` and `remote_rpc_url` for lazily forking mainnet state. Ports are always dynamic (`pubsub_url` is _not_ rpc port + 1 on a surfnet), and the client defaults to `Confirmed` because per-transaction block mode advances transactions to confirmed without finalizing roots; the docs on the props call out switching to `Clock` production when a test genuinely needs finality. The agave runner remains the fidelity backend for validator internals.",
+							"#### Callback-driven subscriptions and leaner frame dispatch\n\n_Packages:_ 🟠 _wasm_client_solana_\n\n_Owner:_ [@ifiokjr](https://github.com/ifiokjr) · _Review:_ [PR #181](https://github.com/pina-rs/wasm_solana/pull/181)\n\nEvery `*_subscribe` method now has an `on_*` callback counterpart: `on_account_change`, `on_block`, `on_logs`, `on_program_change`, `on_signature`, `on_slot_change`, `on_root_change`, `on_slots_updates` and `on_vote`, plus a generic `subscribe_with_callback` escape hatch. The callback receives the notification payload — the same type the stream flavor yields from `params.result` — on the target's runtime (`wasm-bindgen-futures` in the browser, `tokio::spawn` under `ssr`), so callers no longer need to spawn their own consumer task; the browser tests' `spawn_local` workaround for driving streams becomes unnecessary. The returned `CallbackSubscription` handle exposes `id`/`subscription_id`, `is_stopped`, a `detach` that keeps the pump running after the handle is dropped, and an `unsubscribe` that stops the callback first and then sends the server unsubscribe, waiting for its ack. Dropping the handle stops the callback _and_ asks the server to unsubscribe in the background — the fire-and-forget teardown a stream `Drop` cannot offer, since the pump task sends the request as it exits.\n\nSubscription dispatch is also cheaper on busy sockets: incoming frames are now matched against the notification method and subscription id with two JSON pointer probes before any typed deserialization, so a subscription only pays full deserialization for frames that belong to it (previously every frame on the socket was fully deserialized by every fork). Acknowledgement and unsubscription-ack waits apply the same probe against the response `id`. The websocket sink now carries `ClientRequest` envelopes directly — serialized to text exactly once — instead of round-tripping through an intermediate `Value` copy, and the HTTP providers assemble envelopes through the new `ClientRequest::from_params` without re-serializing already-encoded params.",
+							"#### Lazy pubsub sockets and push-based confirmation\n\n_Packages:_ 🟠 _wasm_client_solana_\n\n_Owner:_ [@ifiokjr](https://github.com/ifiokjr) · _Review:_ [PR #181](https://github.com/pina-rs/wasm_solana/pull/181)\n\nThe browser transport no longer opens a websocket when a client is constructed: `SolanaRpcClient::new` used to open the pubsub socket — and panic through `unwrap_throw` when the endpoint refused it — before the first HTTP call ever ran. The gloo stream now initiates the connection on first use, matching the reqwest backend, so HTTP-only usage never touches pubsub, and a refused or invalid pubsub endpoint surfaces as a single error frame followed by a terminal stream instead of a construction panic.\n\n`confirm_transaction` now confirms through `signatureSubscribe` before falling back to polling: a notification delivers the status the moment the node reaches the target commitment, one covering status poll closes the race with already-confirmed signatures, and the polling loop only runs when pubsub cannot deliver (unavailable endpoint, failed subscription, or silence past the same total budget). `send_and_confirm_transaction*` no longer discards the confirmation result: a transaction that does not confirm — or lands with an on-chain error — now returns an `RpcError` carrying the signature instead of silently reporting success. Callers that treated `Ok` as fire-and-forget acceptance must now check the error, which carries the signature so its status can be re-queried."
+						]
+					},
+					{
+						"title": "Fixes",
+						"collapsed": false,
+						"entries": [
+							"#### Correct acknowledgement benchmark measurements\n\n_Owner:_ [@ifiokjr](https://github.com/ifiokjr) · _Review:_ [PR #187](https://github.com/pina-rs/wasm_solana/pull/187)\n\nBuffer replay history before timing, consume it before checking a uniquely identified JSON-RPC acknowledgement, and exclude fixture destruction from both subscription benchmark timings.\n\nThe benchmark workflow uses the head subscription harness for both compared revisions, so fixture corrections are not reported as runtime improvements or regressions.",
+							"#### Update constant-time dependency to patched ctutils\n\n_Owner:_ [@ifiokjr](https://github.com/ifiokjr) · _Review:_ [PR #187](https://github.com/pina-rs/wasm_solana/pull/187)\n\nRefresh the Cargo lockfile to ctutils 0.4.4, fixing RUSTSEC-2026-0385 in constant-time mask generation and u128 comparisons. Public client APIs are unchanged.\n\nNormalize existing Rust comment wrapping with the current formatter; the forked crates have no behavioral change.",
+							"- **Benchmark every pull request and gate regressions.** A `benchmark` workflow now runs the criterion suites (`subscription` and `client`) on every pull request, twice: once at the merge-base and once at the PR head, so the numbers isolate exactly what the PR changed. The comparison is posted as a PR comment — one comment per PR, updated in place on every push — and to the job's step summary, and the `benchmark` check fails when any benchmark's median regressed more than ten percent. A regression is still mergeable when the PR description carries a `## Benchmark Justification` section explaining the tradeoff, which turns \"too slow\" into a visible, reviewable decision instead of a silent one; make the job a required status check to enforce that on merge. The comparison itself lives in `setup/scripts/benchmark_compare.py`, pairing the two criterion homes by benchmark id over their median estimates.\n  _Packages:_ 🟢 _wasm_client_solana_\n  _Owner:_ [@ifiokjr](https://github.com/ifiokjr) · _Review:_ [PR #181](https://github.com/pina-rs/wasm_solana/pull/181)"
+						]
+					}
+				]
+			},
+			"rendered": "## [0.14.0](https://github.com/pina-rs/wasm_solana/releases/tag/v0.14.0) (2026-10-23)\n\nGrouped release for `core`.\n\n### Breaking Changes\n\n#### Pubsub reliability: rejections, slot feed, fork wakeups\n\n_Packages:_ 🔴 _wasm_client_solana_\n\n_Owner:_ [@ifiokjr](https://github.com/ifiokjr) · _Review:_ [PR #181](https://github.com/pina-rs/wasm_solana/pull/181)\n\nBreaking: `SlotInfo.timestamp` is now `Option<u64>`, so code reading the field must handle `None`.\n\nFour defects in the pubsub path are fixed, three of them capable of hanging or silencing a healthy subscription:\n\n- **Rejected subscriptions no longer hang.** When a node answered a `*Subscribe` or `*Unsubscribe` request with a JSON-RPC error envelope, the acknowledgement loop treated the reply as \"not mine yet\" and waited forever. Both loops now fail fast with `ClientWebSocketError::Subscription`/`Unsubscription` and log the node's reason, so an invalid filter or a permission-gated feed surfaces immediately instead of parking the caller.\n- **`slotSubscribe` and `rootSubscribe` sent a config the node rejects.** A default config serialized as `[{}]`, which agave refuses (\"No parameters were expected\"); `logsSubscribe` sent `[\"allWithVotes\",{}]`, refused by several releases with \"missing field `commitment`\". A config left at its default now serializes as `null` — which the request envelope then omits entirely for the no-parameter feeds — matching the wire shape every node accepts. `slotSubscribe` and `rootSubscribe` now actually work against agave; previously no test covered them and every call hung on the rejected handshake.\n- **`SlotInfo.timestamp` is now `Option<u64>`.** Agave sends `{parent, slot, root}` with no `timestamp` member, so every `slotNotification` failed to deserialize and was silently dropped — a slot subscription delivered nothing, ever. The field is `None` from nodes that omit it.\n- **Parked subscriptions can no longer starve behind dead wakers.** The pubsub fan-out now uses a vendored, corrected `fork_stream` (the published 0.1.0 remains a dependency of nothing here): its single source-registered waker meant the last task to poll the socket — say a confirmation's unsubscription — left its dying waker with the socket, and parked forks queued behind stale wakers never heard about later frames; an `accountSubscribe` alongside a `send_and_confirm` could silently stop delivering. The vendored fork registers every parked fork through one shared waker and wakes all of them when a frame lands, at the cost of an occasional spurious no-op wake. This is also why the `fork_stream` dependency is gone from the manifest.\n\n### Features\n\n#### Embed a surfpool node for tests\n\n_Packages:_ 🟠 _test_utils_solana_\n\n_Owner:_ [@ifiokjr](https://github.com/ifiokjr) · _Review:_ [PR #181](https://github.com/pina-rs/wasm_solana/pull/181)\n\n`test_utils_solana` grows a `surfpool` feature: `SurfpoolRunner` embeds a surfpool node in-process via the `surfpool-sdk` crate (1.6, published by the Solana Foundation), the same backend the Playwright browser examples already drive externally. Where `TestValidatorRunner` pays for agave genesis, a RocksDB ledger and a faucet thread, a `SurfpoolRunner` starts in milliseconds — its suites boot, airdrop, confirm over pubsub, and send a transfer in under half a second.\n\nThe props mirror `TestValidatorRunnerProps` where the backends agree — funded `pubkeys` with `initial_lamports`, seeded `accounts`, deployed `programs`, and the client `commitment` — plus surfpool-specific knobs: `slot_time_ms`, `skip_blockhash_check`, `block_production_mode` and `remote_rpc_url` for lazily forking mainnet state. Ports are always dynamic (`pubsub_url` is _not_ rpc port + 1 on a surfnet), and the client defaults to `Confirmed` because per-transaction block mode advances transactions to confirmed without finalizing roots; the docs on the props call out switching to `Clock` production when a test genuinely needs finality. The agave runner remains the fidelity backend for validator internals.\n\n#### Callback-driven subscriptions and leaner frame dispatch\n\n_Packages:_ 🟠 _wasm_client_solana_\n\n_Owner:_ [@ifiokjr](https://github.com/ifiokjr) · _Review:_ [PR #181](https://github.com/pina-rs/wasm_solana/pull/181)\n\nEvery `*_subscribe` method now has an `on_*` callback counterpart: `on_account_change`, `on_block`, `on_logs`, `on_program_change`, `on_signature`, `on_slot_change`, `on_root_change`, `on_slots_updates` and `on_vote`, plus a generic `subscribe_with_callback` escape hatch. The callback receives the notification payload — the same type the stream flavor yields from `params.result` — on the target's runtime (`wasm-bindgen-futures` in the browser, `tokio::spawn` under `ssr`), so callers no longer need to spawn their own consumer task; the browser tests' `spawn_local` workaround for driving streams becomes unnecessary. The returned `CallbackSubscription` handle exposes `id`/`subscription_id`, `is_stopped`, a `detach` that keeps the pump running after the handle is dropped, and an `unsubscribe` that stops the callback first and then sends the server unsubscribe, waiting for its ack. Dropping the handle stops the callback _and_ asks the server to unsubscribe in the background — the fire-and-forget teardown a stream `Drop` cannot offer, since the pump task sends the request as it exits.\n\nSubscription dispatch is also cheaper on busy sockets: incoming frames are now matched against the notification method and subscription id with two JSON pointer probes before any typed deserialization, so a subscription only pays full deserialization for frames that belong to it (previously every frame on the socket was fully deserialized by every fork). Acknowledgement and unsubscription-ack waits apply the same probe against the response `id`. The websocket sink now carries `ClientRequest` envelopes directly — serialized to text exactly once — instead of round-tripping through an intermediate `Value` copy, and the HTTP providers assemble envelopes through the new `ClientRequest::from_params` without re-serializing already-encoded params.\n\n#### Lazy pubsub sockets and push-based confirmation\n\n_Packages:_ 🟠 _wasm_client_solana_\n\n_Owner:_ [@ifiokjr](https://github.com/ifiokjr) · _Review:_ [PR #181](https://github.com/pina-rs/wasm_solana/pull/181)\n\nThe browser transport no longer opens a websocket when a client is constructed: `SolanaRpcClient::new` used to open the pubsub socket — and panic through `unwrap_throw` when the endpoint refused it — before the first HTTP call ever ran. The gloo stream now initiates the connection on first use, matching the reqwest backend, so HTTP-only usage never touches pubsub, and a refused or invalid pubsub endpoint surfaces as a single error frame followed by a terminal stream instead of a construction panic.\n\n`confirm_transaction` now confirms through `signatureSubscribe` before falling back to polling: a notification delivers the status the moment the node reaches the target commitment, one covering status poll closes the race with already-confirmed signatures, and the polling loop only runs when pubsub cannot deliver (unavailable endpoint, failed subscription, or silence past the same total budget). `send_and_confirm_transaction*` no longer discards the confirmation result: a transaction that does not confirm — or lands with an on-chain error — now returns an `RpcError` carrying the signature instead of silently reporting success. Callers that treated `Ok` as fire-and-forget acceptance must now check the error, which carries the signature so its status can be re-queried.\n\n### Fixes\n\n#### Correct acknowledgement benchmark measurements\n\n_Owner:_ [@ifiokjr](https://github.com/ifiokjr) · _Review:_ [PR #187](https://github.com/pina-rs/wasm_solana/pull/187)\n\nBuffer replay history before timing, consume it before checking a uniquely identified JSON-RPC acknowledgement, and exclude fixture destruction from both subscription benchmark timings.\n\nThe benchmark workflow uses the head subscription harness for both compared revisions, so fixture corrections are not reported as runtime improvements or regressions.\n\n#### Update constant-time dependency to patched ctutils\n\n_Owner:_ [@ifiokjr](https://github.com/ifiokjr) · _Review:_ [PR #187](https://github.com/pina-rs/wasm_solana/pull/187)\n\nRefresh the Cargo lockfile to ctutils 0.4.4, fixing RUSTSEC-2026-0385 in constant-time mask generation and u128 comparisons. Public client APIs are unchanged.\n\nNormalize existing Rust comment wrapping with the current formatter; the forked crates have no behavioral change.\n\n- **Benchmark every pull request and gate regressions.** A `benchmark` workflow now runs the criterion suites (`subscription` and `client`) on every pull request, twice: once at the merge-base and once at the PR head, so the numbers isolate exactly what the PR changed. The comparison is posted as a PR comment — one comment per PR, updated in place on every push — and to the job's step summary, and the `benchmark` check fails when any benchmark's median regressed more than ten percent. A regression is still mergeable when the PR description carries a `## Benchmark Justification` section explaining the tradeoff, which turns \"too slow\" into a visible, reviewable decision instead of a silent one; make the job a required status check to enforce that on merge. The comparison itself lives in `setup/scripts/benchmark_compare.py`, pairing the two criterion homes by benchmark id over their median estimates.\n  _Packages:_ 🟢 _wasm_client_solana_\n  _Owner:_ [@ifiokjr](https://github.com/ifiokjr) · _Review:_ [PR #181](https://github.com/pina-rs/wasm_solana/pull/181)"
+		},
+		{
+			"owner_id": "forks",
+			"owner_kind": "group",
+			"output": "default",
+			"stream": "default",
+			"path": "forks/changelog.md",
+			"format": "keep_a_changelog",
+			"notes": {
+				"title": "forks [5.0.1](https://github.com/pina-rs/wasm_solana/releases/tag/forks/v5.0.1) (2026-10-23)",
+				"summary": [
+					"Grouped release for `forks`."
+				],
+				"sections": [
+					{
+						"title": "Fixes",
+						"collapsed": false,
+						"entries": [
+							"#### Update constant-time dependency to patched ctutils\n\n_Owner:_ [@ifiokjr](https://github.com/ifiokjr) · _Review:_ [PR #187](https://github.com/pina-rs/wasm_solana/pull/187)\n\nRefresh the Cargo lockfile to ctutils 0.4.4, fixing RUSTSEC-2026-0385 in constant-time mask generation and u128 comparisons. Public client APIs are unchanged.\n\nNormalize existing Rust comment wrapping with the current formatter; the forked crates have no behavioral change."
+						]
+					}
+				]
+			},
+			"rendered": "## forks [5.0.1](https://github.com/pina-rs/wasm_solana/releases/tag/forks/v5.0.1) (2026-10-23)\n\nGrouped release for `forks`.\n\n### Fixes\n\n#### Update constant-time dependency to patched ctutils\n\n_Owner:_ [@ifiokjr](https://github.com/ifiokjr) · _Review:_ [PR #187](https://github.com/pina-rs/wasm_solana/pull/187)\n\nRefresh the Cargo lockfile to ctutils 0.4.4, fixing RUSTSEC-2026-0385 in constant-time mask generation and u128 comparisons. Public client APIs are unchanged.\n\nNormalize existing Rust comment wrapping with the current formatter; the forked crates have no behavioral change."
+		}
+	],
+	"provider": {
+		"kind": "github",
+		"owner": "pina-rs",
+		"repo": "wasm_solana",
+		"host": null
+	}
+}
