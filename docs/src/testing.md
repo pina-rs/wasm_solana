@@ -2,14 +2,14 @@
 
 ## Test suites
 
-| Suite                      | Command                                                               | Needs                    |
-| -------------------------- | --------------------------------------------------------------------- | ------------------------ |
-| `memory_wallet` (ssr)      | `cargo test_memory_wallet_ssr`                                        | nothing                  |
-| `wasm_client_solana` (ssr) | `cargo test_wasm_client_solana_ssr`                                   | nothing (mock transport) |
-| doc tests                  | `cargo test_memory_wallet_docs`, `cargo test_wasm_client_solana_docs` | nothing                  |
-| streams                    | `cargo test_streams`                                                  | a local validator        |
-| surfpool                   | `cargo test_surfpool`                                                 | nothing (embedded node)  |
-| wasm (browser)             | `cargo test_wasm`                                                     | validator + chromedriver |
+| Suite                      | Command                                                               | Needs                                      |
+| -------------------------- | --------------------------------------------------------------------- | ------------------------------------------ |
+| `memory_wallet` (ssr)      | `cargo test_memory_wallet_ssr`                                        | nothing                                    |
+| `wasm_client_solana` (ssr) | `cargo test_wasm_client_solana_ssr`                                   | nothing (mock transport)                   |
+| doc tests                  | `cargo test_memory_wallet_docs`, `cargo test_wasm_client_solana_docs` | nothing                                    |
+| streams                    | `cargo test_streams`                                                  | a local validator                          |
+| surfpool                   | `cargo test_surfpool`                                                 | nothing (embedded node)                    |
+| wasm (browser)             | `cargo test_wasm`                                                     | Linux: validator + Chromium + chromedriver |
 
 All aliases live in `.cargo/config.toml` and run through `cargo nextest`.
 
