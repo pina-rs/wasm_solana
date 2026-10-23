@@ -74,17 +74,16 @@ jobs:
           echo "base=$BASE_SHA" >> "$GITHUB_OUTPUT"
           echo "head=$HEAD_SHA" >> "$GITHUB_OUTPUT"
 
-      - name: benchmark the base
+      - name: benchmark the base and head in one shell
         run: |
           set -euo pipefail
+          # Initialize devenv on the head once. Re-entering it while the base
+          # is checked out can format historical sources and prevent the
+          # checkout back to the head. Both runs share one shell environment.
           export CRITERION_HOME="$(pwd)/.benchmark/criterion-base"
           git checkout --detach "$(cat .benchmark/base-sha)"
           cargo bench --locked --package wasm_client_solana --features ssr
-        shell: devenv shell -c -- bash -e {0}
 
-      - name: benchmark the head
-        run: |
-          set -euo pipefail
           export CRITERION_HOME="$(pwd)/.benchmark/criterion-head"
           git checkout --detach "$(cat .benchmark/head-sha)"
           cargo bench --locked --package wasm_client_solana --features ssr
