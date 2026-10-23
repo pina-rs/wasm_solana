@@ -98,4 +98,4 @@ The workspace pins the latest stable Rust in `rust-toolchain.toml` and targets `
 cargo build -p wasm_client_solana --target wasm32-unknown-unknown -F js
 ```
 
-For `wasm-bindgen` test runs the devenv environment provides `wasm-bindgen-cli`, chromedriver and a local validator — see [Testing](./testing.md).
+For `wasm-bindgen` test runs the devenv environment provides `wasm-bindgen-cli` and a local validator. The matched Chromium and chromedriver pair is provided on Linux; run the browser suite in a Linux development shell or CI — see [Testing](./testing.md).

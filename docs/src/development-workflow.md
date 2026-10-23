@@ -8,7 +8,7 @@ The repository uses [devenv](https://devenv.sh) for a hermetic environment. `dir
 devenv shell   # or: direnv allow
 ```
 
-Provided by the environment: the pinned Rust toolchain (from `rust-toolchain.toml`), agave (validator binaries) and monochange from `ifiokjr/nixpkgs`, mdbook, chromedriver, wasm-bindgen tooling, and all lint/security tools (cargo-deny, cargo-audit, zizmor, gitleaks).
+Provided by the environment: the pinned Rust toolchain (from `rust-toolchain.toml`), agave (validator binaries) and monochange from `ifiokjr/nixpkgs`, mdbook, wasm-bindgen tooling, and all lint/security tools (cargo-deny, cargo-audit, zizmor, gitleaks). Linux also receives the matched Chromium and chromedriver packages used by the browser tests.
 
 ## Daily commands
 

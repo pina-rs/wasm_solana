@@ -33,7 +33,7 @@ Every typed method has a `tests::response` snapshot test that deserializes a rea
 test:validator   # starts the validator, runs the browser tests
 ```
 
-The devenv environment provides `wasm-bindgen-cli` (version-pinned to match the `wasm-bindgen` crate), chromedriver and `wait-for-them` for port readiness.
+The devenv environment provides `wasm-bindgen-cli` (version-pinned to match the `wasm-bindgen` crate) and `wait-for-them` for port readiness. On Linux it also provides a matched Chromium and chromedriver pair. Run the browser suite in a Linux development shell or CI; the Darwin shell does not install Chromium or chromedriver.
 
 ## Coverage
 
