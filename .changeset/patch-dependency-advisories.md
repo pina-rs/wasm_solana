@@ -3,9 +3,9 @@ memory_wallet: patch
 wasm_client_solana: patch
 ---
 
-# Patch dependency advisories reachable within existing requirements
+# Patch dependency advisories within declared ranges
 
-Lockfile-only bump for this workspace. Three crates move within ranges the
+Lockfile-only bump for this workspace. Four crates move within ranges the
 manifests already declare:
 
 - `tokio` 1.53.1 → 1.54.1 — `AsyncFd::new` and related constructors violate
@@ -14,6 +14,8 @@ manifests already declare:
   growth with `ENABLE_WIKILINKS` (RUSTSEC-2026-0414, fixed 0.13.5) and
   quadratic parsing of nested image wikilinks (RUSTSEC-2026-0433, fixed
   0.13.6)
+- `zstd-safe` 7.3.0 → 7.4.0 — clears the batch of zstd-safe advisories
+  published as RUSTSEC-2026-0395 through 2026-0406
 - `libz-sys` 1.1.29 → 1.1.31 — bundled zlib advisory
 
 `quinn-proto` 0.11.18 → 0.11.19 rides along for currency; OSV lists no open
