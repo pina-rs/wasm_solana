@@ -321,10 +321,12 @@ in
         # Comments stay above the command: a `#` after a line continuation
         # swallows every remaining argument.
         # RUSTSEC-2026-0387: crypto-bigint 0.5.5 timing variability in
-        # constant-time ops. Enters only through elliptic-curve -> k256 ->
-        # solana-secp256k1-program in the agave validator stack, never the
-        # published client surface; the fix is 0.7.6, a major the k256 0.13
-        # chain does not permit. Revisit when agave moves to k256 0.14+.
+        # constant-time ops. The fix is 0.7.6, a major the k256 0.13 chain
+        # does not permit. Two dependency paths carry it: elliptic-curve ->
+        # k256 -> solana-secp256k1-program in the agave validator stack, and
+        # bip32 -> txtx-addon-kit -> surfpool-core -> surfpool-sdk behind
+        # the optional `surfpool` feature of the published test_utils_solana
+        # crate. Revisit when either path moves to k256 0.14+.
         cargo-audit audit \
           --ignore RUSTSEC-2026-0387 \
           --db "$DEVENV_ROOT/target/advisory-db-audit" \
