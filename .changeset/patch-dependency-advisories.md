@@ -5,15 +5,32 @@ wasm_client_solana: patch
 
 # Patch dependency advisories reachable within existing requirements
 
-Four advisory-affected crates move within their already-declared ranges:
+Lockfile-only bump for this workspace. Three crates move within ranges the
+manifests already declare:
 
-- `tokio` 1.53.1 → 1.54.1 — `AsyncFd::new` and related constructors violate I/O safety (RUSTSEC-2026-0386)
-- `quinn-proto` 0.11.18 → 0.11.19 — payload-length and stream-reassembly advisories
-- `pulldown-cmark` 0.13.4 → 0.13.6 — exponential event growth with `ENABLE_WIKILINKS` (RUSTSEC-2026-0414, RUSTSEC-2026-0433)
-- `libz-sys` 1.1.29 → 1.1.31
+- `tokio` 1.53.1 → 1.54.1 — `AsyncFd::new` and related constructors violate
+  I/O safety (RUSTSEC-2026-0386)
+- `pulldown-cmark` 0.13.4 → 0.13.6 — two distinct fixes: exponential event
+  growth with `ENABLE_WIKILINKS` (RUSTSEC-2026-0414, fixed 0.13.5) and
+  quadratic parsing of nested image wikilinks (RUSTSEC-2026-0433, fixed
+  0.13.6)
+- `libz-sys` 1.1.29 → 1.1.31 — bundled zlib advisory
 
-Lockfile only. The remaining advisory-affected crates in the graph are either
-unmaintained-crate advisories with no patched release (`ansi_term`, `atty`,
-`instant`, `net2`, `derivative`, `paste`, `proc-macro-error2`,
-`unsafe-libyaml`) or old majors pinned by manifest requirements, both of which
-need code changes rather than a lock bump.
+`quinn-proto` 0.11.18 → 0.11.19 rides along for currency; OSV lists no open
+advisories at either version. The unbounded stream-reassembly advisory
+(RUSTSEC-2026-0185) was fixed at 0.11.15 and this lock was already past it.
+
+## Consumers must update their own lockfiles
+
+`memory_wallet` and `wasm_client_solana` are published libraries. This bump
+hardens *this workspace's* builds only — the manifests still declare caret
+ranges (for example `tokio ^1`), so a consumer's lockfile can legitimately
+resolve `tokio 1.53.1` and remain exposed to RUSTSEC-2026-0386. Anyone
+consuming these crates should run `cargo update` in their own workspace and
+audit their lock independently.
+
+The remaining advisory-affected crates in this graph are unmaintained-crate
+advisories with no patched release (`ansi_term`, `atty`, `instant`, `net2`,
+`derivative`, `paste`, `proc-macro-error2`, `unsafe-libyaml`) or old majors
+pinned by manifest requirements — both need code changes rather than a lock
+bump.
