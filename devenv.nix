@@ -320,7 +320,13 @@ in
         # 0.103 lines, which the workspace carries at 1.0.10 and 0.103.16.
         # Comments stay above the command: a `#` after a line continuation
         # swallows every remaining argument.
+        # RUSTSEC-2026-0387: crypto-bigint 0.5.5 timing variability in
+        # constant-time ops. Enters only through elliptic-curve -> k256 ->
+        # solana-secp256k1-program in the agave validator stack, never the
+        # published client surface; the fix is 0.7.6, a major the k256 0.13
+        # chain does not permit. Revisit when agave moves to k256 0.14+.
         cargo-audit audit \
+          --ignore RUSTSEC-2026-0387 \
           --db "$DEVENV_ROOT/target/advisory-db-audit" \
           --url "https://github.com/RustSec/advisory-db.git" \
           --deny yanked \
