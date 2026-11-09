@@ -105,6 +105,7 @@ mod tests {
     "params": [
       "4Nd1mBQtrMJVYVfKf2PJy9NZUZdTAsp7D4xWLs4gDB4T",
       {
+        "encoding": "base64",
         "filters": [
           {
             "dataSize": 17

@@ -563,7 +563,7 @@ pub struct RpcEpochConfig {
 
 /// Configuration for methods that return a single account.
 #[skip_serializing_none]
-#[derive(Debug, Clone, Default, PartialEq, Eq, Serialize, Deserialize, TypedBuilder)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, TypedBuilder)]
 #[serde(rename_all = "camelCase")]
 pub struct RpcAccountInfoConfig {
 	/// <!-- {=encodingAccount|trim|linePrefix:"/// ":true} -->
@@ -571,6 +571,7 @@ pub struct RpcAccountInfoConfig {
 	/// <!-- {/encodingAccount} -->
 	///
 	/// Defaults to `base64`, which round trips any account regardless of size.
+	/// [`Default`] matches the builder: both set this field to `base64`.
 	#[builder(default = Some(UiAccountEncoding::Base64), setter(into, strip_option(fallback = encoding_opt)))]
 	pub encoding: Option<UiAccountEncoding>,
 	/// Return only a slice of the account data, given an offset and length.
@@ -590,6 +591,20 @@ pub struct RpcAccountInfoConfig {
 	/// when the commitment is `processed`. <!-- {/minContextSlot} -->
 	#[builder(default, setter(into, strip_option(fallback = min_context_slot_opt)))]
 	pub min_context_slot: Option<Slot>,
+}
+
+impl Default for RpcAccountInfoConfig {
+	fn default() -> Self {
+		Self {
+			// The builder already defaults here. `Default` has to match, or
+			// `..Default::default()` omits `encoding` and the node answers
+			// with `jsonParsed`, which `UiAccount::to_account` cannot decode.
+			encoding: Some(UiAccountEncoding::Base64),
+			data_slice: None,
+			commitment: None,
+			min_context_slot: None,
+		}
+	}
 }
 
 /// Configuration for `getProgramAccounts`.
