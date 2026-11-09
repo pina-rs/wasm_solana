@@ -144,7 +144,15 @@ in
     # The nix-only PATH sanitization drops /usr/bin on macOS, but vendored
     # build scripts depend on system tools: libusb1-sys (trezor-client via
     # solana-keypair) invokes `sw_vers` and aborts when it is missing.
-    export PATH="/usr/bin:/bin:/usr/sbin:/sbin:$PATH";
+    # Prepend only on Darwin. On Linux the same prepend puts the host
+    # /usr/bin/clang ahead of the pinned nix clang, and a host clang without
+    # libstdc++ fails the C++ configure check inside protobuf-src.
+    ${lib.optionalString pkgs.stdenv.hostPlatform.isDarwin ''
+      export PATH="/usr/bin:/bin:/usr/sbin:/sbin:$PATH";
+    ''}
+    ${lib.optionalString pkgs.stdenv.hostPlatform.isLinux ''
+      export PATH="$PATH:/usr/bin:/bin:/usr/sbin:/sbin";
+    ''}
     # Install the nightly rustfmt used by dprint before the git hooks run,
     # so the hook runner never races a concurrent toolchain update. Without
     # --force the install is idempotent: rustup skips it when the toolchain
