@@ -152,6 +152,17 @@ impl From<&SolanaRpcClient> for SolanaRpcClient {
 	}
 }
 
+/// Use `base64` when the caller left the account encoding unset.
+///
+/// [`Account`](solana_account::Account) reconstruction needs a binary
+/// encoding. The node default is `jsonParsed`, and that payload has no raw
+/// bytes, so an existing account would come back as missing.
+fn with_binary_encoding(config: &RpcAccountInfoConfig) -> RpcAccountInfoConfig {
+	let mut config = config.clone();
+	config.encoding = config.encoding.or(Some(UiAccountEncoding::Base64));
+	config
+}
+
 impl SolanaRpcClient {
 	/// Create an HTTP `SolanaRpcClient`.
 	///
@@ -277,6 +288,9 @@ impl SolanaRpcClient {
 
 	/// Return the account stored at `pubkey`, or `None` when the node knows
 	/// of no such account.
+	///
+	/// An unset `config.encoding` is sent as `base64`. An encoding the caller
+	/// set explicitly is left unchanged.
 	pub async fn get_account_with_config(
 		&self,
 		pubkey: &Pubkey,
@@ -284,7 +298,7 @@ impl SolanaRpcClient {
 	) -> ClientResult<Option<Account>> {
 		let request = GetAccountInfoRequest::builder()
 			.pubkey(*pubkey)
-			.config(config)
+			.config(with_binary_encoding(&config))
 			.build();
 		let response: ClientResponse<GetAccountInfoResponse> = self.send(request).await?;
 
@@ -716,6 +730,9 @@ impl SolanaRpcClient {
 
 	/// Return every account owned by `pubkey` that matches `config`, with
 	/// the commitment falling back to the client's default.
+	///
+	/// An unset account encoding is sent as `base64`. An encoding the caller
+	/// set explicitly is left unchanged.
 	pub async fn get_program_accounts_with_config(
 		&self,
 		pubkey: &Pubkey,
@@ -725,10 +742,10 @@ impl SolanaRpcClient {
 			.account_config
 			.commitment
 			.unwrap_or_else(|| self.commitment_config());
-		let account_config = RpcAccountInfoConfig {
+		let account_config = with_binary_encoding(&RpcAccountInfoConfig {
 			commitment: Some(commitment),
 			..config.account_config
-		};
+		});
 		let config = RpcProgramAccountsConfig {
 			account_config,
 			..config
@@ -1118,20 +1135,17 @@ impl SolanaRpcClient {
 			.await
 	}
 
-	/// Return the accounts stored at `pubkeys`.
+	/// Return the accounts stored at `pubkeys`, in request order.
 	///
-	/// Accounts that do not exist are omitted from the result, so the returned
-	/// vector is not positionally aligned with `pubkeys`. Accounts that exist
-	/// but cannot be decoded are kept as `None`.
+	/// Index `i` is `None` when that account does not exist or its data
+	/// cannot be decoded. An unset `config.encoding` is sent as `base64`.
+	/// An encoding the caller set explicitly is left unchanged.
 	pub async fn get_multiple_accounts_with_config(
 		&self,
 		pubkeys: &[Pubkey],
 		config: RpcAccountInfoConfig,
 	) -> ClientResult<Vec<Option<Account>>> {
-		let config = RpcAccountInfoConfig {
-			commitment: config.commitment,
-			..config
-		};
+		let config = with_binary_encoding(&config);
 
 		let request = GetMultipleAccountsRequest::new_with_config(pubkeys.to_vec(), config);
 		let response: ClientResponse<GetMultipleAccountsResponse> = self.send(request).await?;
