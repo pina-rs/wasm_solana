@@ -117,9 +117,16 @@ async fn dropping_the_handle_stops_the_callback() -> anyhow::Result<()> {
 		})
 		.await?;
 
-	// Slots arrive roughly every block; wait long enough for a healthy
-	// stream to have delivered several, then prove the drop stopped it.
-	tokio::time::sleep(Duration::from_secs(2)).await;
+	// The ordered-slot test allows 30s for the first notification. A fixed
+	// two-second sleep treats a live subscription as empty when the runner
+	// is still finishing the websocket handshake.
+	let started = std::time::Instant::now();
+	while received.load(std::sync::atomic::Ordering::Relaxed) == 0 {
+		if started.elapsed() > Duration::from_secs(30) {
+			anyhow::bail!("on_slot_change delivered no slot within 30s");
+		}
+		tokio::time::sleep(Duration::from_millis(50)).await;
+	}
 	let before = received.load(std::sync::atomic::Ordering::Relaxed);
 	drop(subscription);
 	tokio::time::sleep(Duration::from_secs(2)).await;

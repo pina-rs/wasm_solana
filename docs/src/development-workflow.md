@@ -35,7 +35,9 @@ The devenv git-hooks integration installs gitleaks secret scanning, dprint forma
 
 ## Benchmarking
 
-The `benchmark` workflow runs the criterion suites (`subscription`, `client`) on every pull request: once at the merge-base and once at the PR head, so the numbers isolate exactly what the PR changed. The comparison lands as a PR comment — one per PR, updated in place on every push — and the `benchmark` check fails when any benchmark's median regressed more than ten percent.
+The `benchmark` workflow runs the criterion suites (`subscription`, `client`) on every pull request. It builds the merge-base and head bench binaries once, with the head harness sources overlaid on the base, then runs each binary with `--bench` in the order base, head, head, base. Criterion 0.8 writes `estimates.json` only in that mode; a bare executable runs one test iteration and records nothing.
+
+A benchmark fails the check when both orders are slower than the base by more than ten percent and that slowdown is larger than the gap between the two runs of the same binary. When the orders disagree, or the slowdown sits inside that repeat gap, the report marks the row inconclusive and the check stays green. New and removed benchmarks are reported the same way. An empty result directory fails the job. The comparison is posted as one PR comment, updated in place on every push.
 
 A regression is still mergeable when the PR description carries a `## Benchmark Justification` section explaining the tradeoff: the check passes with the section present, and the comment makes the decision visible to reviewers. Make `benchmark` a required status check to enforce that on merge.
 
