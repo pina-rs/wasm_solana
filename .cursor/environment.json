@@ -1,0 +1,4 @@
+{
+	"name": "wasm_solana",
+	"install": "bash .cursor/install.sh"
+}
