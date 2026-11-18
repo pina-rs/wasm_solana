@@ -138,5 +138,9 @@ zstd = [
 	"solana-account-decoder-wasm/zstd",
 ]
 
+# `getrandom` 0.4's `wasm_js` backend has to be enabled on every wasm32 build,
+# including ones that do not turn on the `js` feature. This repeats the direct
+# dependency under the same name so the feature is added without linking
+# getrandom a second time.
 [target.'cfg(all(target_arch = "wasm32", target_os = "unknown"))'.dependencies]
-getrandom-04 = { default-features = false, features = ["wasm_js"], package = "getrandom", version = "^0.4" }
+getrandom = { workspace = true, default-features = true, features = ["wasm_js"] }
