@@ -11,7 +11,7 @@ use std::sync::Mutex;
 use anyhow::Result;
 use crossbeam_channel::unbounded;
 use port_check::is_local_ipv4_port_free;
-use rand::Rng;
+use rand::RngExt;
 use solana_account::AccountSharedData;
 use solana_clock::Slot;
 use solana_commitment_config::CommitmentConfig;
