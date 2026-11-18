@@ -5,8 +5,15 @@ name: benchmark
 # benchmark regressed.
 #
 # Base is the merge-base rather than the tip of main, so the numbers isolate
-# what this PR changed. The gate is the escape hatch the comment explains: a
-# regression fails this check unless the PR description carries a
+# what this PR changed. Each binary is built once and run twice, in the order
+# base, head, head, base. A later process on a shared runner is often slower
+# or faster than an earlier one by more than the threshold, even for identical
+# code; reversing the order flips that bias. A benchmark gates only when both
+# orders are slower than the threshold and that slowdown exceeds the gap
+# between the two runs of the same binary. Disagreement, or a slowdown inside
+# the repeat gap, is inconclusive and does not gate.
+#
+# A regression fails this check unless the PR description carries a
 # "## Benchmark Justification" section acknowledging the tradeoff, which turns
 # the failure into a visible, reviewable decision instead of a silent one.
 # Make this job a required status check to enforce it on merge.
@@ -27,8 +34,8 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  # Shared runners only ever make a benchmark slower, so a generous relative
-  # threshold keeps noise from gating merges.
+  # A quiet runner still gates a real slowdown of this size. Between-run
+  # machine noise is measured per benchmark and is not folded into this number.
   BENCH_THRESHOLD_PCT: "10"
 
 jobs:
@@ -74,25 +81,11 @@ jobs:
           echo "base=$BASE_SHA" >> "$GITHUB_OUTPUT"
           echo "head=$HEAD_SHA" >> "$GITHUB_OUTPUT"
 
-      - name: benchmark the base and head in one shell
-        run: |
-          set -euo pipefail
-          # Initialize devenv on the head once. Re-entering it while the base
-          # is checked out can format historical sources and prevent the
-          # checkout back to the head. Both runs share one shell environment.
-          # Use the same benchmark harness for both revisions so changes to
-          # fixture setup or timing cannot masquerade as runtime changes.
-          benchmark_source=crates/wasm_client_solana/benches/subscription.rs
-          git show "$(cat .benchmark/head-sha):$benchmark_source" > .benchmark/subscription.rs
-          export CRITERION_HOME="$(pwd)/.benchmark/criterion-base"
-          git checkout --detach "$(cat .benchmark/base-sha)"
-          cp .benchmark/subscription.rs "$benchmark_source"
-          cargo bench --locked --package wasm_client_solana --features ssr
-
-          export CRITERION_HOME="$(pwd)/.benchmark/criterion-head"
-          git restore -- "$benchmark_source"
-          git checkout --detach "$(cat .benchmark/head-sha)"
-          cargo bench --locked --package wasm_client_solana --features ssr
+      - name: benchmark the base and head in balanced order
+        # Initialize devenv on the head once. The pair script checks the base
+        # out inside this same shell; re-entering devenv on the base can format
+        # historical sources and prevent the checkout back to the head.
+        run: bash setup/scripts/benchmark_pair.sh
         shell: devenv shell -c -- bash -e {0}
 
       - name: compare the runs
@@ -103,8 +96,10 @@ jobs:
         run: |
           set -euo pipefail
           python3 setup/scripts/benchmark_compare.py \
-            --base .benchmark/criterion-base \
-            --head .benchmark/criterion-head \
+            --base-first .benchmark/runs/base-first \
+            --head-second .benchmark/runs/head-second \
+            --head-first .benchmark/runs/head-first \
+            --base-second .benchmark/runs/base-second \
             --threshold-pct "$THRESHOLD" \
             --markdown benchmark-report.md \
             --status benchmark-status.json
@@ -112,11 +107,11 @@ jobs:
           {
             echo "# Benchmark comparison"
             echo
-            echo "Base \`${BASE_SHA}\` vs head \`${HEAD_SHA}\` (median, threshold ${THRESHOLD}%)."
+            echo "Base \`${BASE_SHA}\` vs head \`${HEAD_SHA}\`. Each binary ran twice, base-first and head-first. A row gates when both orders are slower than ${THRESHOLD}% and that slowdown exceeds the repeat gap."
             echo
             cat benchmark-report.md
             echo
-            echo "Regressions gate this check. To merge despite one, describe the tradeoff in a \`## Benchmark Justification\` section of the PR description."
+            echo "Regressions gate this check. Inconclusive rows stay green. To merge despite a regression, describe the tradeoff in a \`## Benchmark Justification\` section of the PR description."
           } >> "$GITHUB_STEP_SUMMARY"
 
       - name: comment the report on the PR
@@ -135,16 +130,19 @@ jobs:
             const verdict = status.regressions > 0
               ? `**${status.regressions} benchmark regression${status.regressions === 1 ? '' : 's'}** — merge needs a justification`
               : 'No regressions above threshold';
+            const noise = status.inconclusive > 0
+              ? ` ${status.inconclusive} inconclusive (the two run orders disagree, or the change is inside the same-binary repeat gap).`
+              : '';
 
             const body = [
               marker,
               '## Benchmark comparison',
               '',
-              `${verdict} (median, threshold ${status.threshold_pct}%).`,
+              `${verdict} (threshold ${status.threshold_pct}%).${noise}`,
               '',
               report,
               '',
-              'Regressions gate the `benchmark` check. To merge despite one, describe the tradeoff in a `## Benchmark Justification` section of the PR description.',
+              'A row gates when both run orders (base-then-head and head-then-base) are slower than the threshold by more than the gap between the two runs of the same binary. Inconclusive rows stay green. To merge despite a regression, describe the tradeoff in a `## Benchmark Justification` section of the PR description.',
             ].join('\n');
 
             const { data: comments } = await github.rest.issues.listComments({
