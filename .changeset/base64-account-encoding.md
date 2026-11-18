@@ -1,5 +1,5 @@
 ---
-wasm_client_solana: patch
+wasm_client_solana: major
 ---
 
 # Request base64 when an account encoding is left unset
