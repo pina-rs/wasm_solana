@@ -84,7 +84,11 @@ run_suite() {
 
 	for bin in "$bin_dir"/*; do
 		[ -f "$bin" ] || continue
-		"$bin"
+		# Criterion 0.8 treats a bare harness=false executable as `cargo test
+		# --benches`: it prints "Testing" / "Success" and writes no
+		# estimates.json. `cargo bench` passes `--bench`, which selects
+		# benchmark mode.
+		"$bin" --bench
 	done
 }
 
