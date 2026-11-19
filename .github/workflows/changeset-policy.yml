@@ -84,7 +84,7 @@ jobs:
       # also compares each attached changeset bump with the classified change
       # type, so a changeset that understates a high-confidence break fails.
       - name: enforce changeset policy
-        uses: monochange/actions/changeset-policy@77fe97c0119e8c16e429d6f5cf94859b097cdcf8 # v0.10.1
+        uses: monochange/actions/changeset-policy@104b58f3ff8b6d3a6153a87a553a2bdaaa42a78f # v0.12.0
         with:
           setup-monochange: false
           github-token: ${{ secrets.GITHUB_TOKEN }}
