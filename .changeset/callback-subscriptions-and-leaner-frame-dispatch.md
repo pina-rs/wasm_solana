@@ -1,9 +1,0 @@
----
-wasm_client_solana: minor
----
-
-# Callback-driven subscriptions and leaner frame dispatch
-
-Every `*_subscribe` method now has an `on_*` callback counterpart: `on_account_change`, `on_block`, `on_logs`, `on_program_change`, `on_signature`, `on_slot_change`, `on_root_change`, `on_slots_updates` and `on_vote`, plus a generic `subscribe_with_callback` escape hatch. The callback receives the notification payload — the same type the stream flavor yields from `params.result` — on the target's runtime (`wasm-bindgen-futures` in the browser, `tokio::spawn` under `ssr`), so callers no longer need to spawn their own consumer task; the browser tests' `spawn_local` workaround for driving streams becomes unnecessary. The returned `CallbackSubscription` handle exposes `id`/`subscription_id`, `is_stopped`, a `detach` that keeps the pump running after the handle is dropped, and an `unsubscribe` that stops the callback first and then sends the server unsubscribe, waiting for its ack. Dropping the handle stops the callback _and_ asks the server to unsubscribe in the background — the fire-and-forget teardown a stream `Drop` cannot offer, since the pump task sends the request as it exits.
-
-Subscription dispatch is also cheaper on busy sockets: incoming frames are now matched against the notification method and subscription id with two JSON pointer probes before any typed deserialization, so a subscription only pays full deserialization for frames that belong to it (previously every frame on the socket was fully deserialized by every fork). Acknowledgement and unsubscription-ack waits apply the same probe against the response `id`. The websocket sink now carries `ClientRequest` envelopes directly — serialized to text exactly once — instead of round-tripping through an intermediate `Value` copy, and the HTTP providers assemble envelopes through the new `ClientRequest::from_params` without re-serializing already-encoded params.
