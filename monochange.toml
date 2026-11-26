@@ -133,7 +133,8 @@ packages = [
 	"solana-account-decoder-wasm",
 	"solana-transaction-status-wasm",
 ]
-release = true
+# No GitHub release for the forks: without a tag a release can only ever stay a draft.
+release = false
 tag = false
 version_format = "namespaced"
 # The forks track upstream Agave versions, so their release history lives
