@@ -77,7 +77,7 @@ dependencies = [
  "solana-bls-signatures",
  "solana-signer-store",
  "thiserror 2.0.21",
- "wincode",
+ "wincode 0.5.5",
 ]
 
 [[package]]
@@ -108,7 +108,7 @@ dependencies = [
  "solana-signer-store",
  "solana-streamer",
  "thiserror 2.0.21",
- "wincode",
+ "wincode 0.5.5",
 ]
 
 [[package]]
@@ -297,7 +297,7 @@ dependencies = [
  "tar",
  "tempfile",
  "thiserror 2.0.21",
- "wincode",
+ "wincode 0.5.5",
  "zstd 0.13.4",
 ]
 
@@ -359,7 +359,7 @@ dependencies = [
  "solana-transaction 4.1.6",
  "solana-transaction-error 3.3.2",
  "thiserror 2.0.21",
- "wincode",
+ "wincode 0.5.5",
 ]
 
 [[package]]
@@ -381,7 +381,7 @@ dependencies = [
  "solana-short-vec 3.2.2",
  "solana-signer-store",
  "thiserror 2.0.21",
- "wincode",
+ "wincode 0.5.5",
 ]
 
 [[package]]
@@ -4964,7 +4964,7 @@ dependencies = [
  "solana-transaction-context",
  "solana-transaction-error 3.3.2",
  "thiserror 2.0.21",
- "wincode",
+ "wincode 0.5.5",
 ]
 
 [[package]]
@@ -7654,7 +7654,7 @@ dependencies = [
  "spl-token-interface 3.0.0",
  "spl-token-metadata-interface 1.0.1",
  "thiserror 2.0.21",
- "wincode",
+ "wincode 0.5.5",
  "zstd 0.13.4",
 ]
 
@@ -7714,7 +7714,7 @@ dependencies = [
  "spl-token-interface 3.0.0",
  "spl-token-metadata-interface 1.0.1",
  "thiserror 2.0.21",
- "wincode",
+ "wincode 0.6.3",
  "zstd 0.14.3",
 ]
 
@@ -7821,7 +7821,7 @@ dependencies = [
  "solana-program-error 3.0.1",
  "solana-sanitize 3.0.1",
  "solana-sha256-hasher 3.1.0",
- "wincode",
+ "wincode 0.5.5",
 ]
 
 [[package]]
@@ -7857,7 +7857,7 @@ dependencies = [
  "solana-pubkey 4.2.1",
  "solana-sdk-ids 3.1.0",
  "solana-slot-hashes 3.1.0",
- "wincode",
+ "wincode 0.5.5",
 ]
 
 [[package]]
@@ -8024,7 +8024,7 @@ dependencies = [
  "serde",
  "solana-sanitize 3.0.1",
  "solana-time-utils",
- "wincode",
+ "wincode 0.5.5",
 ]
 
 [[package]]
@@ -8050,7 +8050,7 @@ dependencies = [
  "solana-signer",
  "subtle",
  "thiserror 2.0.21",
- "wincode",
+ "wincode 0.5.5",
  "zeroize",
 ]
 
@@ -8353,7 +8353,7 @@ dependencies = [
  "solana-sdk-ids 3.1.0",
  "solana-sdk-macro 3.0.1",
  "solana-sysvar-id 3.1.0",
- "wincode",
+ "wincode 0.5.5",
 ]
 
 [[package]]
@@ -8600,7 +8600,7 @@ dependencies = [
  "tokio",
  "tokio-util 0.7.19",
  "trees",
- "wincode",
+ "wincode 0.5.5",
 ]
 
 [[package]]
@@ -8782,7 +8782,7 @@ dependencies = [
  "solana-transaction 4.1.6",
  "solana-transaction-error 3.3.2",
  "thiserror 2.0.21",
- "wincode",
+ "wincode 0.5.5",
 ]
 
 [[package]]
@@ -8822,7 +8822,7 @@ dependencies = [
  "solana-sdk-ids 3.1.0",
  "solana-sdk-macro 3.0.1",
  "solana-sysvar-id 3.1.0",
- "wincode",
+ "wincode 0.5.5",
 ]
 
 [[package]]
@@ -8862,7 +8862,7 @@ dependencies = [
  "solana-sdk-ids 3.1.0",
  "solana-sdk-macro 3.0.1",
  "solana-sysvar-id 3.1.0",
- "wincode",
+ "wincode 0.5.5",
 ]
 
 [[package]]
@@ -8910,7 +8910,7 @@ dependencies = [
  "spl-memo-interface",
  "thiserror 2.0.21",
  "tokio",
- "wincode",
+ "wincode 0.5.5",
 ]
 
 [[package]]
@@ -8993,7 +8993,7 @@ dependencies = [
  "log",
  "serde",
  "serde_derive",
- "wincode",
+ "wincode 0.5.5",
 ]
 
 [[package]]
@@ -9165,7 +9165,7 @@ dependencies = [
  "solana-wincode-varint",
  "static_assertions",
  "thiserror 2.0.21",
- "wincode",
+ "wincode 0.5.5",
 ]
 
 [[package]]
@@ -9219,7 +9219,7 @@ dependencies = [
  "serde_derive",
  "solana-atomic-u64 3.0.1",
  "solana-sanitize 3.0.1",
- "wincode",
+ "wincode 0.5.5",
 ]
 
 [[package]]
@@ -9291,7 +9291,7 @@ dependencies = [
  "solana-define-syscall 5.2.0",
  "solana-instruction-error",
  "solana-pubkey 4.2.1",
- "wincode",
+ "wincode 0.5.5",
 ]
 
 [[package]]
@@ -9304,7 +9304,7 @@ dependencies = [
  "serde",
  "serde_derive",
  "solana-program-error 3.0.1",
- "wincode",
+ "wincode 0.5.5",
 ]
 
 [[package]]
@@ -9425,7 +9425,7 @@ dependencies = [
  "solana-sdk-ids 3.1.0",
  "solana-sdk-macro 3.0.1",
  "solana-sysvar-id 3.1.0",
- "wincode",
+ "wincode 0.5.5",
 ]
 
 [[package]]
@@ -9547,7 +9547,7 @@ dependencies = [
  "tokio",
  "tokio-stream",
  "trees",
- "wincode",
+ "wincode 0.5.5",
 ]
 
 [[package]]
@@ -9633,7 +9633,7 @@ dependencies = [
  "solana-pubkey 4.2.1",
  "solana-sdk-ids 3.1.0",
  "solana-system-interface 3.2.0",
- "wincode",
+ "wincode 0.5.5",
 ]
 
 [[package]]
@@ -9738,7 +9738,7 @@ dependencies = [
  "solana-sdk-ids 3.1.0",
  "solana-short-vec 3.2.2",
  "solana-transaction-error 3.3.2",
- "wincode",
+ "wincode 0.5.5",
 ]
 
 [[package]]
@@ -9844,7 +9844,7 @@ dependencies = [
  "solana-hash 4.5.0",
  "solana-pubkey 4.2.1",
  "solana-sha256-hasher 3.1.0",
- "wincode",
+ "wincode 0.5.5",
 ]
 
 [[package]]
@@ -9857,7 +9857,7 @@ dependencies = [
  "solana-hash 4.5.0",
  "solana-nonce 3.2.1",
  "solana-sdk-ids 3.1.0",
- "wincode",
+ "wincode 0.5.5",
 ]
 
 [[package]]
@@ -9941,7 +9941,7 @@ dependencies = [
  "solana-signature",
  "solana-time-utils",
  "solana-transaction-context",
- "wincode",
+ "wincode 0.5.5",
 ]
 
 [[package]]
@@ -10252,7 +10252,7 @@ dependencies = [
  "solana-sysvar-id 3.1.0",
  "solana-transaction-context",
  "thiserror 2.0.21",
- "wincode",
+ "wincode 0.5.5",
 ]
 
 [[package]]
@@ -10483,7 +10483,7 @@ dependencies = [
  "solana-sdk-ids 3.1.0",
  "solana-sdk-macro 3.0.1",
  "solana-sysvar-id 3.1.0",
- "wincode",
+ "wincode 0.5.5",
 ]
 
 [[package]]
@@ -10494,7 +10494,7 @@ checksum = "dc553b782111862cd6c56bdeba696dcba9722a42154ef1248c5a06ca1d983797"
 dependencies = [
  "serde",
  "serde_derive",
- "wincode",
+ "wincode 0.5.5",
 ]
 
 [[package]]
@@ -10578,7 +10578,7 @@ dependencies = [
  "thiserror 2.0.21",
  "tokio",
  "tokio-util 0.7.19",
- "wincode",
+ "wincode 0.5.5",
 ]
 
 [[package]]
@@ -10621,7 +10621,7 @@ dependencies = [
  "solana-version",
  "solana-vote-interface 6.0.3",
  "tokio",
- "wincode",
+ "wincode 0.5.5",
 ]
 
 [[package]]
@@ -10814,7 +10814,7 @@ dependencies = [
  "strum_macros 0.28.0",
  "tempfile",
  "thiserror 2.0.21",
- "wincode",
+ "wincode 0.5.5",
 ]
 
 [[package]]
@@ -10837,7 +10837,7 @@ dependencies = [
  "solana-transaction 4.1.6",
  "solana-transaction-context",
  "solana-transaction-error 3.3.2",
- "wincode",
+ "wincode 0.5.5",
 ]
 
 [[package]]
@@ -11102,7 +11102,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7d8250a4495aad49ad20556a607da53bdcb20de78da10b65afbf918b7f1de647"
 dependencies = [
  "serde_core",
- "wincode",
+ "wincode 0.5.5",
 ]
 
 [[package]]
@@ -11131,7 +11131,7 @@ dependencies = [
  "serde-big-array",
  "serde_derive",
  "solana-sanitize 3.0.1",
- "wincode",
+ "wincode 0.5.5",
 ]
 
 [[package]]
@@ -11181,7 +11181,7 @@ dependencies = [
  "solana-hash 4.5.0",
  "solana-sdk-ids 3.1.0",
  "solana-sysvar-id 3.1.0",
- "wincode",
+ "wincode 0.5.5",
 ]
 
 [[package]]
@@ -11209,7 +11209,7 @@ dependencies = [
  "solana-get-sysvar",
  "solana-sdk-ids 3.1.0",
  "solana-sysvar-id 3.1.0",
- "wincode",
+ "wincode 0.5.5",
 ]
 
 [[package]]
@@ -11244,7 +11244,7 @@ dependencies = [
  "solana-get-sysvar",
  "solana-sdk-ids 3.1.0",
  "solana-sysvar-id 3.1.0",
- "wincode",
+ "wincode 0.5.5",
 ]
 
 [[package]]
@@ -11286,7 +11286,7 @@ dependencies = [
  "solana-system-interface 3.2.0",
  "solana-sysvar 4.1.0",
  "solana-sysvar-id 3.1.0",
- "wincode",
+ "wincode 0.5.5",
 ]
 
 [[package]]
@@ -11350,7 +11350,7 @@ dependencies = [
  "solana-transaction-status",
  "thiserror 2.0.21",
  "tonic-prost-build",
- "wincode",
+ "wincode 0.5.5",
 ]
 
 [[package]]
@@ -11540,7 +11540,7 @@ dependencies = [
  "solana-sysvar-id 3.1.0",
  "solana-transaction-context",
  "thiserror 2.0.21",
- "wincode",
+ "wincode 0.5.5",
 ]
 
 [[package]]
@@ -11587,7 +11587,7 @@ dependencies = [
  "solana-instruction 3.4.1",
  "solana-msg 3.1.0",
  "solana-program-error 3.0.1",
- "wincode",
+ "wincode 0.5.5",
 ]
 
 [[package]]
@@ -11700,7 +11700,7 @@ dependencies = [
  "solana-slot-history 3.1.0",
  "solana-stake-history",
  "solana-sysvar-id 3.1.0",
- "wincode",
+ "wincode 0.5.5",
 ]
 
 [[package]]
@@ -11828,7 +11828,7 @@ dependencies = [
  "solana-transaction-error 3.3.2",
  "thiserror 2.0.21",
  "tokio",
- "wincode",
+ "wincode 0.5.5",
 ]
 
 [[package]]
@@ -11903,7 +11903,7 @@ dependencies = [
  "solana-signature",
  "solana-signer",
  "solana-transaction-error 3.3.2",
- "wincode",
+ "wincode 0.5.5",
 ]
 
 [[package]]
@@ -11921,7 +11921,7 @@ dependencies = [
  "solana-rent 4.3.0",
  "solana-sbpf",
  "solana-sdk-ids 3.1.0",
- "wincode",
+ "wincode 0.5.5",
 ]
 
 [[package]]
@@ -11944,7 +11944,7 @@ dependencies = [
  "serde_derive",
  "solana-instruction-error",
  "solana-sanitize 3.0.1",
- "wincode",
+ "wincode 0.5.5",
 ]
 
 [[package]]
@@ -11988,7 +11988,7 @@ dependencies = [
  "spl-token-interface 3.0.0",
  "spl-token-metadata-interface 1.0.1",
  "thiserror 2.0.21",
- "wincode",
+ "wincode 0.5.5",
 ]
 
 [[package]]
@@ -12012,7 +12012,7 @@ dependencies = [
  "solana-transaction-context",
  "solana-transaction-error 3.3.2",
  "thiserror 2.0.21",
- "wincode",
+ "wincode 0.5.5",
 ]
 
 [[package]]
@@ -12057,7 +12057,7 @@ dependencies = [
  "spl-token-interface 3.0.0",
  "spl-token-metadata-interface 1.0.1",
  "thiserror 2.0.21",
- "wincode",
+ "wincode 0.6.3",
 ]
 
 [[package]]
@@ -12105,7 +12105,7 @@ dependencies = [
  "solana-time-utils",
  "solana-transaction-error 3.3.2",
  "thiserror 2.0.21",
- "wincode",
+ "wincode 0.5.5",
 ]
 
 [[package]]
@@ -12189,7 +12189,7 @@ dependencies = [
  "solana-sanitize 3.0.1",
  "solana-serde-varint 3.0.1",
  "solana-wincode-varint",
- "wincode",
+ "wincode 0.5.5",
 ]
 
 [[package]]
@@ -12301,7 +12301,7 @@ version = "1.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "6679e72a01dcfe7ff180f0e9d3a0d165e4e9664426930014f2702e7571c259c7"
 dependencies = [
- "wincode",
+ "wincode 0.5.5",
 ]
 
 [[package]]
@@ -12997,7 +12997,7 @@ dependencies = [
  "txtx-addon-network-svm",
  "txtx-addon-network-svm-types",
  "uuid",
- "wincode",
+ "wincode 0.5.5",
 ]
 
 [[package]]
@@ -14588,7 +14588,7 @@ dependencies = [
  "wasm-bindgen-futures",
  "wasm-bindgen-test",
  "web-sys",
- "wincode",
+ "wincode 0.6.3",
  "zstd 0.14.3",
 ]
 
@@ -14711,6 +14711,18 @@ dependencies = [
  "quote",
  "thiserror 2.0.21",
  "wincode-derive",
+]
+
+[[package]]
+name = "wincode"
+version = "0.6.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "063b5affe63fb4e584a33101d8808f01f2348b4f533db6223bf27263a0fdb9e9"
+dependencies = [
+ "pastey",
+ "proc-macro2",
+ "quote",
+ "thiserror 2.0.21",
 ]
 
 [[package]]
